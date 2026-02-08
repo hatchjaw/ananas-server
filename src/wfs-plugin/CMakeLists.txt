@@ -49,6 +49,7 @@ target_sources(ananasWFS
         UI/WFSInterfaceComponent.cpp
         UI/XYControllerComponent.cpp
         UI/ModuleComponent.cpp
+        UI/WfsLookAndFeel.cpp
 )
 
 target_link_libraries(ananasWFS

@@ -19,8 +19,8 @@ namespace ananas::WFS::UI
 
         enum ColourIds
         {
-            backgroundColourId = 0x1001000,
-            gridLineColourId = 0x1001001,
+            backgroundColourId = 0x2001500,
+            gridLineColourId = 0x2001501,
         };
 
         //======================================================================
@@ -60,9 +60,9 @@ namespace ananas::WFS::UI
 
             enum ColourIds
             {
-                backgroundColourId = 0x1002000,
-                borderColourId = 0x1002001,
-                textColourId = 0x1002002,
+                backgroundColourId = 0x2001600,
+                borderColourId = 0x2001601,
+                textColourId = 0x2001602,
             };
 
             //======================================================================

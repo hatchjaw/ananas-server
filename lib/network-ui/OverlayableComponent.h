@@ -15,10 +15,22 @@ namespace ananas::UI
 
         void resized() override;
 
-    private:
         class OverlayComponent final : public Component
         {
         public:
+            //==================================================================
+
+            enum ColourIds
+            {
+                backgroundColourId = 0x2001000,
+                boxShadowColourId = 0x2001001,
+                boxBackgroundColourId = 0x2001002,
+                boxBorderColourId = 0x2001003,
+                boxTextColourId = 0x2001004,
+            };
+
+            //==================================================================
+
             void paint(juce::Graphics &g) override;
 
             void setText(const juce::String &textToDisplay);
@@ -26,6 +38,7 @@ namespace ananas::UI
             juce::String text;
         };
 
+    private:
         std::unique_ptr<OverlayComponent> overlay;
     };
 } // ananas

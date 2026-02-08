@@ -1,4 +1,5 @@
 #include "OverlayableComponent.h"
+#include <AnanasLookAndFeel.h>
 #include "AnanasUIUtils.h"
 #include <Server.h>
 
@@ -48,37 +49,8 @@ namespace ananas::UI
 
     void OverlayableComponent::OverlayComponent::paint(juce::Graphics &g)
     {
-        // Semi-transparent background
-        g.fillAll(juce::Colours::black.withAlpha(Colours::OverlayBgAlpha));
-
-        // Calculate centered box
-        const auto box{
-            juce::Rectangle(Dimensions::OverlayBoxWidth, Dimensions::OverlayBoxHeight)
-            .withCentre(getLocalBounds().getCentre())
-        };
-
-        // Create shadow
-        const juce::DropShadow shadow(
-            juce::Colours::black.withAlpha(Colours::OverlayBoxShadowAlpha),
-            Dimensions::OverlayBoxBorderRadius * 2.f,
-            juce::Point(Dimensions::OverlayBoxShadowOffset,
-                        Dimensions::OverlayBoxShadowOffset));
-
-        // Draw the shadow
-        shadow.drawForRectangle(g, box);
-
-        // Draw opaque box
-        g.setColour(juce::Colours::white);
-        g.fillRoundedRectangle(box.toFloat(), Dimensions::OverlayBoxBorderRadius);
-
-        // Add border
-        g.setColour(juce::Colours::slategrey);
-        g.drawRoundedRectangle(box.toFloat(), Dimensions::OverlayBoxBorderRadius, Dimensions::OverlayBoxBorderThickness);
-
-        // Draw text
-        g.setColour(juce::Colours::black);
-        g.setFont(Dimensions::OverlayBoxTextSize);
-        g.drawText(text, box, juce::Justification::centred);
+        if (auto *lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())})
+            lnf->drawOverlay(g, *this, text);
     }
 
     void OverlayableComponent::OverlayComponent::setText(const juce::String &textToDisplay)

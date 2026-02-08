@@ -14,7 +14,7 @@ NetworkOverviewComponent::NetworkOverviewComponent(juce::ValueTree &dynamicTree,
 
 void NetworkOverviewComponent::paint(juce::Graphics &g)
 {
-    g.fillAll(juce::Colours::transparentWhite);
+    g.fillAll(findColour(backgroundColourId));
 }
 
 void NetworkOverviewComponent::resized()

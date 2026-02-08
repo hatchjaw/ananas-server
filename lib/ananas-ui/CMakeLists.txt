@@ -1,5 +1,5 @@
 add_library(ananas_ui STATIC
-        LookAndFeel.cpp
+        AnanasLookAndFeel.cpp
 )
 
 target_include_directories(ananas_ui
@@ -9,5 +9,6 @@ target_include_directories(ananas_ui
 
 target_link_libraries(ananas_ui
         PUBLIC
+        ananas_network_overview
         juce::juce_gui_basics
 )

@@ -19,8 +19,8 @@ PluginEditor::PluginEditor(PluginProcessor &p)
     setLookAndFeel(&lookAndFeel);
 
     addAndMakeVisible(tabbedComponent);
-    tabbedComponent.addTab(ananas::WFS::Strings::WfsTabName, ananas::WFS::UI::Colours::TabBackgroundColour, &wfsInterface, false);
-    tabbedComponent.addTab(ananas::WFS::Strings::NetworkTabName, ananas::WFS::UI::Colours::TabBackgroundColour, &networkOverview, false);
+    tabbedComponent.addTab(ananas::WFS::Strings::WfsTabName, juce::Colours::whitesmoke, &wfsInterface, false);
+    tabbedComponent.addTab(ananas::WFS::Strings::NetworkTabName, juce::Colours::whitesmoke, &networkOverview, false);
     lookAndFeel.setNumberOfTabs(tabbedComponent.getNumTabs());
 
     setSize(ananas::UI::Dimensions::UiWidth, ananas::UI::Dimensions::UiHeight);
@@ -61,7 +61,6 @@ void PluginEditor::resized()
 {
     lookAndFeel.setTotalWidth(getWidth());
     tabbedComponent.setBounds(getLocalBounds());
-    tabbedComponent.setLookAndFeel(&lookAndFeel);
 }
 
 void PluginEditor::valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged, const juce::Identifier &property)

@@ -1,6 +1,7 @@
 #ifndef CLIENTSOVERVIEWCOMPONENT_H
 #define CLIENTSOVERVIEWCOMPONENT_H
 
+#include <AnanasLookAndFeel.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "AnanasNetworkTable.h"
 
@@ -14,6 +15,15 @@ namespace ananas::UI
         explicit ClientsOverviewComponent(juce::ValueTree &treeToListenTo);
 
         ~ClientsOverviewComponent() override;
+
+        //======================================================================
+
+        enum ColourIds
+        {
+            backgroundColourId = 0x2001400
+        };
+
+        //======================================================================
 
         void update(const juce::var &var);
 
@@ -66,12 +76,10 @@ namespace ananas::UI
             void resized() override;
 
         private:
-            class LookAndFeel final : public juce::LookAndFeel_V4
+            class LookAndFeel final : public AnanasLookAndFeel
             {
-            public:
-                void drawTableHeaderColumn(juce::Graphics &, juce::TableHeaderComponent &,
-                                           const juce::String &columnName, int columnId, int width, int height,
-                                           bool isMouseOver, bool isMouseDown, int columnFlags) override;
+            protected:
+                juce::Justification getTableHeaderJustification(int columnId) override;
             };
 
             struct Row

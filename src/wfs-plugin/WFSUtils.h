@@ -178,45 +178,10 @@ namespace ananas::WFS
 
             constexpr static float NodeDiameter{40.f};
             constexpr static float NodeHalfDiameter{NodeDiameter / 2.f};
-            constexpr static float NodeBorderThickness{3.f};
-            constexpr static float NodeIndexFontSize{20.f};
 
             constexpr static int ModuleSelectorHeight{25};
             constexpr static int ModuleSpeakerHeight{25};
             constexpr static int ModuleHeight{ModuleSelectorHeight + ModuleSpeakerHeight};
-
-            constexpr static float SpeakerIconDimension{100.f};
-            constexpr static float SpeakerIconCoilStartX{26.f};
-            constexpr static float SpeakerIconCoilStartY{0.f};
-            constexpr static float SpeakerIconCoilWidth{SpeakerIconDimension - 2.f * SpeakerIconCoilStartX};
-            constexpr static float SpeakerIconCoilHeight{25.f};
-            constexpr static float SpeakerIconConeRightX{SpeakerIconDimension};
-            constexpr static float SpeakerIconConeEndY{SpeakerIconDimension};
-            constexpr static float SpeakerIconConeLeftX{0.f};
-            constexpr static float SpeakerIconOutlineThickness{0.f};
-        };
-
-        class Colours
-        {
-        public:
-            inline static const juce::Colour TabBackgroundColour{juce::Colours::lightgrey};
-
-            inline static const juce::Colour XYControllerGridlineColour{juce::Colours::lightgrey};
-
-            inline static const juce::Colour NodeBgColour{
-                juce::Colours::black
-                .withSaturation(.5f)
-                .withAlpha(.5f)
-            };
-            inline static const juce::Colour NodeBorderColour{juce::Colours::lightseagreen};
-            constexpr static float NodeBorderSaturationRange{.9f};
-            constexpr static float NodeBorderBrightnessMin{.2f};
-            constexpr static float NodeBorderBrightnessMax{.9f};
-            constexpr static float NodeBorderAlpha{.75f};
-            inline static const juce::Colour NodeIndexColour{juce::Colours::white};
-
-            inline static const juce::Colour SpeakerIconFillColour{juce::Colours::ghostwhite};
-            inline static const juce::Colour SpeakerIconOutlineColour{juce::Colours::darkgrey};
         };
 
         class Shortcuts

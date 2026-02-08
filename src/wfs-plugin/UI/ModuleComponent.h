@@ -18,7 +18,6 @@ namespace ananas::WFS::UI
 
         void shouldShowModuleSelector(bool show);
 
-    private:
         class SpeakerIconComponent final : public Component
         {
         public:
@@ -26,19 +25,16 @@ namespace ananas::WFS::UI
 
             enum ColourIds
             {
-                fillColourId = 0x1003000,
-                borderColourId = 0x1003001,
-                textColourId = 0x1003002,
+                fillColourId = 0x2001700,
+                borderColourId = 0x2001701
             };
 
             //==================================================================
 
             void paint(juce::Graphics &g) override;
-
-        private:
-            static juce::Path createSpeakerPath();
         };
 
+    private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleComponent)
 
         void setSelectedModule(const juce::var &var);

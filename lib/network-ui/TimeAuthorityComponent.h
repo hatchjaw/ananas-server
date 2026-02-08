@@ -1,6 +1,7 @@
 #ifndef TIMEAUTHORITYCOMPONENT_H
 #define TIMEAUTHORITYCOMPONENT_H
 
+#include <AnanasLookAndFeel.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "AnanasNetworkTable.h"
 
@@ -15,6 +16,15 @@ namespace ananas::UI
         explicit TimeAuthorityComponent(juce::ValueTree &treeToListenTo);
 
         ~TimeAuthorityComponent() override;
+
+        //======================================================================
+
+        enum ColourIds
+        {
+            backgroundColourId = 0x2001300
+        };
+
+        //======================================================================
 
         void update(const juce::var &var);
 
@@ -32,6 +42,8 @@ namespace ananas::UI
         public:
             TimeAuthorityTable();
 
+            ~TimeAuthorityTable() override;
+
             void update(const juce::var &var);
 
             int getNumRows() override;
@@ -43,6 +55,12 @@ namespace ananas::UI
             void resized() override;
 
         private:
+            class LookAndFeel final : public AnanasLookAndFeel
+            {
+            protected:
+                juce::Justification getTableHeaderJustification(int columnId) override;
+            };
+
             struct Row
             {
                 juce::String ip;
@@ -52,6 +70,7 @@ namespace ananas::UI
             };
 
             Row row{};
+            LookAndFeel lookAndFeel;
         };
 
         juce::Label title;

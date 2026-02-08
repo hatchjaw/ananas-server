@@ -1,8 +1,7 @@
 #ifndef PLUGINEDITOR_H
 #define PLUGINEDITOR_H
 
-#include <LookAndFeel.h>
-
+#include <AnanasLookAndFeel.h>
 #include "PluginProcessor.h"
 #include <NetworkOverviewComponent.h>
 

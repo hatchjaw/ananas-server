@@ -1,5 +1,6 @@
 #include "ModuleComponent.h"
 #include <AnanasUtils.h>
+#include "WfsLookAndFeel.h"
 #include "../WFSUtils.h"
 
 namespace ananas::WFS::UI
@@ -89,35 +90,7 @@ namespace ananas::WFS::UI
 
     void ModuleComponent::SpeakerIconComponent::paint(juce::Graphics &g)
     {
-        const auto speaker = createSpeakerPath();
-
-        const auto targetBounds = juce::Rectangle(0.f, 0.f,
-                                                  getBounds().toFloat().getWidth(),
-                                                  getBounds().toFloat().getHeight() - Dimensions::SpeakerIconOutlineThickness);
-
-        const juce::RectanglePlacement placement{juce::RectanglePlacement::stretchToFit};
-        const auto transform = placement.getTransformToFit(
-            speaker.getBounds(), targetBounds);
-
-        g.setColour(Colours::SpeakerIconFillColour);
-        g.fillPath(speaker, transform);
-
-        g.setColour(Colours::SpeakerIconOutlineColour);
-        g.strokePath(speaker, juce::PathStrokeType{Dimensions::SpeakerIconOutlineThickness, juce::PathStrokeType::mitered}, transform);
-    }
-
-    juce::Path ModuleComponent::SpeakerIconComponent::createSpeakerPath()
-    {
-        juce::Path speaker;
-
-        speaker.startNewSubPath(Dimensions::SpeakerIconCoilStartX, Dimensions::SpeakerIconCoilStartY);
-        speaker.lineTo(Dimensions::SpeakerIconCoilStartX + Dimensions::SpeakerIconCoilWidth, Dimensions::SpeakerIconCoilStartY);
-        speaker.lineTo(Dimensions::SpeakerIconCoilStartX + Dimensions::SpeakerIconCoilWidth, Dimensions::SpeakerIconCoilHeight);
-        speaker.lineTo(Dimensions::SpeakerIconConeRightX, Dimensions::SpeakerIconConeEndY);
-        speaker.lineTo(Dimensions::SpeakerIconConeLeftX, Dimensions::SpeakerIconConeEndY);
-        speaker.lineTo(Dimensions::SpeakerIconCoilStartX, Dimensions::SpeakerIconCoilHeight);
-        speaker.closeSubPath();
-
-        return speaker;
+        if (auto *lnf{dynamic_cast<WfsLookAndFeel *>(&getLookAndFeel())})
+            lnf->drawSpeakerIcon(g, *this);
     }
 } // ananas::WFS

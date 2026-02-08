@@ -1,6 +1,7 @@
 #ifndef SWITCHESCOMPONENT_H
 #define SWITCHESCOMPONENT_H
 
+#include <AnanasLookAndFeel.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "AnanasNetworkTable.h"
 
@@ -14,6 +15,15 @@ namespace ananas::UI
         SwitchesComponent(juce::ValueTree &dynamicTreeRef, juce::ValueTree &persistentTreeRef);
 
         ~SwitchesComponent() override;
+
+        //======================================================================
+
+        enum ColourIds
+        {
+            backgroundColourId = 0x2001200
+        };
+
+        //======================================================================
 
         void paint(juce::Graphics &g) override;
 
@@ -36,6 +46,8 @@ namespace ananas::UI
         {
         public:
             SwitchesTable();
+
+            ~SwitchesTable() override;
 
             void update(const juce::var &var);
 
@@ -61,6 +73,12 @@ namespace ananas::UI
             bool isEditing{false};
 
         private:
+            class LookAndFeel final : public AnanasLookAndFeel
+            {
+            protected:
+                juce::Justification getTableHeaderJustification(int columnId) override;
+            };
+
             struct Row
             {
                 juce::Identifier id;
@@ -73,6 +91,7 @@ namespace ananas::UI
 
             inline static const juce::Array<int> editableColumnIDs{1, 2, 3};
             constexpr static int passwordColumnID{3};
+            LookAndFeel lookAndFeel;
             juce::Array<Row> rows;
         };
 

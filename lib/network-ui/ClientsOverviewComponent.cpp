@@ -169,17 +169,15 @@ namespace ananas::UI
         addColumn(TableColumns::ClientTablePercentCPU);
         addColumn(TableColumns::ClientTableModuleID);
 
-        table.getHeader().setLookAndFeel(&lookAndFeel);
+        setLookAndFeel(&lookAndFeel);
 
         table.setModel(this);
-        table.setColour(juce::ListBox::outlineColourId, juce::Colours::black);
-        table.setColour(juce::ListBox::backgroundColourId, juce::Colours::transparentWhite);
         table.setOutlineThickness(1);
     }
 
     ClientsOverviewComponent::ClientTable::~ClientTable()
     {
-        table.getHeader().setLookAndFeel(nullptr);
+        setLookAndFeel(nullptr);
     }
 
     void ClientsOverviewComponent::ClientTable::update(const juce::var &clientInfo)
@@ -230,7 +228,11 @@ namespace ananas::UI
             g.fillAll(juce::Colours::white);
     }
 
-    void ClientsOverviewComponent::ClientTable::paintCell(juce::Graphics &g, const int rowNumber, const int columnId, const int width, const int height,
+    void ClientsOverviewComponent::ClientTable::paintCell(juce::Graphics &g,
+                                                          const int rowNumber,
+                                                          const int columnId,
+                                                          const int width,
+                                                          const int height,
                                                           bool rowIsSelected)
     {
         juce::ignoreUnused(rowIsSelected);
@@ -249,44 +251,33 @@ namespace ananas::UI
                 moduleID
             ] = rows[rowNumber];
             juce::String text;
-            juce::Justification justification{juce::Justification::centredLeft};
 
             switch (columnId) {
                 case 1: text = ip;
-                    justification = TableColumns::ClientTableIpAddress.justification;
                     break;
                 case 2: text = serialNumber;
-                    justification = TableColumns::ClientTableSerialNumber.justification;
                     break;
                 case 3: text = ptpLock ? "Yes" : "No";
-                    justification = TableColumns::ClientTablePTPLock.justification;
-                    g.setColour(ptpLock ? juce::Colours::lightseagreen : juce::Colours::palevioletred);
+                    g.setColour(ptpLock ? findColour(okColour) : findColour(warningColour));
                     g.fillRect(2, 2, width - 4, height - 4);
                     break;
                 case 4: text = Strings::formatWithThousandsSeparator(offsetTime + audioPTPOffset) +
                                " (" + juce::String(offsetFrame) +
                                (offsetFrame == 1 ? " frame)" : " frames)");
-                    justification = TableColumns::ClientTablePresentationTimeOffset.justification;
                     break;
                 case 5: text = juce::String(bufferFillPercent) + " %";
-                    justification = TableColumns::ClientTableBufferFillPercent.justification;
-                    g.setColour(bufferFillPercent > 80 || bufferFillPercent < 20 ? juce::Colours::palevioletred : juce::Colours::lightseagreen);
+                    g.setColour(bufferFillPercent > 80 || bufferFillPercent < 20 ? findColour(warningColour) : findColour(okColour));
                     g.fillRect(2, 2, static_cast<int>((width - 4) * (bufferFillPercent / 100.f)), height - 4);
                     break;
                 case 6: text = Strings::formatWithThousandsSeparator(samplingRate, 6);
-                    justification = TableColumns::ClientTableSamplingRate.justification;
                     break;
-                case 7: text = juce::String(percentCPU, 3);
-                    justification = TableColumns::ClientTablePercentCPU.justification;
+                case 7: text = juce::String{percentCPU, 3};
                     break;
                 case 8: text = juce::String{moduleID};
-                    justification = TableColumns::ClientTableModuleID.justification;
                 default: break;
             }
 
-            g.setColour(juce::Colours::black);
-            g.setFont(14.0f);
-            g.drawText(text, 2, 0, width - 4, height, justification, true);
+            g.drawText(text, 2, 0, width - 4, height, getJustification(columnId), true);
         }
     }
 
@@ -295,62 +286,18 @@ namespace ananas::UI
         table.setBounds(getLocalBounds().reduced(10));
     }
 
-    //==========================================================================
-
-    void ClientsOverviewComponent::ClientTable::LookAndFeel::drawTableHeaderColumn(
-        juce::Graphics &g,
-        juce::TableHeaderComponent &header,
-        const juce::String &columnName,
-        const int columnId,
-        const int width,
-        const int height,
-        const bool isMouseOver,
-        const bool isMouseDown,
-        const int columnFlags
-    )
+    juce::Justification ClientsOverviewComponent::ClientTable::LookAndFeel::getTableHeaderJustification(const int columnId)
     {
-        const auto highlightColour{header.findColour(juce::TableHeaderComponent::highlightColourId)};
-
-        if (isMouseDown)
-            g.fillAll(highlightColour);
-        else if (isMouseOver)
-            g.fillAll(highlightColour.withMultipliedAlpha(0.625f));
-
-        juce::Rectangle<int> area(width, height);
-        area.reduce(4, 0);
-
-        if ((columnFlags & (juce::TableHeaderComponent::sortedForwards | juce::TableHeaderComponent::sortedBackwards)) != 0) {
-            juce::Path sortArrow;
-            sortArrow.addTriangle(0.0f, 0.0f,
-                                  0.5f, (columnFlags & juce::TableHeaderComponent::sortedForwards) != 0 ? -0.8f : 0.8f,
-                                  1.0f, 0.0f);
-
-            g.setColour(juce::Colour(0x99000000));
-            g.fillPath(sortArrow, sortArrow.getTransformToScaleToFit(area.removeFromRight(height / 2).reduced(2).toFloat(), true));
-        }
-
-        g.setColour(header.findColour(juce::TableHeaderComponent::textColourId));
-        g.setFont(withDefaultMetrics(juce::FontOptions(static_cast<float>(height) * 0.5f, juce::Font::bold)));
-        auto justification{juce::Justification::centredLeft};
         switch (columnId) {
-            case 1: justification = TableColumns::ClientTableIpAddress.justification;
-                break;
-            case 2: justification = TableColumns::ClientTableSerialNumber.justification;
-                break;
-            case 3: justification = TableColumns::ClientTablePTPLock.justification;
-                break;
-            case 4: justification = TableColumns::ClientTablePresentationTimeOffset.justification;
-                break;
-            case 5: justification = TableColumns::ClientTableBufferFillPercent.justification;
-                break;
-            case 6: justification = TableColumns::ClientTableSamplingRate.justification;
-                break;
-            case 7: justification = TableColumns::ClientTablePercentCPU.justification;
-                break;
-            case 8: justification = TableColumns::ClientTableModuleID.justification;
-            default:
-                break;
+            case 1: return TableColumns::ClientTableIpAddress.justification;
+            case 2: return TableColumns::ClientTableSerialNumber.justification;
+            case 3: return TableColumns::ClientTablePTPLock.justification;
+            case 4: return TableColumns::ClientTablePresentationTimeOffset.justification;
+            case 5: return TableColumns::ClientTableBufferFillPercent.justification;
+            case 6: return TableColumns::ClientTableSamplingRate.justification;
+            case 7: return TableColumns::ClientTablePercentCPU.justification;
+            case 8: return TableColumns::ClientTableModuleID.justification;
+            default: return AnanasLookAndFeel::getTableHeaderJustification(columnId);
         }
-        g.drawFittedText(columnName, area, justification, 1);
     }
 }

@@ -24,7 +24,7 @@ namespace ananas::UI
 
         enum ColourIds
         {
-            //...
+            backgroundColourId = 0x2001100,
         };
 
         //======================================================================

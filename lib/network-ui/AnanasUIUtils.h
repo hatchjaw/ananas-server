@@ -15,20 +15,6 @@ namespace ananas::UI
         constexpr static int SwitchesSectionHeight{175};
         constexpr static int TimeAuthoritySectionHeight{112};
         constexpr static int NetworkSectionTitleHeight{40};
-
-        constexpr static int OverlayBoxWidth{400};
-        constexpr static int OverlayBoxHeight{200};
-        constexpr static float OverlayBoxBorderRadius{10.f};
-        constexpr static int OverlayBoxShadowOffset{4};
-        constexpr static float OverlayBoxTextSize{20.f};
-        constexpr static float OverlayBoxBorderThickness{5.f};
-    };
-
-    class Colours
-    {
-    public:
-        constexpr static float OverlayBgAlpha{.25f};
-        constexpr static float OverlayBoxShadowAlpha{.5f};
     };
 
     class Timing

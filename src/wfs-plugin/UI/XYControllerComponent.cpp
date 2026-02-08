@@ -1,7 +1,6 @@
 #include "XYControllerComponent.h"
 
-#include <LookAndFeel.h>
-
+#include "WfsLookAndFeel.h"
 #include "../WFSUtils.h"
 
 namespace ananas::WFS::UI
@@ -31,7 +30,7 @@ namespace ananas::WFS::UI
 
     void XYControllerComponent::paint(juce::Graphics &g)
     {
-        if (auto *lnf{dynamic_cast<ananas::UI::AnanasLookAndFeel *>(&getLookAndFeel())})
+        if (auto *lnf{dynamic_cast<WfsLookAndFeel *>(&getLookAndFeel())})
             lnf->drawXYController(g, *this);
     }
 
@@ -149,7 +148,7 @@ namespace ananas::WFS::UI
 
     void XYControllerComponent::Node::paint(juce::Graphics &g)
     {
-        if (auto *lnf{dynamic_cast<ananas::UI::AnanasLookAndFeel *>(&getLookAndFeel())})
+        if (const auto *lnf{dynamic_cast<WfsLookAndFeel *>(&getLookAndFeel())})
             lnf->drawXYControllerNode(g, *this, intensity);
     }
 
