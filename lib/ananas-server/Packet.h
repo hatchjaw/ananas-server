@@ -15,7 +15,7 @@ namespace ananas
             uint16_t numFrames;
         };
 
-        void prepare(int numChannels, int framesPerPacket, double sampleRate);
+        void prepare(uint numChannels, int framesPerPacket, double sampleRate);
 
         uint8_t *getAudioData();
 

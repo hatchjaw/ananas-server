@@ -37,7 +37,7 @@ private:
     [[nodiscard]] const PluginProcessor &getProcessor() const;
 
     juce::TooltipWindow tooltipWindow;
-    ananas::UI::LookAndFeel lookAndFeel;
+    ananas::UI::AnanasLookAndFeel lookAndFeel;
     juce::TabbedComponent tabbedComponent{juce::TabbedButtonBar::TabsAtTop};
     ananas::UI::NetworkOverviewComponent networkOverview;
     ananas::WFS::UI::WFSInterfaceComponent wfsInterface;

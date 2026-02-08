@@ -125,8 +125,8 @@ namespace ananas::WFS::UI
         juce::StringArray ips;
         if (auto *obj = var.getDynamicObject()) {
             for (const auto &prop: obj->getProperties()) {
-                auto module{obj->getProperty(prop.name)};
-                if (module.getProperty(ananas::Utils::Identifiers::ModuleIsConnectedPropertyID, false)) {
+                if (auto module{obj->getProperty(prop.name)};
+                    module.getProperty(ananas::Utils::Identifiers::ModuleIsConnectedPropertyID, false)) {
                     ips.add(prop.name.toString());
                 }
             }

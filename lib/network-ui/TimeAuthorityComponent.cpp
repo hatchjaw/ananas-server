@@ -21,7 +21,7 @@ TimeAuthorityComponent::~TimeAuthorityComponent()
     tree.removeListener(this);
 }
 
-void TimeAuthorityComponent::update(juce::var var)
+void TimeAuthorityComponent::update(const juce::var &var)
 {
     authorityTable.update(var);
 }
@@ -107,7 +107,7 @@ void TimeAuthorityComponent::TimeAuthorityTable::paintRowBackground(juce::Graphi
     g.fillAll(juce::Colours::white);
 }
 
-void TimeAuthorityComponent::TimeAuthorityTable::paintCell(juce::Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+void TimeAuthorityComponent::TimeAuthorityTable::paintCell(juce::Graphics &g, int rowNumber, const int columnId, const int width, const int height, bool rowIsSelected)
 {
     juce::ignoreUnused(rowIsSelected, rowNumber);
 

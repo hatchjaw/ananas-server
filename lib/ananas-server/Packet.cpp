@@ -3,7 +3,7 @@
 
 namespace ananas
 {
-    void AudioPacket::prepare(const int numChannels, const int framesPerPacket, const double sampleRate)
+    void AudioPacket::prepare(const uint numChannels, const int framesPerPacket, const double sampleRate)
     {
         setSize(sizeof(Header) + numChannels * framesPerPacket * sizeof(int16_t));
         fillWith(0);
@@ -46,7 +46,7 @@ namespace ananas
         copyFrom(&header, 0, sizeof(Header));
     }
 
-    void AudioPacket::setTime(timespec ts)
+    void AudioPacket::setTime(const timespec ts)
     {
         // Set the time a little ahead; a reproduction offset, and something to
         // compensate for the fact that it took a little while for the follow-up

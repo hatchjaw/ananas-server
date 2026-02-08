@@ -66,9 +66,9 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 
-    static BusesProperties getBusesProperties();
+    constexpr static size_t NumChannelsToSend{NUM_CHANNELS_TO_SEND};
 
-    constexpr static uint NumChannelsToSend{NUM_CHANNELS_TO_SEND};
+    BusesProperties getBusesProperties(size_t numSources);
 
     std::unique_ptr<ananas::Server::Server> server;
 

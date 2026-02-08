@@ -9,9 +9,17 @@ namespace ananas::Server
     class Constants
     {
     public:
+        /**
+         * The number of nanoseconds in one second.
+         */
         constexpr static int64_t NSPS{1'000'000'000};
 
+        /**
+         * The number of frames (per-channel samples) to transmit in each
+         * outgoing audio packet.
+         */
         constexpr static size_t FramesPerPacket{32};
+
         /**
          * Tweak this value such that clients stay in the middle of their
          * packet buffer.
@@ -19,9 +27,21 @@ namespace ananas::Server
          * packets; decrease it if they're reporting too few.
          */
         constexpr static int64_t PacketOffsetNs{NSPS / 62};
+
+        /**
+         * The number of audio packets stored by each client.
+         */
         constexpr static size_t ClientPacketBufferSize{50};
 
+        /**
+         * Capacity, in frames, of the server's FIFO buffer.
+         */
         constexpr static uint16_t FifoCapacityFrames{(1 << 10)};
+
+        /**
+         * Obsolete... report interval for the FIFO, i.e. how frequently to
+         * print the fill-level of the FIFO.
+         */
         constexpr static int FifoReportIntervalMs{2000};
 
         constexpr static size_t ListenerBufferSize{1500};

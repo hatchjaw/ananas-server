@@ -212,7 +212,7 @@ namespace ananas::UI
         return rows.size();
     }
 
-    void SwitchesComponent::SwitchesTable::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected)
+    void SwitchesComponent::SwitchesTable::paintRowBackground(juce::Graphics &g, const int rowNumber, int width, int height, const bool rowIsSelected)
     {
         juce::ignoreUnused(width, height);
 
@@ -224,7 +224,7 @@ namespace ananas::UI
             g.fillAll(juce::Colours::white);
     }
 
-    void SwitchesComponent::SwitchesTable::paintCell(juce::Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+    void SwitchesComponent::SwitchesTable::paintCell(juce::Graphics &g, const int rowNumber, const int columnId, const int width, const int height, bool rowIsSelected)
     {
         juce::ignoreUnused(rowIsSelected);
 

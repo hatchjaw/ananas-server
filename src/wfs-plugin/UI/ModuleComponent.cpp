@@ -60,11 +60,11 @@ namespace ananas::WFS::UI
 
     void ModuleComponent::setIndexForModule() const
     {
-        auto modules{tree.getProperty(ananas::Utils::Identifiers::ModulesParamID)};
+        const auto modules{tree.getProperty(ananas::Utils::Identifiers::ModulesParamID)};
         if (auto *obj = modules.getDynamicObject()) {
             for (const auto &prop: obj->getProperties()) {
                 if (prop.name.toString() == moduleSelector.getText()) {
-                    auto module{obj->getProperty(prop.name).getDynamicObject()};
+                    const auto module{obj->getProperty(prop.name).getDynamicObject()};
                     module->setProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, static_cast<int>(index));
                     tree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
                 }

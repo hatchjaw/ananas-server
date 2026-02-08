@@ -111,16 +111,26 @@ namespace ananas
 
         for (const auto &[ip, clientInfo]: clients) {
             auto *client{new juce::DynamicObject()};
-            const auto &info{clientInfo.getInfo()};
-            client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(info.serial));
-            client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, info.ptpLock);
-            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID, info.presentationOffsetNs);
-            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID, info.presentationOffsetFrame);
-            client->setProperty(Utils::Identifiers::ClientAudioPTPOffsetPropertyID, info.audioPTPOffsetNs);
-            client->setProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID, info.bufferFillPercent);
-            client->setProperty(Utils::Identifiers::ClientSamplingRatePropertyID, info.samplingRate);
-            client->setProperty(Utils::Identifiers::ClientPercentCPUPropertyID, info.percentCPU);
-            client->setProperty(Utils::Identifiers::ClientModuleIDPropertyID, info.moduleID);
+            const auto &[
+                serial,
+                samplingRate,
+                percentCPU,
+                presentationOffsetFrame,
+                presentationOffsetNs,
+                audioPTPOffsetNs,
+                bufferFillPercent,
+                ptpLock,
+                moduleID
+            ]{clientInfo.getInfo()};
+            client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(serial));
+            client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, ptpLock);
+            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID, presentationOffsetNs);
+            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID, presentationOffsetFrame);
+            client->setProperty(Utils::Identifiers::ClientAudioPTPOffsetPropertyID, audioPTPOffsetNs);
+            client->setProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID, bufferFillPercent);
+            client->setProperty(Utils::Identifiers::ClientSamplingRatePropertyID, samplingRate);
+            client->setProperty(Utils::Identifiers::ClientPercentCPUPropertyID, percentCPU);
+            client->setProperty(Utils::Identifiers::ClientModuleIDPropertyID, moduleID);
             object->setProperty(ip, client);
         }
 

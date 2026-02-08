@@ -218,7 +218,7 @@ namespace ananas::UI
         return rows.size();
     }
 
-    void ClientsOverviewComponent::ClientTable::paintRowBackground(juce::Graphics &g, int rowNumber, int width, int height, bool rowIsSelected)
+    void ClientsOverviewComponent::ClientTable::paintRowBackground(juce::Graphics &g, const int rowNumber, int width, int height, const bool rowIsSelected)
     {
         juce::ignoreUnused(width, height);
 
@@ -230,7 +230,8 @@ namespace ananas::UI
             g.fillAll(juce::Colours::white);
     }
 
-    void ClientsOverviewComponent::ClientTable::paintCell(juce::Graphics &g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+    void ClientsOverviewComponent::ClientTable::paintCell(juce::Graphics &g, const int rowNumber, const int columnId, const int width, const int height,
+                                                          bool rowIsSelected)
     {
         juce::ignoreUnused(rowIsSelected);
 
@@ -296,12 +297,19 @@ namespace ananas::UI
 
     //==========================================================================
 
-    void ClientsOverviewComponent::ClientTable::LookAndFeel::drawTableHeaderColumn(juce::Graphics &g, juce::TableHeaderComponent &header,
-                                                                                   const juce::String &columnName, int columnId, int width, int height,
-                                                                                   bool isMouseOver,
-                                                                                   bool isMouseDown, int columnFlags)
+    void ClientsOverviewComponent::ClientTable::LookAndFeel::drawTableHeaderColumn(
+        juce::Graphics &g,
+        juce::TableHeaderComponent &header,
+        const juce::String &columnName,
+        const int columnId,
+        const int width,
+        const int height,
+        const bool isMouseOver,
+        const bool isMouseDown,
+        const int columnFlags
+    )
     {
-        auto highlightColour = header.findColour(juce::TableHeaderComponent::highlightColourId);
+        const auto highlightColour{header.findColour(juce::TableHeaderComponent::highlightColourId)};
 
         if (isMouseDown)
             g.fillAll(highlightColour);
@@ -322,7 +330,7 @@ namespace ananas::UI
         }
 
         g.setColour(header.findColour(juce::TableHeaderComponent::textColourId));
-        g.setFont(withDefaultMetrics(juce::FontOptions((float) height * 0.5f, juce::Font::bold)));
+        g.setFont(withDefaultMetrics(juce::FontOptions(static_cast<float>(height) * 0.5f, juce::Font::bold)));
         auto justification{juce::Justification::centredLeft};
         switch (columnId) {
             case 1: justification = TableColumns::ClientTableIpAddress.justification;

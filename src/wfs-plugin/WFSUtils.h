@@ -222,8 +222,8 @@ namespace ananas::WFS
         class Shortcuts
         {
         public:
-            constexpr static int SwitchToWfsTabKeycode{'1'};
-            constexpr static int SwitchToNetworkTabKeycode{'2'};
+            constexpr static int SwitchToWfsTabKeycode{'w'};
+            constexpr static int SwitchToNetworkTabKeycode{'n'};
             constexpr static int ToggleModuleSelectorsKeycode{'m'};
         };
     }

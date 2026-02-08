@@ -20,6 +20,15 @@ namespace ananas::UI
     public:
         NetworkOverviewComponent(juce::ValueTree &dynamicTree, juce::ValueTree &persistentTree);
 
+        //======================================================================
+
+        enum ColourIds
+        {
+            //...
+        };
+
+        //======================================================================
+
         void paint(juce::Graphics &g) override;
 
         void resized() override;

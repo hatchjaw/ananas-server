@@ -3,7 +3,7 @@
 #include <AnanasUtils.h>
 
 PluginProcessor::PluginProcessor()
-    : AudioProcessor(getBusesProperties()),
+    : AudioProcessor(getBusesProperties(NumChannelsToSend)),
       server(std::make_unique<ananas::Server::Server>(NumChannelsToSend)),
       dynamicTree(ananas::Utils::Identifiers::DynamicTreeType),
       persistentTree(ananas::Utils::Identifiers::PersistentTreeType)
@@ -174,11 +174,11 @@ ananas::Server::Server &PluginProcessor::getServer() const
     return *server;
 }
 
-juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties()
+juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties(const size_t numSources)
 {
     BusesProperties buses;
 
-    for (size_t i{1}; i <= NumChannelsToSend; ++i) {
+    for (size_t i{1}; i <= numSources; ++i) {
         buses.addBus(true, ananas::Utils::Strings::getInputLabel(i), juce::AudioChannelSet::mono());
         buses.addBus(false, ananas::Utils::Strings::getOutputLabel(i), juce::AudioChannelSet::mono());
     }

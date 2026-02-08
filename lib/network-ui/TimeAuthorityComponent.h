@@ -16,7 +16,7 @@ namespace ananas::UI
 
         ~TimeAuthorityComponent() override;
 
-        void update(juce::var var);
+        void update(const juce::var &var);
 
         void paint(juce::Graphics &g) override;
 

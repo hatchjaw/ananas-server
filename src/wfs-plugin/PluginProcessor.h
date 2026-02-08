@@ -71,9 +71,9 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
 
-    BusesProperties getBusesProperties();
-
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+
+    BusesProperties getBusesProperties(size_t numSources);
 
     std::unique_ptr<ananas::Server::Server> server;
 
@@ -86,7 +86,7 @@ private:
     // For handling user-entered data that should be storable/retrievable.
     juce::ValueTree persistentTree;
 
-    juce::HashMap<int, std::atomic<float>*> sourceAmplitudes;
+    juce::HashMap<int, std::atomic<float> *> sourceAmplitudes;
 };
 
 

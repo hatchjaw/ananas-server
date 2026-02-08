@@ -99,7 +99,7 @@ namespace ananas::Server
         public:
             AudioSender(const Utils::SenderThreadSocketParams &p, Fifo &fifo);
 
-            bool prepare(int numChannels, int samplesPerBlockExpected, double sampleRate);
+            bool prepare(uint numChannels, int samplesPerBlockExpected, double sampleRate);
 
             void setPacketTime(timespec ts);
 

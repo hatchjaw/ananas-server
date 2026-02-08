@@ -4,7 +4,7 @@
 #include <AnanasUtils.h>
 
 PluginProcessor::PluginProcessor()
-    : AudioProcessor(getBusesProperties()),
+    : AudioProcessor(getBusesProperties(ananas::WFS::Constants::NumSources)),
       server(std::make_unique<ananas::Server::Server>(ananas::WFS::Constants::NumSources)),
       wfsMessenger(ananas::WFS::Sockets::WfsMessengerSocketParams),
       apvts(*this, nullptr, ananas::WFS::Identifiers::StaticTreeType, createParameterLayout()),
@@ -253,11 +253,11 @@ juce::HashMap<int, std::atomic<float> *> &PluginProcessor::getSourceAmplitudes()
     return sourceAmplitudes;
 }
 
-juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties()
+juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties(const size_t numSources)
 {
     BusesProperties buses;
 
-    for (size_t i{1}; i <= ananas::WFS::Constants::NumSources; ++i) {
+    for (size_t i{1}; i <= numSources; ++i) {
         buses.addBus(true, ananas::Utils::Strings::getInputLabel(i), juce::AudioChannelSet::mono());
         buses.addBus(false, ananas::Utils::Strings::getOutputLabel(i), juce::AudioChannelSet::mono());
     }

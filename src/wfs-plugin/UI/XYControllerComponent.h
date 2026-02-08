@@ -15,6 +15,16 @@ namespace ananas::WFS::UI
                               juce::AudioProcessorValueTreeState &apvts,
                               juce::HashMap<int, std::atomic<float> *> &sourceAmplitudes);
 
+        //======================================================================
+
+        enum ColourIds
+        {
+            backgroundColourId = 0x1001000,
+            gridLineColourId = 0x1001001,
+        };
+
+        //======================================================================
+
         void paint(juce::Graphics &g) override;
 
         void resized() override;
@@ -31,7 +41,12 @@ namespace ananas::WFS::UI
 
         void timerCallback() override;
 
-    private:
+        int getGridSpacingX() const;
+
+        int getMaxYMetres() const;
+
+        int getMinYMetres() const;
+
         class Node final : public Component,
                            public juce::AsyncUpdater,
                            public juce::SettableTooltipClient
@@ -40,6 +55,17 @@ namespace ananas::WFS::UI
             class Listener;
 
             explicit Node(int idx);
+
+            //======================================================================
+
+            enum ColourIds
+            {
+                backgroundColourId = 0x1002000,
+                borderColourId = 0x1002001,
+                textColourId = 0x1002002,
+            };
+
+            //======================================================================
 
             void paint(juce::Graphics &g) override;
 
@@ -112,6 +138,7 @@ namespace ananas::WFS::UI
             float intensity{-100.f};
         };
 
+    private:
         class ParameterAttachment final : Node::Listener
         {
         public:

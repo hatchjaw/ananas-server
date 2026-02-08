@@ -60,12 +60,10 @@ namespace ananas::Server
 
     bool Server::isConnected() const
     {
-        for (const auto &t: threads) {
-            if (!t->isConnected()) {
-                return false;
-            }
-        }
-        return true;
+        return std::all_of(threads.begin(), threads.end(), [](const AnanasThread *t)
+        {
+            return t->isConnected();
+        });
     }
 
     ClientList *Server::getClientList()
@@ -182,7 +180,7 @@ namespace ananas::Server
     {
     }
 
-    bool Server::AudioSender::prepare(const int numChannels, const int samplesPerBlockExpected, const double sampleRate)
+    bool Server::AudioSender::prepare(const uint numChannels, const int samplesPerBlockExpected, const double sampleRate)
     {
         juce::ignoreUnused(sampleRate);
 
@@ -209,7 +207,7 @@ namespace ananas::Server
         return Thread::stopThread(timeOutMilliseconds);
     }
 
-    void Server::AudioSender::changeListenerCallback(juce::ChangeBroadcaster *source)
+    void Server::AudioSender::changeListenerCallback(ChangeBroadcaster *source)
     {
         if (const auto *t = dynamic_cast<TimestampListener *>(source)) {
             setPacketTime(t->getPacketTime());

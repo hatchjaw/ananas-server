@@ -22,6 +22,17 @@ namespace ananas::WFS::UI
         class SpeakerIconComponent final : public Component
         {
         public:
+            //==================================================================
+
+            enum ColourIds
+            {
+                fillColourId = 0x1003000,
+                borderColourId = 0x1003001,
+                textColourId = 0x1003002,
+            };
+
+            //==================================================================
+
             void paint(juce::Graphics &g) override;
 
         private:

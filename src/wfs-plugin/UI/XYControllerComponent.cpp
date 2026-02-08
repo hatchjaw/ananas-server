@@ -1,4 +1,7 @@
 #include "XYControllerComponent.h"
+
+#include <LookAndFeel.h>
+
 #include "../WFSUtils.h"
 
 namespace ananas::WFS::UI
@@ -28,30 +31,8 @@ namespace ananas::WFS::UI
 
     void XYControllerComponent::paint(juce::Graphics &g)
     {
-        g.fillAll(juce::Colour{0.f, 0.f, 0.f, .1f});
-
-        g.setColour(Colours::XYControllerGridlineColour);
-        const auto right{getBounds().toFloat().getWidth()};
-
-        if (xGridSpacing > 0) {
-            // Draw positive x grid lines, one per metre
-            for (int x{getWidth() / 2}; x < getWidth(); x += xGridSpacing) {
-                g.drawVerticalLine(x, 0.f, getHeight());
-            }
-
-            // Draw negative x grid lines
-            for (int x{getWidth() / 2 - xGridSpacing}; x > 0; x -= xGridSpacing) {
-                g.drawVerticalLine(x, 0.f, getHeight());
-            }
-        }
-
-        const auto yZero{Constants::MaxYMetres * getHeight() / (Constants::MaxYMetres - Constants::MinYMetres)};
-        const auto unit{getHeight() / (Constants::MaxYMetres - Constants::MinYMetres)};
-
-        // y gridlines
-        for (int y{Constants::MinYMetres}; y < Constants::MaxYMetres; ++y) {
-            g.drawHorizontalLine(yZero - y * unit, 0.f, right);
-        }
+        if (auto *lnf{dynamic_cast<ananas::UI::AnanasLookAndFeel *>(&getLookAndFeel())})
+            lnf->drawXYController(g, *this);
     }
 
     void XYControllerComponent::resized()
@@ -145,6 +126,21 @@ namespace ananas::WFS::UI
         }
     }
 
+    int XYControllerComponent::getGridSpacingX() const
+    {
+        return xGridSpacing;
+    }
+
+    int XYControllerComponent::getMaxYMetres() const
+    {
+        return Constants::MaxYMetres;
+    }
+
+    int XYControllerComponent::getMinYMetres() const
+    {
+        return Constants::MinYMetres;
+    }
+
     //==========================================================================
 
     XYControllerComponent::Node::Node(const int idx) : index(idx)
@@ -153,27 +149,8 @@ namespace ananas::WFS::UI
 
     void XYControllerComponent::Node::paint(juce::Graphics &g)
     {
-        g.setColour(Colours::NodeBgColour);
-        g.fillEllipse(getLocalBounds().toFloat());
-        const auto level{(100.f + intensity) * .01f};
-        const auto saturation{1.0f - level * Colours::NodeBorderSaturationRange};
-        const auto brightness{
-            Colours::NodeBorderBrightnessMin +
-            level * Colours::NodeBorderBrightnessMax
-        };
-        g.setColour(juce::Colour::fromHSV(
-            Colours::NodeBorderColour.getHue(),
-            saturation,
-            brightness,
-            Colours::NodeBorderAlpha));
-        const auto bounds{getBounds().toFloat()};
-        g.drawEllipse(getLocalBounds().toFloat().withSizeKeepingCentre(
-                          bounds.getWidth() - Dimensions::NodeBorderThickness,
-                          bounds.getHeight() - Dimensions::NodeBorderThickness),
-                      Dimensions::NodeBorderThickness);
-        g.setColour(Colours::NodeIndexColour);
-        g.setFont(Dimensions::NodeIndexFontSize);
-        g.drawText(juce::String(index + 1), getLocalBounds(), juce::Justification::centred);
+        if (auto *lnf{dynamic_cast<ananas::UI::AnanasLookAndFeel *>(&getLookAndFeel())})
+            lnf->drawXYControllerNode(g, *this, intensity);
     }
 
     void XYControllerComponent::Node::mouseDown(const juce::MouseEvent &event)
@@ -366,7 +343,7 @@ namespace ananas::WFS::UI
         return index;
     }
 
-    void XYControllerComponent::Node::setIntensity(float newIntensity)
+    void XYControllerComponent::Node::setIntensity(const float newIntensity)
     {
         // Avoid unnecessary repaints
         if (isVisible() && std::abs(newIntensity - intensity) > 0.01f) {

@@ -114,7 +114,7 @@ void PluginEditor::getCommandInfo(const juce::CommandID commandID, juce::Applica
                 ananas::WFS::Strings::ToggleModuleSelectorsShortName,
                 ananas::WFS::Strings::ToggleModuleSelectorsDescription,
                 ananas::WFS::Strings::OptionsCommandCategoryName,
-                0);
+                wfsInterface.isVisible() ? 0 : juce::ApplicationCommandInfo::CommandFlags::isDisabled);
             result.addDefaultKeypress(ananas::WFS::UI::Shortcuts::ToggleModuleSelectorsKeycode, juce::ModifierKeys::noModifiers);
 
         default:

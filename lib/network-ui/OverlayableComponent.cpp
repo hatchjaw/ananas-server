@@ -18,11 +18,9 @@ namespace ananas::UI
         if (!isVisible()) return;
 
         if (const auto *server = dynamic_cast<Server::Server *>(source)) {
-            const auto connected{server->isConnected()};
-
             // If the server is connected and the overlay is present, get rid
             // of the overlay.
-            if (connected && overlay != nullptr) {
+            if (const auto connected{server->isConnected()}; connected && overlay != nullptr) {
                 overlay.reset();
             } else if (!connected) {
                 // If not connected and there's no overlay, create the overlay

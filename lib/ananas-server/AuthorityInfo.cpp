@@ -3,7 +3,7 @@
 
 namespace ananas
 {
-    void AuthorityInfo::handlePacket(const juce::String &senderIP, AuthorityAnnouncePacket *packet)
+    void AuthorityInfo::handlePacket(const juce::String &senderIP, const AuthorityAnnouncePacket *packet)
     {
         ip = senderIP;
         info = *packet;
