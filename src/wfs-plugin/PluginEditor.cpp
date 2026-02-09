@@ -80,11 +80,15 @@ juce::ApplicationCommandTarget *PluginEditor::getNextCommandTarget()
 
 void PluginEditor::getAllCommands(juce::Array<int> &commands)
 {
-    return commands.addArray({
+    commands.addArray({
         ananas::WFS::SwitchToWfsTab,
         ananas::WFS::SwitchToNetworkTab,
         ananas::WFS::ToggleModuleSelectorDisplay
     });
+
+    for (size_t m{0}; m < ananas::WFS::Constants::NumModules; m++) {
+        commands.add(ananas::WFS::RevealModuleSelector + static_cast<int>(m));
+    }
 }
 
 void PluginEditor::getCommandInfo(const juce::CommandID commandID, juce::ApplicationCommandInfo &result)
@@ -117,6 +121,19 @@ void PluginEditor::getCommandInfo(const juce::CommandID commandID, juce::Applica
             result.addDefaultKeypress(ananas::WFS::UI::Shortcuts::ToggleModuleSelectorsKeycode, juce::ModifierKeys::noModifiers);
 
         default:
+            const auto moduleID{commandID - ananas::WFS::RevealModuleSelector - 1};
+            const auto moduleSelectorsAreVisible{
+                getProcessor().getParamState().getRawParameterValue(ananas::WFS::Params::ShowModuleSelectors.id)->load() > .5f
+            };
+            result.setInfo(
+                ananas::WFS::Strings::getRevealModuleSelectorShortName(moduleID),
+                ananas::WFS::Strings::getRevealModuleSelectorDescription(moduleID),
+                ananas::WFS::Strings::ModulesCommandCategoryName,
+                wfsInterface.isVisible() && moduleSelectorsAreVisible ? 0 : juce::ApplicationCommandInfo::CommandFlags::isDisabled);
+            result.addDefaultKeypress(
+                ananas::WFS::UI::Shortcuts::RevealModuleSelectorListKeycode + commandID - ananas::WFS::RevealModuleSelector,
+                juce::ModifierKeys::noModifiers
+            );
             break;
     }
 }
@@ -139,7 +156,8 @@ bool PluginEditor::perform(const InvocationInfo &info)
         }
 
         default:
-            return false;
+            wfsInterface.expandModuleList(info.commandID - ananas::WFS::RevealModuleSelector);
+            return true;
     }
 }
 

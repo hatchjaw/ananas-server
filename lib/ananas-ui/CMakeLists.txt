@@ -2,6 +2,12 @@ add_library(ananas_ui STATIC
         AnanasLookAndFeel.cpp
 )
 
+set_target_properties(ananas_ui PROPERTIES
+        POSITION_INDEPENDENT_CODE ON
+        VERSION 0.1.0
+        SOVERSION 1
+)
+
 target_include_directories(ananas_ui
         PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}

@@ -12,8 +12,9 @@ namespace ananas::UI
     public:
         enum ColourIds
         {
-            okColour = 0x2001800,
-            warningColour = 0x2001801,
+            textColourId = 0x20018000,
+            okColourId = 0x2001801,
+            warningColourId = 0x2001802,
         };
     protected:
         void addColumn(const TableColumns::ColumnHeader &h);

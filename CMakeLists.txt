@@ -15,7 +15,7 @@ add_subdirectory(src/console-app)
 
 option(SHOW_NO_NETWORK_OVERLAY
         "Show UI overlay if a network connection cannot be established"
-        OFF)
+        ON)
 
 add_subdirectory(lib/ananas-ui)
 

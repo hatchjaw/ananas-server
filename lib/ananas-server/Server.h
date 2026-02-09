@@ -149,17 +149,18 @@ namespace ananas::Server
         public:
             explicit TimestampListener(const Utils::ListenerThreadSocketParams &p);
 
-            timespec getPacketTime() const;
+            bool isNewTimestampAvailable();
 
-            bool getTimestampChanged() const;
+            timespec getTimestamp() const noexcept;
 
         protected:
             void handlePacket() override;
 
         private:
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimestampListener);
-            timespec timestamp{};
-            bool timestampChanged{false};
+
+            std::atomic<bool> newTimestampAvailable{false};
+            std::atomic<timespec> timestamp{};
         };
 
         //======================================================================
@@ -201,8 +202,6 @@ namespace ananas::Server
         {
         public:
             RebootSender(const Utils::SenderThreadSocketParams &p, ClientList &clients);
-
-            bool prepare();
 
         protected:
             void runImpl() override;

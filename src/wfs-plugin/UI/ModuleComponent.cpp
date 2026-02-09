@@ -79,6 +79,16 @@ namespace ananas::WFS::UI
         resized();
     }
 
+    void ModuleComponent::expandModuleList()
+    {
+        moduleSelector.showPopup();
+    }
+
+    void ModuleComponent::collapseModuleList()
+    {
+        moduleSelector.hidePopup();
+    }
+
     void ModuleComponent::setSelectedModule(const juce::var &var)
     {
         if (var.isString()) {

@@ -9,6 +9,7 @@ namespace ananas::Server
     Server::Server(const uint numChannelsToSend) : numChannels(numChannelsToSend),
                                                    fifo(numChannelsToSend)
     {
+        // Add all the threads.
         threads.add(new AudioSender(Sockets::AudioSenderSocketParams, fifo));
         threads.add(new TimestampListener(Sockets::TimestampListenerSocketParams));
         threads.add(new ClientListener(Sockets::ClientListenerSocketParams, clients, modules));
@@ -16,9 +17,9 @@ namespace ananas::Server
         threads.add(new RebootSender(Sockets::RebootSenderSocketParams, clients));
         threads.add(new SwitchInspector(Threads::SwitchInspectorThreadParams, switches));
 
+        // The server should listen for change messages sent by all threads.
         for (const auto &t: threads) {
             t->addChangeListener(this);
-            t->startThread();
         }
     }
 
@@ -29,8 +30,14 @@ namespace ananas::Server
 
     void Server::prepareToPlay(const int samplesPerBlockExpected, const double sampleRate)
     {
-        if (auto *s = dynamic_cast<AudioSender *>(threads[0])) {
-            s->prepare(numChannels, samplesPerBlockExpected, sampleRate);
+        for (const auto &t: threads) {
+            if (auto *s = dynamic_cast<AudioSender *>(t)) {
+                // The audio sender needs to be prepared; other threads do not.
+                s->prepare(numChannels, samplesPerBlockExpected, sampleRate);
+            }
+            // With the audio sender thread prepared, and memory allocated to
+            // its AudioPacket member, it's safe to start all the threads.
+            t->startThread();
         }
     }
 
@@ -38,20 +45,39 @@ namespace ananas::Server
     {
         for (const auto &t: threads) {
             if (t->isThreadRunning()) {
-                t->stopThread(t->getTimeout());
+                if (auto *s = dynamic_cast<AudioSender *>(t)) {
+                    // The sender thread overrides stopThread, so handle it
+                    // separately.
+                    s->stopThread(t->getTimeout());
+                } else {
+                    // Stop all the other threads as normal.
+                    t->stopThread(t->getTimeout());
+                }
             }
         }
     }
 
     void Server::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
     {
+        // These checks are kind of overkill, since the order in which threads
+        // were added to the OwnedArray is known, but as a santiy check...
+        if (auto *s = dynamic_cast<AudioSender *>(threads[0])) {
+            if (auto *t = dynamic_cast<TimestampListener *>(threads[1])) {
+                // If a new timestamp is available, send it to the audio sender
+                // to see whether the packet timestamp needs to be updated.
+                if (t->isNewTimestampAvailable()) {
+                    s->setPacketTime(t->getTimestamp());
+                }
+            }
+        }
+
         fifo.write(bufferToFill.buffer);
     }
 
     void Server::changeListenerCallback(ChangeBroadcaster *source)
     {
-        if (const auto *t = dynamic_cast<TimestampListener *>(source)) {
-            if (t->getTimestampChanged()) {
+        if (auto *t = dynamic_cast<TimestampListener *>(source)) {
+            if (t->isNewTimestampAvailable()) {
                 return;
             }
         }
@@ -209,14 +235,14 @@ namespace ananas::Server
 
     void Server::AudioSender::changeListenerCallback(ChangeBroadcaster *source)
     {
-        if (const auto *t = dynamic_cast<TimestampListener *>(source)) {
-            setPacketTime(t->getPacketTime());
-        }
+        // if (const auto *t = dynamic_cast<TimestampListener *>(source)) {
+        //     setPacketTime(t->getPacketTime());
+        // }
     }
 
     void Server::AudioSender::runImpl()
     {
-        DBG("Sending audio packets...");
+        std::cout << getThreadName() << " sending audio packets..." << std::endl << std::flush;
 
         while (!threadShouldExit()) {
             // Read from the fifo into the packet.
@@ -231,7 +257,7 @@ namespace ananas::Server
             nanosleep(&t, nullptr);
         }
 
-        DBG("Stopping send thread");
+        std::cout << getThreadName() << " stopping." << std::endl;
     }
 
     //==========================================================================
@@ -292,7 +318,7 @@ namespace ananas::Server
 
     void Server::AnnouncementListenerThread::runImpl()
     {
-        std::cout << getThreadName() << " listening..." << std::endl;
+        std::cout << getThreadName() << " listening..." << std::endl << std::flush;
 
         while (!threadShouldExit()) {
             if (socket.waitUntilReady(true, timeoutMs)) {
@@ -308,7 +334,7 @@ namespace ananas::Server
             }
         }
 
-        std::cout << getThreadName() << "stopping." << std::endl;
+        std::cout << getThreadName() << " stopping." << std::endl;
     }
 
     //==============================================================================
@@ -319,24 +345,20 @@ namespace ananas::Server
     {
     }
 
-    timespec Server::TimestampListener::getPacketTime() const
+    bool Server::TimestampListener::isNewTimestampAvailable()
     {
-        return timestamp;
+        return newTimestampAvailable.exchange(false, std::memory_order_acquire);
     }
 
-    bool Server::TimestampListener::getTimestampChanged() const
+    timespec Server::TimestampListener::getTimestamp() const noexcept
     {
-        return timestampChanged;
+        return timestamp.load(std::memory_order_acquire);
     }
 
     void Server::TimestampListener::handlePacket()
     {
-        // DBG("Received " << bytesRead << " bytes from " << senderIP << ":" << senderPort);
-
         // Check for Follow_Up message (0x08)
         if ((buffer[0] & 0x0f) == Constants::PTPFollowUpMessageType) {
-            // DBG("PTP follow-up message received from " << senderIP << ":" << senderPort);
-
             timespec ts{};
 
             // Extract seconds (6 bytes)
@@ -349,12 +371,9 @@ namespace ananas::Server
                 ts.tv_nsec = ts.tv_nsec << 8 | buffer[40 + i];
             }
 
-            // DBG("Timestamp: " << ts.tv_sec << "." << ts.tv_nsec << " --- " << ctime(&ts.tv_sec));
-
-            timestamp = ts;
-            timestampChanged = true;
-            sendSynchronousChangeMessage();
-            timestampChanged = false;
+            // Store the new timestamp and indicate that it is available.
+            timestamp.store(ts, std::memory_order_release);
+            newTimestampAvailable.store(true, std::memory_order_release);
         }
     }
 
@@ -427,7 +446,7 @@ namespace ananas::Server
 
     void Server::SwitchInspector::runImpl()
     {
-        DBG("Inspecting switches...");
+        std::cout << getThreadName() <<  " inspecting..." << std::endl << std::flush;
 
         while (!threadShouldExit()) {
             auto switchesVar{switches.toVar()};
@@ -466,7 +485,7 @@ namespace ananas::Server
                 wait(100);
         }
 
-        DBG("Stopping switch inspector thread");
+        std::cout << getThreadName() << " stopping." << std::endl;
     }
 
     bool Server::SwitchInspector::connect()

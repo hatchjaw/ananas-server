@@ -155,4 +155,12 @@ namespace ananas::WFS::UI
         }
         resized();
     }
+
+    void WFSInterfaceComponent::expandModuleList(const int moduleID)
+    {
+        for (auto *m: modules) {
+            m->collapseModuleList();
+        }
+        modules[moduleID]->expandModuleList();
+    }
 } // ananas::WFS

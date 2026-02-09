@@ -17,14 +17,15 @@ namespace ananas::WFS
         SwitchToWfsTab = 0x1001,
         SwitchToNetworkTab = 0x1002,
         ToggleModuleSelectorDisplay = 0x1003,
+        RevealModuleSelector = 0x1004
     };
 
     class Constants
     {
     public:
         // For the following, see ananas-client wfsParams.lib
-        constexpr static uint NumSources{NUM_SOURCES};
-        constexpr static uint NumModules{NUM_MODULES};
+        constexpr static size_t NumSources{NUM_SOURCES};
+        constexpr static size_t NumModules{NUM_MODULES};
         // TODO: receive min/max y-coordinates from clients?
         constexpr static int MaxYMetres{10};
         constexpr static int MinYMetres{-3};
@@ -114,6 +115,10 @@ namespace ananas::WFS
         inline static const juce::StringRef ToggleModuleSelectorsShortName{"Toggle module selectors"};
         inline static const juce::StringRef ToggleModuleSelectorsDescription{"Toggles display of module selector lists"};
 
+        inline static const juce::StringRef ModulesCommandCategoryName{"Modules"};
+        static juce::String getRevealModuleSelectorShortName(const int moduleID) { return "Module " + juce::String{moduleID}; }
+        static juce::String getRevealModuleSelectorDescription(const int moduleID) { return "Reveal module selector " + juce::String{moduleID}; }
+
         inline static const juce::StringRef HideSourceText{"Hide this source"};
         inline static const juce::StringRef HideAllOtherSourcesText{"Hide all except this source"};
     };
@@ -160,7 +165,7 @@ namespace ananas::WFS
     class Sockets
     {
     public:
-        inline static const ananas::Utils::SenderThreadSocketParams WfsMessengerSocketParams {
+        inline static const ananas::Utils::SenderThreadSocketParams WfsMessengerSocketParams{
             "WFS Messenger",
             500,
             "224.4.224.10",
@@ -187,9 +192,10 @@ namespace ananas::WFS
         class Shortcuts
         {
         public:
-            constexpr static int SwitchToWfsTabKeycode{'w'};
-            constexpr static int SwitchToNetworkTabKeycode{'n'};
+            constexpr static int SwitchToWfsTabKeycode{'['};
+            constexpr static int SwitchToNetworkTabKeycode{']'};
             constexpr static int ToggleModuleSelectorsKeycode{'m'};
+            constexpr static int RevealModuleSelectorListKeycode{'1'};
         };
     }
 }

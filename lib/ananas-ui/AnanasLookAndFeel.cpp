@@ -29,8 +29,9 @@ namespace ananas::UI
         setColour(juce::TableListBox::backgroundColourId, juce::Colours::transparentWhite);
         setColour(juce::TableListBox::outlineColourId, juce::Colours::black);
         setColour(juce::TableListBox::textColourId, juce::Colours::red); //?
-        setColour(AnanasNetworkTable::okColour, juce::Colours::lightseagreen);
-        setColour(AnanasNetworkTable::warningColour, juce::Colours::palevioletred);
+        setColour(AnanasNetworkTable::textColourId, juce::Colours::black);
+        setColour(AnanasNetworkTable::okColourId, juce::Colours::lightseagreen);
+        setColour(AnanasNetworkTable::warningColourId, juce::Colours::palevioletred);
 
         // Switches
         setColour(SwitchesComponent::backgroundColourId, juce::Colours::transparentWhite);

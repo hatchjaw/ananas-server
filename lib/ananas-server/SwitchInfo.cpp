@@ -108,6 +108,7 @@ namespace ananas
             sendChangeMessage();
         } else {
             // TODO: Probably got an error response...
+            //  Indicate this in the UI; probably incorrect ip/username/password
         }
     }
 

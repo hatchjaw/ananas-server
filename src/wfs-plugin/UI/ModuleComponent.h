@@ -18,6 +18,10 @@ namespace ananas::WFS::UI
 
         void shouldShowModuleSelector(bool show);
 
+        void expandModuleList();
+
+        void collapseModuleList();
+
         class SpeakerIconComponent final : public Component
         {
         public:

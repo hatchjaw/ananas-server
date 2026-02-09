@@ -22,4 +22,5 @@ target_link_libraries(ananas_server
         PUBLIC
         juce::juce_audio_basics
         ananas_utilities
+        atomic
 )

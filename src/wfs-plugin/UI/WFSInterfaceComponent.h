@@ -38,6 +38,8 @@ namespace ananas::WFS::UI
 
         void parameterChanged(const juce::String &parameterID, float newValue) override;
 
+        void expandModuleList(int moduleID);
+
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WFSInterfaceComponent)
 

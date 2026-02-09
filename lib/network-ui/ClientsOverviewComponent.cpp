@@ -258,7 +258,7 @@ namespace ananas::UI
                 case 2: text = serialNumber;
                     break;
                 case 3: text = ptpLock ? "Yes" : "No";
-                    g.setColour(ptpLock ? findColour(okColour) : findColour(warningColour));
+                    g.setColour(ptpLock ? findColour(okColourId) : findColour(warningColourId));
                     g.fillRect(2, 2, width - 4, height - 4);
                     break;
                 case 4: text = Strings::formatWithThousandsSeparator(offsetTime + audioPTPOffset) +
@@ -266,7 +266,7 @@ namespace ananas::UI
                                (offsetFrame == 1 ? " frame)" : " frames)");
                     break;
                 case 5: text = juce::String(bufferFillPercent) + " %";
-                    g.setColour(bufferFillPercent > 80 || bufferFillPercent < 20 ? findColour(warningColour) : findColour(okColour));
+                    g.setColour(bufferFillPercent > 80 || bufferFillPercent < 20 ? findColour(warningColourId) : findColour(okColourId));
                     g.fillRect(2, 2, static_cast<int>((width - 4) * (bufferFillPercent / 100.f)), height - 4);
                     break;
                 case 6: text = Strings::formatWithThousandsSeparator(samplingRate, 6);
@@ -277,6 +277,7 @@ namespace ananas::UI
                 default: break;
             }
 
+            g.setColour(findColour(textColourId));
             g.drawText(text, 2, 0, width - 4, height, getJustification(columnId), true);
         }
     }
