@@ -13,7 +13,8 @@ namespace ananas::WFS
     class WFSMessenger final : public juce::Thread,
                                public juce::OSCSender,
                                public juce::AudioProcessorValueTreeState::Listener,
-                               public juce::ValueTree::Listener
+                               public juce::ValueTree::Listener,
+                               public juce::Timer
     {
     public:
         explicit WFSMessenger(const ananas::Utils::SenderThreadSocketParams &p);
@@ -26,13 +27,22 @@ namespace ananas::WFS
 
         void parameterChanged(const juce::String &parameterID, float newValue) override;
 
+        void timerCallback() override;
+
     private:
+        struct ParamSlot
+        {
+            std::atomic<float> value{0.0f};
+            std::atomic<bool> changed{false};
+        };
+
         void runImpl() const;
 
         juce::DatagramSocket socket;
         juce::String ip;
         juce::uint16 localPort, remotePort;
         bool connected{false};
+        std::unordered_map<juce::String, ParamSlot> slots;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WFSMessenger);
     };

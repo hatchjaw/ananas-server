@@ -10,6 +10,9 @@ namespace ananas::WFS
           localPort(p.localPort),
           remotePort(p.remotePort)
     {
+        // Limit the rate of source position updates and their corresponding OSC
+        // sends, to thirty per second.
+        startTimerHz(30);
     }
 
     bool WFSMessenger::connect()
@@ -50,7 +53,7 @@ namespace ananas::WFS
                     auto id{module.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, 0)};
                     auto path{Params::getModuleIndexParamID(id)};
                     juce::OSCBundle bundle;
-                    DBG("Sending OSC: " << path << " " << prop.name);
+                    // DBG("Sending OSC: " << path << " " << prop.name);
                     bundle.addElement(juce::OSCMessage{path, prop.name.toString()});
                     send(bundle);
                 }
@@ -60,12 +63,26 @@ namespace ananas::WFS
 
     void WFSMessenger::parameterChanged(const juce::String &parameterID, float newValue)
     {
+        // Indicate that a parameter change message should be sent at the next
+        // timer callback.
+        slots[parameterID].value.store(newValue);
+        slots[parameterID].changed.store(true);
+    }
+
+    void WFSMessenger::timerCallback()
+    {
         if (!connected) { return; }
 
-        juce::OSCBundle bundle;
-        DBG("Sending OSC: " << parameterID << " " << newValue);
-        bundle.addElement(juce::OSCMessage{parameterID, newValue});
-        send(bundle);
+        // Send all changed parameters.
+        for (auto &[id, slot]: slots) {
+            if (slot.changed.load()) {
+                juce::OSCBundle bundle;
+                // DBG("Sending OSC: " << parameterID << " " << newValue);
+                bundle.addElement(juce::OSCMessage{id, slot.value.load()});
+                send(bundle);
+                slot.changed.store(false);
+            }
+        }
     }
 
     void WFSMessenger::runImpl() const

@@ -67,7 +67,7 @@ namespace ananas::Server
     public:
         inline static const Utils::ThreadParams SwitchInspectorThreadParams{
             "Ananas Switch Inspector",
-            1100
+            100
         };
     };
 
@@ -76,41 +76,41 @@ namespace ananas::Server
     public:
         inline static const Utils::SenderThreadSocketParams AudioSenderSocketParams{
             "Ananas Audio Sender",
-            500,
+            100,
             "224.4.224.4",
-            14841,
+            49152,
             49152
-        };
-
-        inline static const Utils::ListenerThreadSocketParams TimestampListenerSocketParams{
-            "Ananas Timestamp Listener",
-            1500,
-            "224.0.1.129",
-            320
-        };
-
-        inline static const Utils::ListenerThreadSocketParams ClientListenerSocketParams{
-            "Ananas Client Listener",
-            500,
-            "224.4.224.6",
-            49153,
-            1250
-        };
-
-        inline static const Utils::ListenerThreadSocketParams AuthorityListenerSocketParams{
-            "Ananas Authority Listener",
-            500,
-            "224.4.224.7",
-            49154,
-            1000
         };
 
         inline static const Utils::SenderThreadSocketParams RebootSenderSocketParams{
             "Ananas Reboot Sender",
-            500,
-            "224.4.224.8",
-            14842,
-            49155
+            100,
+            "224.4.224.5",
+            49163,
+            49163
+        };
+
+        inline static const Utils::ListenerThreadSocketParams TimestampListenerSocketParams{
+            "Ananas Timestamp Listener",
+            150,
+            "224.0.1.129",
+            320
+        };
+
+        inline static const Utils::ListenerThreadSocketParams AuthorityListenerSocketParams{
+            "Ananas Authority Listener",
+            100,
+            "224.4.224.6",
+            49172,
+            1000
+        };
+
+        inline static const Utils::ListenerThreadSocketParams ClientListenerSocketParams{
+            "Ananas Client Listener",
+            100,
+            "224.4.224.6",
+            49173,
+            1250
         };
     };
 }

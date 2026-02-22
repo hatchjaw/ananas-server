@@ -43,6 +43,8 @@ namespace ananas::UI
         public:
             OverviewPanel();
 
+            juce::String getPresentationTimeIntervalText(int presentationTimeInterval);
+
             void update(const juce::var &var);
 
             void paint(juce::Graphics &g) override;
@@ -50,10 +52,26 @@ namespace ananas::UI
             void resized() override;
 
         private:
+            class PresentationTimeInterval final : public juce::Label
+            {
+            public:
+                void setBackgroundWidth(float proportion);
+
+                void setMax(float maxSeen);
+
+                void paint(juce::Graphics &g) override;
+
+            private:
+                float backgroundProportion{0.f};
+                float maxValue{0.f};
+            };
+
             juce::Label totalClientsLabel;
             juce::Label totalClientsValue;
             juce::Label presentationTimeIntervalLabel;
-            juce::Label presentationTimeIntervalValue;
+            PresentationTimeInterval presentationTimeIntervalValue;
+            juce::int32 maxPresentationTimeInterval{0};
+            uint numUpdates{0};
         };
 
         class ClientTable final : public AnanasNetworkTable

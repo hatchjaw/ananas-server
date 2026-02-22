@@ -21,7 +21,7 @@ namespace ananas
         // transmitted for each host audio callback. Without a small delay
         // between transmission of consecutive packets, these bursts can be
         // disruptive to reception of PTP packets, client-side.
-        nsSleepInterval = nsPerPacket * 1 / 62;
+        nsSleepInterval = nsPerPacket * 1 / 10;
 
         clientBufferDuration = (static_cast<double>(nsPerPacket) + nsPerPacketRemainder) * Server::Constants::ClientPacketBufferSize;
 

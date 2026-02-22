@@ -53,7 +53,7 @@ namespace ananas::UI
         };
         title.setBounds(titleRow.removeFromLeft(85));
         rebootAllClientsButton.setBounds(titleRow.removeFromLeft(100).reduced(8));
-        overviewPanel.setBounds(bounds.removeFromTop(35));
+        overviewPanel.setBounds(bounds.removeFromTop(45));
         clientTable.setBounds(bounds);
     }
 
@@ -96,6 +96,13 @@ namespace ananas::UI
         presentationTimeIntervalLabel.setText(Strings::PresentationTimeIntervalLabel, juce::dontSendNotification);
     }
 
+    juce::String ClientsOverviewComponent::OverviewPanel::getPresentationTimeIntervalText(const int presentationTimeInterval)
+    {
+        return presentationTimeInterval < 1000
+                   ? juce::String{presentationTimeInterval} + " ns"
+                   : juce::String{static_cast<float>(presentationTimeInterval) / 1000.f, 3} + " µs";
+    }
+
     void ClientsOverviewComponent::OverviewPanel::update(const juce::var &var)
     {
         if (!isVisible()) return;
@@ -122,7 +129,21 @@ namespace ananas::UI
                     }
                 }
             }
-            presentationTimeIntervalValue.setText(juce::String{maxOffsetTime - minOffsetTime} + " ns", juce::dontSendNotification);
+
+            const auto presentationTimeInterval{maxOffsetTime - minOffsetTime};
+
+            if (++numUpdates >= 250) {
+                maxPresentationTimeInterval = 0;
+                numUpdates = 0;
+            }
+
+            if (presentationTimeInterval > maxPresentationTimeInterval) {
+                maxPresentationTimeInterval = presentationTimeInterval;
+                presentationTimeIntervalValue.setMax(juce::jmin(1.f, maxPresentationTimeInterval / 5000.f));
+            }
+
+            presentationTimeIntervalValue.setText(getPresentationTimeIntervalText(presentationTimeInterval), juce::dontSendNotification);
+            presentationTimeIntervalValue.setBackgroundWidth(juce::jlimit(0.f, 1.f, presentationTimeInterval / 5000.f));
         }
     }
 
@@ -152,6 +173,40 @@ namespace ananas::UI
         rightFlex.items.add(juce::FlexItem(presentationTimeIntervalLabel).withWidth(200));
         rightFlex.items.add(juce::FlexItem(presentationTimeIntervalValue).withFlex(1));
         rightFlex.performLayout(bounds);
+    }
+
+    //==========================================================================
+
+    void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::setBackgroundWidth(const float proportion)
+    {
+        backgroundProportion = proportion;
+        repaint();
+    }
+
+    void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::setMax(const float maxSeen)
+    {
+        maxValue = maxSeen;
+    }
+
+    void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::paint(juce::Graphics &g)
+    {
+        const auto bounds{getLocalBounds().toFloat()};
+        const auto maxWidth{bounds.getWidth() - 1};
+        const auto rectWidth{maxWidth * backgroundProportion};
+
+        g.setColour(backgroundProportion <= .2 ? juce::Colours::lightseagreen.withAlpha(.25f) : juce::Colours::palevioletred.withAlpha(.25f));
+        g.fillRect(0.0f, 0.0f, rectWidth, bounds.getHeight());
+        if (backgroundProportion > .2) {
+            g.setColour(juce::Colours::white);
+            g.drawVerticalLine(maxWidth * .2f, 0.f, bounds.getHeight());
+        }
+
+        if (maxValue > 0.f) {
+            g.setColour(maxValue <= .2 ? juce::Colours::lightseagreen.withAlpha(.5f) : juce::Colours::palevioletred.withAlpha(.5f));
+            g.fillRect(maxWidth * maxValue - 1.f, 0.0f, 2.f, bounds.getHeight());
+        }
+
+        Label::paint(g);
     }
 
     //==========================================================================

@@ -54,8 +54,6 @@ namespace ananas
     {
         juce::uint32 serial;
         juce::uint32 usbFeedbackAccumulator;
-        int numClients;
-        int avgBufferFillPercent;
         int numUnderruns;
         int numOverflows;
     };

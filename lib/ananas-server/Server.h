@@ -93,8 +93,7 @@ namespace ananas::Server
 
         //======================================================================
 
-        class AudioSender final : public SenderThread,
-                                  public ChangeListener
+        class AudioSender final : public SenderThread
         {
         public:
             AudioSender(const Utils::SenderThreadSocketParams &p, Fifo &fifo);
@@ -106,8 +105,6 @@ namespace ananas::Server
             int64_t getPacketTime() const;
 
             bool stopThread(int timeOutMilliseconds);
-
-            void changeListenerCallback(ChangeBroadcaster *source) override;
 
         protected:
             void runImpl() override;

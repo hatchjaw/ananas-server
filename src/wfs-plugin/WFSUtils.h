@@ -167,10 +167,10 @@ namespace ananas::WFS
     public:
         inline static const ananas::Utils::SenderThreadSocketParams WfsMessengerSocketParams{
             "WFS Messenger",
-            500,
-            "224.4.224.10",
-            49160,
-            49160
+            100,
+            "224.4.224.5",
+            49162,
+            49162
         };
     };
 

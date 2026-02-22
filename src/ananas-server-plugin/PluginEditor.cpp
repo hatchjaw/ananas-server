@@ -21,6 +21,7 @@ PluginEditor::PluginEditor(PluginProcessor &p)
 
 #if SHOW_NO_NETWORK_OVERLAY
     getProcessor().getServer().addChangeListener(&networkOverview);
+    getProcessor().getServer().sendChangeMessage();
 #endif
 }
 

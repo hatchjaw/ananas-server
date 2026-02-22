@@ -31,6 +31,7 @@ PluginEditor::PluginEditor(PluginProcessor &p)
 #if SHOW_NO_NETWORK_OVERLAY
     getProcessor().getServer().addChangeListener(&wfsInterface);
     getProcessor().getServer().addChangeListener(&networkOverview);
+    getProcessor().getServer().sendChangeMessage();
 #endif
 
     commandManager.setFirstCommandTarget(this);
@@ -119,6 +120,7 @@ void PluginEditor::getCommandInfo(const juce::CommandID commandID, juce::Applica
                 ananas::WFS::Strings::OptionsCommandCategoryName,
                 wfsInterface.isVisible() ? 0 : juce::ApplicationCommandInfo::CommandFlags::isDisabled);
             result.addDefaultKeypress(ananas::WFS::UI::Shortcuts::ToggleModuleSelectorsKeycode, juce::ModifierKeys::noModifiers);
+            break;
 
         default:
             const auto moduleID{commandID - ananas::WFS::RevealModuleSelector - 1};

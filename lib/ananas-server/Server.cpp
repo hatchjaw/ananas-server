@@ -76,11 +76,6 @@ namespace ananas::Server
 
     void Server::changeListenerCallback(ChangeBroadcaster *source)
     {
-        if (auto *t = dynamic_cast<TimestampListener *>(source)) {
-            if (t->isNewTimestampAvailable()) {
-                return;
-            }
-        }
         sendChangeMessage();
     }
 
@@ -163,14 +158,12 @@ namespace ananas::Server
         if (-1 == socket.getBoundPort()) {
             if (!socket.setEnablePortReuse(true)) {
                 std::cerr << getThreadName() << " failed to set socket port reuse: " << strerror(errno) << std::endl;
-                socket.shutdown();
                 sendChangeMessage();
                 return false;
             }
 
             if (!socket.bindToPort(localPort, Utils::Strings::LocalInterfaceIP)) {
                 std::cerr << getThreadName() << " failed to bind socket to port: " << strerror(errno) << std::endl;
-                socket.shutdown();
                 sendChangeMessage();
                 return false;
             }
@@ -178,7 +171,6 @@ namespace ananas::Server
             if (!socket.joinMulticast(ip)) {
                 std::cerr << getThreadName() << " failed to join multicast group: " << strerror(errno) << std::endl;
                 sendChangeMessage();
-                socket.shutdown();
                 return false;
             }
 
@@ -233,13 +225,6 @@ namespace ananas::Server
         return Thread::stopThread(timeOutMilliseconds);
     }
 
-    void Server::AudioSender::changeListenerCallback(ChangeBroadcaster *source)
-    {
-        // if (const auto *t = dynamic_cast<TimestampListener *>(source)) {
-        //     setPacketTime(t->getPacketTime());
-        // }
-    }
-
     void Server::AudioSender::runImpl()
     {
         std::cout << getThreadName() << " sending audio packets..." << std::endl << std::flush;
@@ -278,7 +263,6 @@ namespace ananas::Server
             // hell)...
             if (!socket.setEnablePortReuse(true)) {
                 std::cerr << getThreadName() << " failed to set socket port reuse: " << strerror(errno) << std::endl;
-                socket.shutdown();
                 sendChangeMessage();
                 return false;
             }
@@ -287,7 +271,6 @@ namespace ananas::Server
             // specifying a local interface here...
             if (!socket.bindToPort(localPort)) {
                 std::cerr << getThreadName() << " failed to bind socket to port: " << strerror(errno) << std::endl;
-                socket.shutdown();
                 sendChangeMessage();
                 return false;
             }
@@ -304,7 +287,6 @@ namespace ananas::Server
                     IP_ADD_MEMBERSHIP,
                     &mreq, sizeof (mreq)) < 0) {
                 std::cerr << getThreadName() << " failed to add multicast membership: " << strerror(errno) << std::endl;
-                socket.shutdown();
                 sendChangeMessage();
                 return false;
             }
