@@ -63,19 +63,19 @@ cmake --build cmake-build-(debug|release) --target ananasWFS_CLAP -j 18
 In this instance, the build process will automatically install the .clap plugin
 to an appropriate directory (typically `~/.clap/`).
 
-## Deliverables
+## Hardware setup
 
-Note that, at the time of writing, in order for deliverables to work, i.e. not 
-just print error messages to the console or cause a DAW host to freeze, the 
-machine running the plugin must be connected to an appropriately configured
-ethernet switch. The ethernet interface should be configured manually, i.e.
-_without DHCP_ as follows:
+The machine running a plugin (or standalone) must be connected to an 
+appropriately configured ethernet switch. The ethernet interface should be 
+configured manually, i.e. _without DHCP_ as follows:
 
 - Address: 192.168.10.10
 - Subnet mask: 255.255.255.0
 - Gateway: 192.168.10.x
 
 where 'x' is the last octet of the IP address assigned to the switch.
+
+## Deliverables
 
 ### `ananas_console`
 
@@ -87,115 +87,21 @@ A basic commandline application that embeds the `ananas_server` library.
 ananas_console [-f |--file=][filename]
 ```
 
-Transmits `filename` (.wav, .aif) to the network on UDP multicast IP
-`224.4.224.4`, port `41952`.
+Transmits two channeels of `filename` (.wav, .aif) to the network on UDP 
+multicast IP `224.4.224.4`, port `41952`.
 
-### AnanasWFS
+### ananasServer
 
-A CLAP DAW plugin that embeds `ananas_server` and controls a distributed WFS
-algorithm running on a network of embedded devices. See associated repository
-[ananas-client](https://github.com/hatchjaw/ananas-client).
+A CLAP DAW plugin (and standalone application) that embeds `ananas-server` and, 
+as with `ananas_console`, transmits two channels of audio data to 
+`224.4.224.4:49152`. Provides functionality for monitoring (and basic management
+of) connected switches, the connected time authority, and connected clients.
 
-(Instructions to follow.)
+### ananasWFS
 
----
+A CLAP DAW plugin that embeds `ananas_server` transmits sixteen channels of 
+audio data, representing wave field synthesis (WFS) sound sources, and controls 
+a distributed WFS algorithm running on a network of embedded devices. See 
+associated repository [ananas-client](https://github.com/hatchjaw/ananas-client).
 
-#### Me
-Can you give me an ascii-art pineapple?
-
-#### AI Assistant
-Sure! Here's an ASCII-art pineapple for you! 🍍
-
-```
-      .
-     /_\
-    _\ /_
-   /     \
-   \_   _/
-     | |
-    /___\
-   //   \\
-  ||     ||
-  \\_____/\
-   `-----`
-```
-
-I hope you like it! Let me know if you'd like to see something else. 😊
-
-#### Me
-Can you try again, please?
-
-#### AI Assistant
-Of course! Here's a more detailed ASCII-art pineapple for you: 🍍
-
-```
-      __---__
-    _-       -_
-   /           \
-  |     /\      |
-   \    ||     /
-    |   ||    |
-    |   ||    |
-     \  ||   /
-      | ||   |
-      | ||   |
-       \||  /
-        |   |
-        |   |
-        |   |
-        '---'
-```
-
-If you'd like something different or even more detailed, just let me know! 😊🍍
-
-#### Me
-Never mind.
-
-#### AI Assistant
-No problem! Feel free to reach out if you need any help in the future. 😊
-
-#### Me
-Pouvez-vous me dessiner un ananas en ascii-art ?
-
-#### AI Assistant
-Bien sûr ! Voici un bel ananas en ASCII-art pour vous : 🍍
-
-```
-      ______
-     /      \
-    /        \
-   |          |   _ _
-   |          |  /   \
-    \        /   \_   |
-     \______/      |  |
-        ||         |  |
-        ||         |  |
-        ||         |__|
-        ||         ||||
-       //\\        ||||
-      //  \\       ||||
-     ||    ||      ||||
-```
-
-J’espère que ça vous plaît ! 😊 Si vous souhaitez autre chose, n’hésitez pas à demander. 🍍
-
-#### Me
-Beurk !
-
-#### AI Assistant
-Oh, je suis désolé que celui-ci ne vous ait pas plu ! Laissez-moi réessayer avec une meilleure version d’un ananas en ASCII-art 🌟 :
-
-```
-       .  .
-     .:....:.
-    .:  :   :.
-     .:....:.
-     '::::::'
-    :::'  ':::  
-   :::      ::: 
-    :::.  .:::  
-     '::::::'   
-        ':'
-```
-
-J'espère que celui-ci est plus à votre goût ! 😊 🍍 S'il y a autre chose que vous aimeriez voir, n'hésitez pas à demander.
+(Full instructions to follow.)
