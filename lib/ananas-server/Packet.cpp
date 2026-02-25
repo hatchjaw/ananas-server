@@ -84,7 +84,7 @@ namespace ananas
         return header.timestamp;
     }
 
-    __syscall_slong_t AudioPacket::getSleepInterval() const
+    long AudioPacket::getSleepInterval() const
     {
         return nsSleepInterval;
     }
