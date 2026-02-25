@@ -7,6 +7,13 @@ add_subdirectory(JUCE)
 
 add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
 
+juce_add_binary_data(fonts
+        HEADER_NAME AnanasFonts.h
+        SOURCES
+        "resources/fonts/FF Unit Pro Regular.otf"
+        "resources/fonts/FF Unit Pro Bold.otf"
+)
+
 add_subdirectory(lib/ananas-utilities)
 
 add_subdirectory(lib/ananas-server)

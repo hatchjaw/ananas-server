@@ -3,6 +3,7 @@
 
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "ModuleComponent.h"
+#include "SpeakerIconComponent.h"
 #include "XYControllerComponent.h"
 #if SHOW_NO_NETWORK_OVERLAY
 #include <OverlayableComponent.h>
@@ -46,6 +47,7 @@ namespace ananas::WFS::UI
         juce::AudioProcessorValueTreeState &state;
         XYControllerComponent xyController;
         juce::OwnedArray<ModuleComponent> modules;
+        juce::OwnedArray<SpeakerIconComponent> speakerIcons;
         juce::Slider speakerSpacingSlider;
         juce::Label speakerSpacingLabel;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> speakerSpacingAttachment;

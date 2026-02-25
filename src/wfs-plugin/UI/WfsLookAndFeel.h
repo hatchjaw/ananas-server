@@ -2,7 +2,7 @@
 #define WFSLOOKANDFEEL_H
 
 #include <AnanasLookAndFeel.h>
-#include "ModuleComponent.h"
+#include "SpeakerIconComponent.h"
 #include "XYControllerComponent.h"
 
 namespace ananas::WFS::UI
@@ -16,7 +16,7 @@ namespace ananas::WFS::UI
 
         void drawXYControllerNode(juce::Graphics &g, const XYControllerComponent::Node &node, float intensity) const;
 
-        void drawSpeakerIcon(juce::Graphics &g, const ModuleComponent::SpeakerIconComponent &s) const;
+        void drawSpeakerIcon(juce::Graphics &g, const SpeakerIconComponent & s) const;
 
     private:
         juce::Path createSpeakerIconPath() const;
@@ -31,7 +31,7 @@ namespace ananas::WFS::UI
 
         virtual float getNodeBorderThickness() const { return 3.f; }
 
-        virtual float getNodeIndexFontSize() const { return 20.f; }
+        virtual float getNodeIndexFontSize() const { return 18.f; }
 
         virtual float getSpeakerIconCoilStartX() const { return 26.f; }
 

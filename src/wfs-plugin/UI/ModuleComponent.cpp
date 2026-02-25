@@ -10,8 +10,6 @@ namespace ananas::WFS::UI
           index(moduleIndex)
     {
         addAndMakeVisible(moduleSelector);
-        addAndMakeVisible(speakerIcon1);
-        addAndMakeVisible(speakerIcon2);
 
         moduleSelector.onChange = [this]
         {
@@ -29,18 +27,6 @@ namespace ananas::WFS::UI
         } else {
             moduleSelector.setBounds(0, 0, 0, 0);
         }
-
-        juce::FlexBox flex;
-        flex.flexDirection = juce::FlexBox::Direction::row;
-        flex.justifyContent = juce::FlexBox::JustifyContent::center;
-        flex.items.add(juce::FlexItem(speakerIcon1)
-            .withFlex(1.f)
-            .withHeight(Dimensions::ModuleSpeakerHeight));
-        flex.items.add(juce::FlexItem(speakerIcon2)
-            .withFlex(1.f)
-            .withHeight(Dimensions::ModuleSpeakerHeight));
-
-        flex.performLayout(bounds);
     }
 
     void ModuleComponent::setAvailableModules(const juce::StringArray &ips)
@@ -50,9 +36,10 @@ namespace ananas::WFS::UI
 
         const auto modules{tree.getProperty(ananas::Utils::Identifiers::ModulesParamID)};
         const auto varIntN{juce::var{index}};
+        const auto defaultModuleID{juce::var{0}};
         if (auto *obj = modules.getDynamicObject()) {
             for (const auto &prop: obj->getProperties()) {
-                if (prop.value.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, 0) == varIntN) {
+                if (prop.value.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, defaultModuleID) == varIntN) {
                     setSelectedModule(prop.name.toString());
                 }
             }
@@ -94,13 +81,5 @@ namespace ananas::WFS::UI
         if (var.isString()) {
             moduleSelector.setText(var.toString(), juce::dontSendNotification);
         }
-    }
-
-    //==========================================================================
-
-    void ModuleComponent::SpeakerIconComponent::paint(juce::Graphics &g)
-    {
-        if (auto *lnf{dynamic_cast<WfsLookAndFeel *>(&getLookAndFeel())})
-            lnf->drawSpeakerIcon(g, *this);
     }
 } // ananas::WFS

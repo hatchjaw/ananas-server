@@ -16,11 +16,23 @@ PluginEditor::PluginEditor(PluginProcessor &p)
           getProcessor().getSourceAmplitudes()
       )
 {
+    juce::Desktop::getInstance().setDefaultLookAndFeel(&lookAndFeel);
+
     setLookAndFeel(&lookAndFeel);
 
     addAndMakeVisible(tabbedComponent);
-    tabbedComponent.addTab(ananas::WFS::Strings::WfsTabName, juce::Colours::whitesmoke, &wfsInterface, false);
-    tabbedComponent.addTab(ananas::WFS::Strings::NetworkTabName, juce::Colours::whitesmoke, &networkOverview, false);
+    tabbedComponent.addTab(
+        ananas::WFS::Strings::WfsTabName,
+        juce::Colours::whitesmoke,
+        &wfsInterface,
+        false
+    );
+    tabbedComponent.addTab(
+        ananas::WFS::Strings::NetworkTabName,
+        juce::Colours::whitesmoke,
+        &networkOverview,
+        false
+    );
     lookAndFeel.setNumberOfTabs(tabbedComponent.getNumTabs());
 
     setSize(ananas::UI::Dimensions::UiWidth, ananas::UI::Dimensions::UiHeight);
@@ -42,6 +54,7 @@ PluginEditor::PluginEditor(PluginProcessor &p)
 
 PluginEditor::~PluginEditor()
 {
+    juce::Desktop::getInstance().setDefaultLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 
     getProcessor().getPersistentTree().removeListener(this);

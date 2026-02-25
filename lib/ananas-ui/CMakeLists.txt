@@ -17,4 +17,5 @@ target_link_libraries(ananas_ui
         PUBLIC
         ananas_network_overview
         juce::juce_gui_basics
+        fonts
 )

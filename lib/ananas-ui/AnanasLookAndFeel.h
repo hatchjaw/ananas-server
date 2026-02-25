@@ -11,16 +11,19 @@ namespace ananas::UI
     public:
         AnanasLookAndFeel();
 
+        juce::Typeface::Ptr getTypefaceForFont(const juce::Font &) override;
+
         int getTabButtonBestWidth(juce::TabBarButton &, int tabDepth) override;
 
         void setTotalWidth(int width);
 
         void setNumberOfTabs(int numTabs);
 
-        void drawOverlay(juce::Graphics &g, const OverlayableComponent::OverlayComponent &o, const juce::String &text);
+        void drawOverlay(juce::Graphics &g, const OverlayableComponent::OverlayComponent &o, const juce::String &text) const;
 
         void drawTableHeaderColumn(
-            juce::Graphics &, juce::TableHeaderComponent &,
+            juce::Graphics &,
+            juce::TableHeaderComponent &,
             const juce::String &columnName,
             int columnId,
             int width,
@@ -30,12 +33,17 @@ namespace ananas::UI
             int columnFlags
         ) override;
 
+        juce::Font getTextButtonFont(juce::TextButton &, int buttonHeight) override;
+
     protected:
         virtual juce::Justification getTableHeaderJustification(int columnId)
         {
             juce::ignoreUnused(columnId);
             return juce::Justification::centred;
         }
+
+        juce::Typeface::Ptr typefaceSans, typefaceBold;
+        juce::Colour darkTextColour, lightTextColour, okColour, warningColour;
 
     private:
         virtual int getOverlayBoxWidth() const { return 400; }

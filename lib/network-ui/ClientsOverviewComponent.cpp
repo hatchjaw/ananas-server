@@ -11,8 +11,7 @@ namespace ananas::UI
         addAndMakeVisible(overviewPanel);
         addAndMakeVisible(clientTable);
 
-        title.setColour(juce::Label::textColourId, juce::Colours::black);
-        title.setFont(juce::Font(juce::FontOptions(15.f, juce::Font::bold)));
+        title.setFont(juce::Font{juce::FontOptions{18.f, juce::Font::bold}});
         title.setJustificationType(juce::Justification::centredLeft);
         title.setText(Strings::ClientsSectionTitle, juce::dontSendNotification);
 
@@ -41,7 +40,7 @@ namespace ananas::UI
 
     void ClientsOverviewComponent::paint(juce::Graphics &g)
     {
-        g.fillAll(juce::Colours::transparentWhite);
+        g.fillAll(findColour(backgroundColourId));
     }
 
     void ClientsOverviewComponent::resized()
@@ -86,12 +85,6 @@ namespace ananas::UI
         addAndMakeVisible(presentationTimeIntervalLabel);
         addAndMakeVisible(presentationTimeIntervalValue);
 
-        // TODO: use LookAndFeel instead
-        totalClientsLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-        totalClientsValue.setColour(juce::Label::textColourId, juce::Colours::black);
-        presentationTimeIntervalLabel.setColour(juce::Label::textColourId, juce::Colours::black);
-        presentationTimeIntervalValue.setColour(juce::Label::textColourId, juce::Colours::black);
-
         totalClientsLabel.setText(Strings::TotalClientsLabel, juce::dontSendNotification);
         presentationTimeIntervalLabel.setText(Strings::PresentationTimeIntervalLabel, juce::dontSendNotification);
     }
@@ -100,7 +93,7 @@ namespace ananas::UI
     {
         return presentationTimeInterval < 1000
                    ? juce::String{presentationTimeInterval} + " ns"
-                   : juce::String{static_cast<float>(presentationTimeInterval) / 1000.f, 3} + " µs";
+                   : Strings::formatWithThousandsSeparator(static_cast<float>(presentationTimeInterval) / 1000.f) + " µs";
     }
 
     void ClientsOverviewComponent::OverviewPanel::update(const juce::var &var)
@@ -333,6 +326,7 @@ namespace ananas::UI
             }
 
             g.setColour(findColour(textColourId));
+            g.setFont(juce::Font{juce::FontOptions{14.f}});
             g.drawText(text, 2, 0, width - 4, height, getJustification(columnId), true);
         }
     }

@@ -185,8 +185,7 @@ namespace ananas::WFS
             constexpr static float NodeHalfDiameter{NodeDiameter / 2.f};
 
             constexpr static int ModuleSelectorHeight{25};
-            constexpr static int ModuleSpeakerHeight{25};
-            constexpr static int ModuleHeight{ModuleSelectorHeight + ModuleSpeakerHeight};
+            constexpr static int SpeakerIconHeight{25};
         };
 
         class Shortcuts

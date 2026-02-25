@@ -48,6 +48,7 @@ target_sources(ananasWFS
         WFSMessenger.cpp
         UI/WFSInterfaceComponent.cpp
         UI/XYControllerComponent.cpp
+        UI/SpeakerIconComponent.cpp
         UI/ModuleComponent.cpp
         UI/WfsLookAndFeel.cpp
 )

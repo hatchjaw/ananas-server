@@ -16,10 +16,16 @@ namespace ananas::WFS::UI
         xyController(numSources, apvts, sourceAmplitudes),
         persistentTree(persistentTreeToListenTo)
     {
+        // Make speaker icons visible
+        for (int n{0}; n < 2 * numModules; ++n) {
+            const auto s{speakerIcons.add(new SpeakerIconComponent)};
+            addAndMakeVisible(s, -1);
+        }
+
+        // Make XYController visible
         addAndMakeVisible(xyController);
 
         addAndMakeVisible(speakerSpacingLabel);
-        speakerSpacingLabel.setColour(juce::Label::textColourId, juce::Colours::black);
         speakerSpacingLabel.attachToComponent(&speakerSpacingSlider, false);
         speakerSpacingLabel.setText(Params::SpeakerSpacing.name, juce::dontSendNotification);
         speakerSpacingLabel.setJustificationType(juce::Justification::centredRight);
@@ -32,7 +38,6 @@ namespace ananas::WFS::UI
                                              false,
                                              speakerSpacingSlider.getTextBoxWidth(),
                                              25);
-        speakerSpacingSlider.setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
         speakerSpacingSlider.setIncDecButtonsMode(juce::Slider::incDecButtonsDraggable_Vertical);
 
         speakerSpacingAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(
@@ -43,9 +48,6 @@ namespace ananas::WFS::UI
 
         addAndMakeVisible(showModuleSelectorsButton);
         showModuleSelectorsButton.setButtonText(Params::ShowModuleSelectors.name);
-        showModuleSelectorsButton.setColour(juce::ToggleButton::textColourId, juce::Colours::black);
-        showModuleSelectorsButton.setColour(juce::ToggleButton::tickColourId, juce::Colours::black);
-        showModuleSelectorsButton.setColour(juce::ToggleButton::tickDisabledColourId, juce::Colours::black);
 
         showModuleSelectorsAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(
             state,
@@ -97,23 +99,33 @@ namespace ananas::WFS::UI
         bounds = bounds.reduced(10);
         xyController.setBounds(bounds);
 
-        const auto moduleHeight{
-            state.getRawParameterValue(Params::ShowModuleSelectors.id)->load() > 0.5 ? Dimensions::ModuleHeight : Dimensions::ModuleSpeakerHeight
-        };
-
         const auto yZero{Constants::MaxYMetres * bounds.getHeight() / (Constants::MaxYMetres - Constants::MinYMetres)};
-        bounds.removeFromTop(yZero - moduleHeight);
+        bounds.removeFromTop(yZero - Dimensions::ModuleSelectorHeight - Dimensions::SpeakerIconHeight);
 
-        juce::FlexBox flex;
-        flex.flexDirection = juce::FlexBox::Direction::row;
+        juce::FlexBox moduleFlex;
+        moduleFlex.flexDirection = juce::FlexBox::Direction::row;
 
         for (auto *m: modules) {
-            flex.items.add(juce::FlexItem(*m)
+            moduleFlex.items.add(juce::FlexItem(*m)
                 .withFlex(1.f) // Equal flex = equal width
-                .withMaxHeight(moduleHeight));
+                .withMaxHeight(Dimensions::ModuleSelectorHeight));
         }
 
-        flex.performLayout(bounds);
+        moduleFlex.performLayout(bounds);
+
+        bounds.removeFromTop(Dimensions::ModuleSelectorHeight);
+
+        juce::FlexBox speakerFlex;
+        // Speaker icons
+        speakerFlex.flexDirection = juce::FlexBox::Direction::row;
+        speakerFlex.justifyContent = juce::FlexBox::JustifyContent::center;
+        for (const auto &s: speakerIcons) {
+            speakerFlex.items.add(juce::FlexItem{*s}
+                .withFlex(1.f)
+                .withHeight(Dimensions::SpeakerIconHeight));
+        }
+
+        speakerFlex.performLayout(bounds);
 
 #if SHOW_NO_NETWORK_OVERLAY
         OverlayableComponent::resized();

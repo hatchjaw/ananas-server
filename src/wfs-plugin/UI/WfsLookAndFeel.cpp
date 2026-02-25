@@ -8,9 +8,9 @@ namespace ananas::WFS::UI
         setColour(juce::TabbedComponent::backgroundColourId, juce::Colours::whitesmoke);
         setColour(juce::TabbedComponent::outlineColourId, juce::Colours::transparentWhite);
         setColour(juce::TabbedButtonBar::tabOutlineColourId, juce::Colours::transparentWhite);
-        setColour(juce::TabbedButtonBar::tabTextColourId, juce::Colours::slategrey);
+        setColour(juce::TabbedButtonBar::tabTextColourId, darkTextColour.brighter(.5));
         setColour(juce::TabbedButtonBar::frontOutlineColourId, juce::Colours::transparentWhite);
-        setColour(juce::TabbedButtonBar::frontTextColourId, juce::Colours::black);
+        setColour(juce::TabbedButtonBar::frontTextColourId, darkTextColour);
 
         // XY controller
         setColour(XYControllerComponent::backgroundColourId, juce::Colours::black.withAlpha(0.1f));
@@ -19,11 +19,11 @@ namespace ananas::WFS::UI
         // XY controller nodes
         setColour(XYControllerComponent::Node::backgroundColourId, juce::Colours::white.withAlpha(0.5f));
         setColour(XYControllerComponent::Node::borderColourId, juce::Colours::lightseagreen);
-        setColour(XYControllerComponent::Node::textColourId, juce::Colours::black);
+        setColour(XYControllerComponent::Node::textColourId, darkTextColour);
 
         // Speaker icons
-        setColour(ModuleComponent::SpeakerIconComponent::fillColourId, juce::Colours::whitesmoke);
-        setColour(ModuleComponent::SpeakerIconComponent::borderColourId, juce::Colours::darkgrey);
+        setColour(SpeakerIconComponent::fillColourId, juce::Colours::lightgrey);
+        setColour(SpeakerIconComponent::borderColourId, juce::Colours::darkgrey);
     }
 
     void WfsLookAndFeel::drawXYController(juce::Graphics &g, const XYControllerComponent &xy)
@@ -91,7 +91,7 @@ namespace ananas::WFS::UI
                    juce::Justification::centred);
     }
 
-    void WfsLookAndFeel::drawSpeakerIcon(juce::Graphics &g, const ModuleComponent::SpeakerIconComponent &s) const
+    void WfsLookAndFeel::drawSpeakerIcon(juce::Graphics &g, const SpeakerIconComponent & s) const
     {
         const auto bounds{s.getBounds().toFloat()};
         const auto speaker{createSpeakerIconPath()};
@@ -109,10 +109,10 @@ namespace ananas::WFS::UI
             placement.getTransformToFit(speaker.getBounds(), targetBounds)
         };
 
-        g.setColour(s.findColour(ModuleComponent::SpeakerIconComponent::fillColourId));
+        g.setColour(s.findColour(SpeakerIconComponent::fillColourId));
         g.fillPath(speaker, transform);
 
-        g.setColour(s.findColour(ModuleComponent::SpeakerIconComponent::borderColourId));
+        g.setColour(s.findColour(SpeakerIconComponent::borderColourId));
         g.strokePath(speaker, juce::PathStrokeType{getSpeakerOutlineThickness(), juce::PathStrokeType::mitered}, transform);
     }
 

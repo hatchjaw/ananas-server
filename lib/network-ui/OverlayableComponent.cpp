@@ -49,7 +49,7 @@ namespace ananas::UI
 
     void OverlayableComponent::OverlayComponent::paint(juce::Graphics &g)
     {
-        if (auto *lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())})
+        if (const auto *lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())})
             lnf->drawOverlay(g, *this, text);
     }
 

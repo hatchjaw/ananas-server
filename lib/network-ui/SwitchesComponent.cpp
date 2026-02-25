@@ -12,8 +12,7 @@ namespace ananas::UI
         addAndMakeVisible(addSwitchButton);
         addAndMakeVisible(switchesTable);
 
-        title.setColour(juce::Label::textColourId, juce::Colours::black);
-        title.setFont(juce::Font(juce::FontOptions(15.f, juce::Font::bold)));
+        title.setFont(juce::Font{juce::FontOptions{18.f, juce::Font::bold}});
         title.setJustificationType(juce::Justification::centredLeft);
         title.setText(Strings::SwitchesSectionTitle, juce::dontSendNotification);
 
@@ -245,6 +244,8 @@ namespace ananas::UI
                 default: break;
             }
 
+            g.setColour(findColour(textColourId));
+            g.setFont(juce::Font{juce::FontOptions{14.f}});
             g.drawText(text, 2, 0, width - 4, height, getJustification(columnId), true);
         }
     }

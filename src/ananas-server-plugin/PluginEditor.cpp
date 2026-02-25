@@ -10,6 +10,8 @@ PluginEditor::PluginEditor(PluginProcessor &p)
           getProcessor().getPersistentTree()
       )
 {
+    juce::Desktop::getInstance().setDefaultLookAndFeel(&lookAndFeel);
+
     setLookAndFeel(&lookAndFeel);
 
     addAndMakeVisible(networkOverview);
@@ -27,6 +29,7 @@ PluginEditor::PluginEditor(PluginProcessor &p)
 
 PluginEditor::~PluginEditor()
 {
+    juce::Desktop::getInstance().setDefaultLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 
     getProcessor().getPersistentTree().removeListener(this);
