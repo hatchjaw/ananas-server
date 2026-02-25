@@ -25,12 +25,12 @@ namespace ananas
 
         [[nodiscard]] int64_t getTime() const;
 
-        [[nodiscard]] __syscall_slong_t getSleepInterval() const;
+        [[nodiscard]] long getSleepInterval() const;
 
     private:
         Header header{};
         int64_t nsPerPacket{};
-        __syscall_slong_t nsSleepInterval{};
+        long nsSleepInterval{};
         double nsPerPacketRemainder{};
         double timestampRemainder{0};
         double clientBufferDuration{};

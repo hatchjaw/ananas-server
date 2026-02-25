@@ -3,10 +3,12 @@ set(audioSampleRate 48000)
 juce_add_console_app(ananas_console
         PRODUCT_NAME "Ananas Console")
 
-target_compile_definitions(ananas_console
-        PRIVATE
-        JUCE_JACK=1
-        JUCE_JACK_CLIENT_NAME="${PROJECT_NAME}")
+if(NOT APPLE)
+        target_compile_definitions(ananas_console
+                PRIVATE
+                JUCE_JACK=1
+                JUCE_JACK_CLIENT_NAME="${PROJECT_NAME}")
+endif()
 
 target_sources(ananas_console
         PRIVATE

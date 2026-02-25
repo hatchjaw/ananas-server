@@ -22,5 +22,8 @@ target_link_libraries(ananas_server
         PUBLIC
         juce::juce_audio_basics
         ananas_utilities
-        atomic
 )
+
+if(NOT APPLE)
+        target_link_libraries(ananas_server atomic)
+endif()
