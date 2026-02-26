@@ -10,7 +10,7 @@ set(juceFormats Standalone)
 
 # Up to 22 sources @ 32 frames
 # Up to 44 sources @ 16 frames
-set(numSources 16)
+set(numSources 8)
 
 set(numModules 8)
 
