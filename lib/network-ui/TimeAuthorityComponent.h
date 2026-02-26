@@ -42,8 +42,6 @@ namespace ananas::UI
         public:
             TimeAuthorityTable();
 
-            ~TimeAuthorityTable() override;
-
             void update(const juce::var &var);
 
             int getNumRows() override;
@@ -55,12 +53,6 @@ namespace ananas::UI
             void resized() override;
 
         private:
-            class LookAndFeel final : public AnanasLookAndFeel
-            {
-            protected:
-                juce::Justification getTableHeaderJustification(int columnId) override;
-            };
-
             struct Row
             {
                 juce::String ip;
@@ -70,7 +62,6 @@ namespace ananas::UI
             };
 
             Row row{};
-            LookAndFeel lookAndFeel;
         };
 
         juce::Label title;

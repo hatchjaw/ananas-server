@@ -27,12 +27,12 @@ namespace ananas
         lastReceiveTime = juce::Time::getMillisecondCounter();
     }
 
-    uint ModuleInfo::getModuleId() const
+    int ModuleInfo::getModuleId() const
     {
         return id;
     }
 
-    void ModuleInfo::setModuleId(const uint id)
+    void ModuleInfo::setModuleId(int id)
     {
         this->id = id;
     }

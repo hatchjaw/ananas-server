@@ -27,9 +27,9 @@ namespace ananas
         void update();
 
 
-        [[nodiscard]] uint getModuleId() const;
+        [[nodiscard]] int getModuleId() const;
 
-        void setModuleId(uint id);
+        void setModuleId(int id);
 
         [[nodiscard]] juce::ValueTree toValueTree() const;
 
@@ -42,7 +42,7 @@ namespace ananas
         static ModuleInfo fromValueTree(const juce::ValueTree &tree);
 
     private:
-        uint id{0};
+        int id{0};
         juce::uint32 lastReceiveTime{0};
         bool wasConnected{false};
     };

@@ -1,7 +1,6 @@
 #ifndef CLIENTSOVERVIEWCOMPONENT_H
 #define CLIENTSOVERVIEWCOMPONENT_H
 
-#include <AnanasLookAndFeel.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include "AnanasNetworkTable.h"
 
@@ -37,7 +36,6 @@ namespace ananas::UI
 
         void triggerClientReboot() const;
 
-    private:
         class OverviewPanel final : public Component
         {
         public:
@@ -51,10 +49,20 @@ namespace ananas::UI
 
             void resized() override;
 
-        private:
             class PresentationTimeInterval final : public juce::Label
             {
             public:
+                //==============================================================
+
+                enum ColourIds
+                {
+                    okColourId = 0x2001410,
+                    warningColourId = 0x2001411,
+                    oneMicrosecondIndicatorColourId = 0x2001412,
+                };
+
+                //==============================================================
+
                 void setBackgroundWidth(float proportion);
 
                 void setMax(float maxSeen);
@@ -79,8 +87,6 @@ namespace ananas::UI
         public:
             ClientTable();
 
-            ~ClientTable() override;
-
             void update(const juce::var &clientInfo);
 
             int getNumRows() override;
@@ -94,12 +100,6 @@ namespace ananas::UI
             void resized() override;
 
         private:
-            class LookAndFeel final : public AnanasLookAndFeel
-            {
-            protected:
-                juce::Justification getTableHeaderJustification(int columnId) override;
-            };
-
             struct Row
             {
                 juce::String ip;
@@ -115,9 +115,9 @@ namespace ananas::UI
             };
 
             juce::Array<Row> rows;
-            LookAndFeel lookAndFeel;
         };
 
+    private:
         juce::Label title;
         juce::TextButton rebootAllClientsButton;
         OverviewPanel overviewPanel;

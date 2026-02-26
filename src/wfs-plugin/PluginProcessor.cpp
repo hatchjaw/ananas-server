@@ -193,6 +193,7 @@ void PluginProcessor::changeListenerCallback(juce::ChangeBroadcaster *source)
         dynamicTree.setProperty(ananas::Utils::Identifiers::ConnectedClientsParamID, clients->toVar(), nullptr);
     } else if (const auto *modules = dynamic_cast<ananas::ModuleList *>(source)) {
         persistentTree.setProperty(ananas::Utils::Identifiers::ModulesParamID, modules->toVar(), nullptr);
+        persistentTree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
 
         wfsMessenger.parameterChanged(
             ananas::WFS::Params::SpeakerSpacing.id,

@@ -14,8 +14,8 @@ namespace ananas::UI
                                                       BinaryData::FF_Unit_Pro_Bold_otfSize)
           }
     {
-        darkTextColour = juce::Colours::black.brighter(.3);
-        lightTextColour = juce::Colours::white.darker(.05);
+        darkColour = juce::Colours::black.brighter(.3);
+        lightColour = juce::Colours::white.darker(.05);
         okColour = juce::Colours::lightseagreen;
         warningColour = juce::Colours::palevioletred;
 
@@ -23,62 +23,62 @@ namespace ananas::UI
         setColour(juce::ResizableWindow::backgroundColourId, juce::Colours::ghostwhite);
 
         // Labels
-        setColour(juce::Label::textColourId, darkTextColour);
+        setColour(juce::Label::textColourId, darkColour);
 
         // Text buttons
         setColour(juce::TextButton::buttonColourId, okColour);
         setColour(juce::TextButton::buttonOnColourId, okColour.darker());
-        setColour(juce::TextButton::textColourOffId, lightTextColour);
-        setColour(juce::TextButton::textColourOnId, darkTextColour);
+        setColour(juce::TextButton::textColourOffId, lightColour);
+        setColour(juce::TextButton::textColourOnId, darkColour);
 
         // Toggle buttons
-        setColour(juce::ToggleButton::textColourId, darkTextColour);
-        setColour(juce::ToggleButton::tickColourId, darkTextColour);
-        setColour(juce::ToggleButton::tickDisabledColourId, darkTextColour);
+        setColour(juce::ToggleButton::textColourId, darkColour);
+        setColour(juce::ToggleButton::tickColourId, darkColour);
+        setColour(juce::ToggleButton::tickDisabledColourId, darkColour);
 
         // Sliders
-        setColour(juce::Slider::textBoxTextColourId, darkTextColour);
+        setColour(juce::Slider::textBoxTextColourId, darkColour);
 
-        // Comboboxes
-        setColour(juce::ComboBox::backgroundColourId, lightTextColour);
-        setColour(juce::ComboBox::textColourId, darkTextColour);
-        setColour(juce::ComboBox::outlineColourId, darkTextColour);
+        // Combo boxes
+        setColour(juce::ComboBox::backgroundColourId, lightColour);
+        setColour(juce::ComboBox::textColourId, darkColour);
+        setColour(juce::ComboBox::outlineColourId, darkColour);
         setColour(juce::ComboBox::arrowColourId, okColour);
-        setColour(juce::ComboBox::focusedOutlineColourId, darkTextColour.brighter(.25));
+        setColour(juce::ComboBox::focusedOutlineColourId, darkColour.brighter(.25));
 
         // Popup menus
-        setColour(juce::PopupMenu::backgroundColourId, lightTextColour);
-        setColour(juce::PopupMenu::textColourId, darkTextColour);
+        setColour(juce::PopupMenu::backgroundColourId, lightColour);
+        setColour(juce::PopupMenu::textColourId, darkColour);
         setColour(juce::PopupMenu::highlightedBackgroundColourId, juce::Colour(0xff0066cc));
-        setColour(juce::PopupMenu::highlightedTextColourId, lightTextColour);
-        setColour(juce::PopupMenu::headerTextColourId, darkTextColour.withAlpha(0.6f));
+        setColour(juce::PopupMenu::highlightedTextColourId, lightColour);
+        setColour(juce::PopupMenu::headerTextColourId, darkColour.withAlpha(0.6f));
 
         // Tooltips
-        setColour(juce::TooltipWindow::backgroundColourId, darkTextColour);
-        setColour(juce::TooltipWindow::textColourId, lightTextColour);
-        setColour(juce::TooltipWindow::outlineColourId, lightTextColour);
+        setColour(juce::TooltipWindow::backgroundColourId, darkColour);
+        setColour(juce::TooltipWindow::textColourId, lightColour);
+        setColour(juce::TooltipWindow::outlineColourId, darkColour);
 
         // Text fields
-        setColour(juce::TextEditor::backgroundColourId, lightTextColour.darker(.1));
-        setColour(juce::TextEditor::textColourId, darkTextColour);
-        setColour(juce::TextEditor::outlineColourId, lightTextColour);
+        setColour(juce::TextEditor::backgroundColourId, lightColour.darker(.1));
+        setColour(juce::TextEditor::textColourId, darkColour);
+        setColour(juce::TextEditor::outlineColourId, lightColour);
 
         // No-network overlay
-        setColour(OverlayableComponent::OverlayComponent::backgroundColourId, darkTextColour.withAlpha(0.25f));
-        setColour(OverlayableComponent::OverlayComponent::boxShadowColourId, darkTextColour.withAlpha(0.5f));
+        setColour(OverlayableComponent::OverlayComponent::backgroundColourId, darkColour.withAlpha(0.25f));
+        setColour(OverlayableComponent::OverlayComponent::boxShadowColourId, darkColour.withAlpha(0.5f));
         setColour(OverlayableComponent::OverlayComponent::boxBackgroundColourId, juce::Colours::whitesmoke);
         setColour(OverlayableComponent::OverlayComponent::boxBorderColourId, juce::Colours::slategrey);
-        setColour(OverlayableComponent::OverlayComponent::boxTextColourId, darkTextColour);
+        setColour(OverlayableComponent::OverlayComponent::boxTextColourId, darkColour);
 
         // Network overview
         setColour(NetworkOverviewComponent::backgroundColourId, juce::Colours::transparentWhite);
 
         // Network overview tables
         setColour(juce::TableListBox::backgroundColourId, juce::Colours::transparentWhite);
-        setColour(juce::TableListBox::outlineColourId, darkTextColour);
-        setColour(juce::TableHeaderComponent::textColourId, darkTextColour);
-        setColour(juce::TableHeaderComponent::outlineColourId, darkTextColour);
-        setColour(AnanasNetworkTable::textColourId, darkTextColour);
+        setColour(juce::TableListBox::outlineColourId, darkColour);
+        setColour(juce::TableHeaderComponent::textColourId, darkColour);
+        setColour(juce::TableHeaderComponent::outlineColourId, darkColour);
+        setColour(AnanasNetworkTable::textColourId, darkColour);
         setColour(AnanasNetworkTable::okColourId, okColour);
         setColour(AnanasNetworkTable::warningColourId, warningColour);
 
@@ -90,6 +90,18 @@ namespace ananas::UI
 
         // Clients
         setColour(ClientsOverviewComponent::backgroundColourId, juce::Colours::transparentWhite);
+        setColour(
+            ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId,
+            okColour
+        );
+        setColour(
+            ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId,
+            warningColour
+        );
+        setColour(
+            ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId,
+            juce::Colours::white
+        );
     }
 
     juce::Typeface::Ptr AnanasLookAndFeel::getTypefaceForFont(const juce::Font &font)
@@ -196,11 +208,42 @@ namespace ananas::UI
 
         g.setColour(header.findColour(juce::TableHeaderComponent::textColourId));
         g.setFont(withDefaultMetrics(juce::FontOptions{static_cast<float>(height) * 0.5f, juce::Font::bold}));
-        g.drawFittedText(columnName, area, getTableHeaderJustification(columnId), 1);
+
+        auto j{juce::Justification::centred};
+        if (const auto ananasTable{dynamic_cast<AnanasNetworkTable *>(header.getParentComponent()->getParentComponent())}) {
+            j = ananasTable->getJustification(columnId);
+        }
+        g.drawFittedText(columnName, area, j, 1);
     }
 
     juce::Font AnanasLookAndFeel::getTextButtonFont(juce::TextButton &text_button, int buttonHeight)
     {
         return withDefaultMetrics(juce::FontOptions{juce::jmin(16.0f, static_cast<float>(buttonHeight) * 0.6f), juce::Font::bold});
+    }
+
+    void AnanasLookAndFeel::drawPresentationTimeInterval(juce::Graphics &g,
+                                                         const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
+                                                         const float backgroundProportion,
+                                                         const float maxValue)
+    {
+        const auto bounds{p.getLocalBounds().toFloat()};
+        const auto maxWidth{bounds.getWidth() - 1};
+        const auto rectWidth{maxWidth * backgroundProportion};
+
+        g.setColour(backgroundProportion <= getOneMicrosecondPosition()
+                        ? p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.25f)
+                        : p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.25f));
+        g.fillRect(0.0f, 0.0f, rectWidth, bounds.getHeight());
+        if (backgroundProportion > getOneMicrosecondPosition()) {
+            g.setColour(p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId));
+            g.drawVerticalLine(maxWidth * .2f, 0.f, bounds.getHeight());
+        }
+
+        if (maxValue > 0.f) {
+            g.setColour(maxValue <= getOneMicrosecondPosition()
+                            ? p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.5f)
+                            : p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.5f));
+            g.fillRect(maxWidth * maxValue - 1.f, 0.0f, getPresentationTimeIntervalPersistentMarkerWidth(), bounds.getHeight());
+        }
     }
 }

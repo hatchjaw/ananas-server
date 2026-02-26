@@ -47,8 +47,6 @@ namespace ananas::UI
         public:
             SwitchesTable();
 
-            ~SwitchesTable() override;
-
             void update(const juce::var &var);
 
             int getNumRows() override;
@@ -73,12 +71,6 @@ namespace ananas::UI
             bool isEditing{false};
 
         private:
-            class LookAndFeel final : public AnanasLookAndFeel
-            {
-            protected:
-                juce::Justification getTableHeaderJustification(int columnId) override;
-            };
-
             struct Row
             {
                 juce::Identifier id;
@@ -91,7 +83,6 @@ namespace ananas::UI
 
             inline static const juce::Array<int> editableColumnIDs{1, 2, 3};
             constexpr static int passwordColumnID{3};
-            LookAndFeel lookAndFeel;
             juce::Array<Row> rows;
         };
 

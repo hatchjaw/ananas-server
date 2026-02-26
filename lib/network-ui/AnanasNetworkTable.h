@@ -12,14 +12,15 @@ namespace ananas::UI
     public:
         enum ColourIds
         {
-            textColourId = 0x20018000,
+            textColourId = 0x2001800,
             okColourId = 0x2001801,
             warningColourId = 0x2001802,
         };
-    protected:
-        void addColumn(const TableColumns::ColumnHeader &h);
 
         [[nodiscard]] juce::Justification::Flags getJustification(int columnId) const;
+
+    protected:
+        void addColumn(const TableColumns::ColumnHeader &h);
 
         juce::TableListBox table;
 

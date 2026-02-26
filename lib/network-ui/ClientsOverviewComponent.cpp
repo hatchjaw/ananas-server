@@ -1,4 +1,5 @@
 #include "ClientsOverviewComponent.h"
+#include <AnanasLookAndFeel.h>
 #include <AnanasUtils.h>
 
 namespace ananas::UI
@@ -130,13 +131,30 @@ namespace ananas::UI
                 numUpdates = 0;
             }
 
-            if (presentationTimeInterval > maxPresentationTimeInterval) {
-                maxPresentationTimeInterval = presentationTimeInterval;
-                presentationTimeIntervalValue.setMax(juce::jmin(1.f, maxPresentationTimeInterval / 5000.f));
+            auto maxNanoseconds{5000.f};
+            if (const auto lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())}) {
+                maxNanoseconds = lnf->getMaxMicrosecondsToDisplay() * 1000.f;
             }
 
-            presentationTimeIntervalValue.setText(getPresentationTimeIntervalText(presentationTimeInterval), juce::dontSendNotification);
-            presentationTimeIntervalValue.setBackgroundWidth(juce::jlimit(0.f, 1.f, presentationTimeInterval / 5000.f));
+            if (presentationTimeInterval > maxPresentationTimeInterval) {
+                maxPresentationTimeInterval = presentationTimeInterval;
+                presentationTimeIntervalValue.setMax(
+                    juce::jmin(1.f, static_cast<float>(maxPresentationTimeInterval) / maxNanoseconds)
+                );
+            }
+
+            presentationTimeIntervalValue.setText(
+                getPresentationTimeIntervalText(presentationTimeInterval),
+                juce::dontSendNotification
+            );
+
+            presentationTimeIntervalValue.setBackgroundWidth(
+                juce::jlimit(
+                    0.f,
+                    1.f,
+                    static_cast<float>(presentationTimeInterval) / maxNanoseconds
+                )
+            );
         }
     }
 
@@ -183,20 +201,8 @@ namespace ananas::UI
 
     void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::paint(juce::Graphics &g)
     {
-        const auto bounds{getLocalBounds().toFloat()};
-        const auto maxWidth{bounds.getWidth() - 1};
-        const auto rectWidth{maxWidth * backgroundProportion};
-
-        g.setColour(backgroundProportion <= .2 ? juce::Colours::lightseagreen.withAlpha(.25f) : juce::Colours::palevioletred.withAlpha(.25f));
-        g.fillRect(0.0f, 0.0f, rectWidth, bounds.getHeight());
-        if (backgroundProportion > .2) {
-            g.setColour(juce::Colours::white);
-            g.drawVerticalLine(maxWidth * .2f, 0.f, bounds.getHeight());
-        }
-
-        if (maxValue > 0.f) {
-            g.setColour(maxValue <= .2 ? juce::Colours::lightseagreen.withAlpha(.5f) : juce::Colours::palevioletred.withAlpha(.5f));
-            g.fillRect(maxWidth * maxValue - 1.f, 0.0f, 2.f, bounds.getHeight());
+        if (auto *lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())}) {
+            lnf->drawPresentationTimeInterval(g, *this, backgroundProportion, maxValue);
         }
 
         Label::paint(g);
@@ -217,15 +223,8 @@ namespace ananas::UI
         addColumn(TableColumns::ClientTablePercentCPU);
         addColumn(TableColumns::ClientTableModuleID);
 
-        setLookAndFeel(&lookAndFeel);
-
         table.setModel(this);
         table.setOutlineThickness(1);
-    }
-
-    ClientsOverviewComponent::ClientTable::~ClientTable()
-    {
-        setLookAndFeel(nullptr);
     }
 
     void ClientsOverviewComponent::ClientTable::update(const juce::var &clientInfo)
@@ -334,20 +333,5 @@ namespace ananas::UI
     void ClientsOverviewComponent::ClientTable::resized()
     {
         table.setBounds(getLocalBounds().reduced(10));
-    }
-
-    juce::Justification ClientsOverviewComponent::ClientTable::LookAndFeel::getTableHeaderJustification(const int columnId)
-    {
-        switch (columnId) {
-            case 1: return TableColumns::ClientTableIpAddress.justification;
-            case 2: return TableColumns::ClientTableSerialNumber.justification;
-            case 3: return TableColumns::ClientTablePTPLock.justification;
-            case 4: return TableColumns::ClientTablePresentationTimeOffset.justification;
-            case 5: return TableColumns::ClientTableBufferFillPercent.justification;
-            case 6: return TableColumns::ClientTableSamplingRate.justification;
-            case 7: return TableColumns::ClientTablePercentCPU.justification;
-            case 8: return TableColumns::ClientTableModuleID.justification;
-            default: return AnanasLookAndFeel::getTableHeaderJustification(columnId);
-        }
     }
 }

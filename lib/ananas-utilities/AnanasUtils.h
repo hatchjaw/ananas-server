@@ -82,6 +82,7 @@ namespace ananas::Utils
         inline const static juce::Identifier ModulesParamID{"Modules"};
 
         inline const static juce::Identifier ModuleIDPropertyID{"ModuleID"};
+        inline const static juce::Identifier ModuleIDHasChangedPropertyID{"ModuleIDHasChanged"};
         inline const static juce::Identifier ModuleIsConnectedPropertyID{"ModuleIsConnected"};
     };
 

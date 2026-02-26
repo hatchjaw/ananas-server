@@ -50,13 +50,23 @@ namespace ananas::WFS
             if (auto *obj = treeWhosePropertyHasChanged[property].getDynamicObject()) {
                 for (const auto &prop: obj->getProperties()) {
                     auto module{obj->getProperty(prop.name)};
-                    auto id{module.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, 0)};
-                    auto path{Params::getModuleIndexParamID(id)};
-                    juce::OSCBundle bundle;
-                    // DBG("Sending OSC: " << path << " " << prop.name);
-                    bundle.addElement(juce::OSCMessage{path, prop.name.toString()});
-                    send(bundle);
+                    auto hasChanged{module.getProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, false)};
+                    if (hasChanged) {
+                        auto id{module.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, 0)};
+                        auto path{Params::getModuleIndexParamID(id)};
+                        juce::OSCBundle bundle;
+                        DBG("Sending OSC: " << path << " " << prop.name);
+                        bundle.addElement(juce::OSCMessage{path, prop.name.toString()});
+                        send(bundle);
+
+                        if (auto *moduleObj{module.getDynamicObject()}) {
+                            moduleObj->setProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, false);
+                            obj->setProperty(prop.name, module);
+                        }
+                    }
                 }
+
+                treeWhosePropertyHasChanged.setProperty(property, juce::var{obj}, nullptr);
             }
         }
     }
@@ -77,7 +87,7 @@ namespace ananas::WFS
         for (auto &[id, slot]: slots) {
             if (slot.changed.load()) {
                 juce::OSCBundle bundle;
-                // DBG("Sending OSC: " << parameterID << " " << newValue);
+                DBG("Sending OSC: " << id << " " << slot.value.load());
                 bundle.addElement(juce::OSCMessage{id, slot.value.load()});
                 send(bundle);
                 slot.changed.store(false);
