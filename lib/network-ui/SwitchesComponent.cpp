@@ -173,15 +173,8 @@ namespace ananas::UI
         addColumn(TableColumns::SwitchesTableResetPTP);
         addColumn(TableColumns::SwitchesTableRemoveSwitch);
 
-        setLookAndFeel(&lookAndFeel);
-
         table.setModel(this);
         table.setOutlineThickness(1);
-    }
-
-    SwitchesComponent::SwitchesTable::~SwitchesTable()
-    {
-        setLookAndFeel(nullptr);
     }
 
     void SwitchesComponent::SwitchesTable::update(const juce::var &var)
@@ -361,19 +354,5 @@ namespace ananas::UI
     juce::Identifier SwitchesComponent::SwitchesTable::getSwitchID(const int rowNumber) const
     {
         return rows[rowNumber].id;
-    }
-
-    juce::Justification SwitchesComponent::SwitchesTable::LookAndFeel::getTableHeaderJustification(int columnId)
-    {
-        switch (columnId) {
-            case 1: return TableColumns::SwitchesTableIpAddress.justification;
-            case 2: return TableColumns::SwitchesTableUsername.justification;
-            case 3: return TableColumns::SwitchesTablePassword.justification;
-            case 4: return TableColumns::SwitchesTableDrift.justification;
-            case 5: return TableColumns::SwitchesTableOffset.justification;
-            case 6: return TableColumns::SwitchesTableResetPTP.justification;
-            case 7: return TableColumns::SwitchesTableRemoveSwitch.justification;
-            default: return AnanasLookAndFeel::getTableHeaderJustification(columnId);
-        }
     }
 } // ananas::UI

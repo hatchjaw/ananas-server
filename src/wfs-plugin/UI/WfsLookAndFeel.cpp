@@ -8,9 +8,9 @@ namespace ananas::WFS::UI
         setColour(juce::TabbedComponent::backgroundColourId, juce::Colours::whitesmoke);
         setColour(juce::TabbedComponent::outlineColourId, juce::Colours::transparentWhite);
         setColour(juce::TabbedButtonBar::tabOutlineColourId, juce::Colours::transparentWhite);
-        setColour(juce::TabbedButtonBar::tabTextColourId, darkTextColour.brighter(.5));
+        setColour(juce::TabbedButtonBar::tabTextColourId, darkColour.brighter(.5));
         setColour(juce::TabbedButtonBar::frontOutlineColourId, juce::Colours::transparentWhite);
-        setColour(juce::TabbedButtonBar::frontTextColourId, darkTextColour);
+        setColour(juce::TabbedButtonBar::frontTextColourId, darkColour);
 
         // XY controller
         setColour(XYControllerComponent::backgroundColourId, juce::Colours::black.withAlpha(0.1f));
@@ -19,7 +19,7 @@ namespace ananas::WFS::UI
         // XY controller nodes
         setColour(XYControllerComponent::Node::backgroundColourId, juce::Colours::white.withAlpha(0.5f));
         setColour(XYControllerComponent::Node::borderColourId, juce::Colours::lightseagreen);
-        setColour(XYControllerComponent::Node::textColourId, darkTextColour);
+        setColour(XYControllerComponent::Node::textColourId, darkColour);
 
         // Speaker icons
         setColour(SpeakerIconComponent::fillColourId, juce::Colours::lightgrey);

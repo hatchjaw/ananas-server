@@ -35,11 +35,12 @@ namespace ananas::WFS::UI
         moduleSelector.addItemList(ips, 1);
 
         const auto modules{tree.getProperty(ananas::Utils::Identifiers::ModulesParamID)};
-        const auto varIntN{juce::var{index}};
-        const auto defaultModuleID{juce::var{0}};
+
         if (auto *obj = modules.getDynamicObject()) {
             for (const auto &prop: obj->getProperties()) {
-                if (prop.value.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, defaultModuleID) == varIntN) {
+                const auto module{obj->getProperty(prop.name).getDynamicObject()};
+
+                if (module->getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID) == juce::var{index}) {
                     setSelectedModule(prop.name.toString());
                 }
             }
@@ -48,12 +49,24 @@ namespace ananas::WFS::UI
 
     void ModuleComponent::setIndexForModule() const
     {
+        const auto selected{moduleSelector.getText()};
+
         const auto modules{tree.getProperty(ananas::Utils::Identifiers::ModulesParamID)};
         if (auto *obj = modules.getDynamicObject()) {
             for (const auto &prop: obj->getProperties()) {
-                if (prop.name.toString() == moduleSelector.getText()) {
-                    const auto module{obj->getProperty(prop.name).getDynamicObject()};
-                    module->setProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, static_cast<int>(index));
+                const auto module{obj->getProperty(prop.name).getDynamicObject()};
+
+                if (prop.name.toString() == selected) {
+                    // If the module's IP matches this selector's text, set the module's index equal
+                    // to the index of this selector.
+                    module->setProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, index);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, true);
+                    tree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
+                } else if (module->getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID) == juce::var{index}) {
+                    // If the module's ID matches the index of this selector, it's being replaced,
+                    // so set its ID to -1.
+                    module->setProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, -1);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, true);
                     tree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
                 }
             }

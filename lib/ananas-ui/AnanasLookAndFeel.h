@@ -1,6 +1,7 @@
 #ifndef ANANASUILOOKANDFEEL_H
 #define ANANASUILOOKANDFEEL_H
 
+#include <ClientsOverviewComponent.h>
 #include <OverlayableComponent.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 
@@ -35,28 +36,33 @@ namespace ananas::UI
 
         juce::Font getTextButtonFont(juce::TextButton &, int buttonHeight) override;
 
-    protected:
-        virtual juce::Justification getTableHeaderJustification(int columnId)
-        {
-            juce::ignoreUnused(columnId);
-            return juce::Justification::centred;
-        }
+        void drawPresentationTimeInterval(juce::Graphics &g,
+                                          const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
+                                          float backgroundProportion,
+                                          float maxValue);
 
+        [[nodiscard]] virtual float getMaxMicrosecondsToDisplay() const { return 5.f; }
+
+    protected:
         juce::Typeface::Ptr typefaceSans, typefaceBold;
-        juce::Colour darkTextColour, lightTextColour, okColour, warningColour;
+        juce::Colour darkColour, lightColour, okColour, warningColour;
 
     private:
-        virtual int getOverlayBoxWidth() const { return 400; }
+        [[nodiscard]] virtual int getOverlayBoxWidth() const { return 400; }
 
-        virtual int getOverlayBoxHeight() const { return 200; }
+        [[nodiscard]] virtual int getOverlayBoxHeight() const { return 200; }
 
-        virtual float getOverlayBoxBorderRadius() const { return 10.f; }
+        [[nodiscard]] virtual float getOverlayBoxBorderRadius() const { return 10.f; }
 
-        virtual float getOverlayBoxBorderThickness() const { return 5.f; }
+        [[nodiscard]] virtual float getOverlayBoxBorderThickness() const { return 5.f; }
 
-        virtual int getOverlayBoxShadowOffset() const { return 4; }
+        [[nodiscard]] virtual int getOverlayBoxShadowOffset() const { return 4; }
 
-        virtual float getOverlayBoxTextSize() const { return 20.f; }
+        [[nodiscard]] virtual float getOverlayBoxTextSize() const { return 20.f; }
+
+        [[nodiscard]] virtual float getOneMicrosecondPosition() const { return 1.f / getMaxMicrosecondsToDisplay(); }
+
+        [[nodiscard]] virtual float getPresentationTimeIntervalPersistentMarkerWidth() const { return 2.f; }
 
         int totalWidth{};
         int totalNumTabs{};

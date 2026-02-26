@@ -67,15 +67,8 @@ namespace ananas::UI
         addColumn(TableColumns::AuthorityTableFeedbackAccumulator);
         addColumn(TableColumns::AuthorityTableSamplingRate);
 
-        setLookAndFeel(&lookAndFeel);
-
         table.setModel(this);
         table.setOutlineThickness(1);
-    }
-
-    TimeAuthorityComponent::TimeAuthorityTable::~TimeAuthorityTable()
-    {
-        setLookAndFeel(nullptr);
     }
 
     void TimeAuthorityComponent::TimeAuthorityTable::update(const juce::var &var)
@@ -141,16 +134,5 @@ namespace ananas::UI
     void TimeAuthorityComponent::TimeAuthorityTable::resized()
     {
         table.setBounds(getLocalBounds().reduced(10));
-    }
-
-    juce::Justification TimeAuthorityComponent::TimeAuthorityTable::LookAndFeel::getTableHeaderJustification(int columnId)
-    {
-        switch (columnId) {
-            case 1: return TableColumns::AuthorityTableIpAddress.justification;
-            case 2: return TableColumns::AuthorityTableSerialNumber.justification;
-            case 3: return TableColumns::AuthorityTableFeedbackAccumulator.justification;
-            case 4: return TableColumns::AuthorityTableSamplingRate.justification;
-            default: return AnanasLookAndFeel::getTableHeaderJustification(columnId);
-        }
     }
 }
