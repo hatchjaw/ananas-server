@@ -11,7 +11,7 @@ namespace ananas::UI
                                            juce::AsyncUpdater
     {
     public:
-        explicit ClientsOverviewComponent(juce::ValueTree &treeToListenTo);
+        explicit ClientsOverviewComponent(juce::ValueTree &dynamicTree);
 
         ~ClientsOverviewComponent() override;
 
@@ -85,7 +85,7 @@ namespace ananas::UI
         class ClientTable final : public AnanasNetworkTable
         {
         public:
-            ClientTable();
+            explicit ClientTable(bool showModuleIDColumn);
 
             void update(const juce::var &clientInfo);
 
@@ -121,7 +121,7 @@ namespace ananas::UI
         juce::Label title;
         juce::TextButton rebootAllClientsButton;
         OverviewPanel overviewPanel;
-        ClientTable clientTable;
+        std::unique_ptr<ClientTable> clientTable;
         juce::ValueTree &tree;
     };
 }

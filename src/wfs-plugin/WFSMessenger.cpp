@@ -87,7 +87,7 @@ namespace ananas::WFS
         for (auto &[id, slot]: slots) {
             if (slot.changed.load()) {
                 juce::OSCBundle bundle;
-                DBG("Sending OSC: " << id << " " << slot.value.load());
+                // DBG("Sending OSC: " << id << " " << slot.value.load());
                 bundle.addElement(juce::OSCMessage{id, slot.value.load()});
                 send(bundle);
                 slot.changed.store(false);

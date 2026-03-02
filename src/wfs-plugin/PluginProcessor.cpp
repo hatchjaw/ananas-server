@@ -24,6 +24,10 @@ PluginProcessor::PluginProcessor()
         // Set up source amplitudes for visualisation.
         sourceAmplitudes.set(static_cast<int>(n), new std::atomic{0.f});
     }
+
+    // Indicate that the network overview's clients overview should show module
+    // IDs.
+    dynamicTree.setProperty(ananas::Utils::Identifiers::ShowModuleIDsPropertyID, true, nullptr);
 }
 
 PluginProcessor::~PluginProcessor()

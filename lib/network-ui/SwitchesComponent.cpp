@@ -326,7 +326,7 @@ namespace ananas::UI
             auto *button{dynamic_cast<juce::Button *>(existingComponentToUpdate)};
 
             if (button == nullptr) {
-                button = new juce::TextButton{Strings::RemoveSwitchButtonText};
+                button = new RemoveSwitchButton{Strings::RemoveSwitchButtonText};
                 button->onClick = [this, rowNumber]
                 {
                     handleRemoveSwitch(rows[rowNumber].id);

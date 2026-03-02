@@ -4,13 +4,14 @@
 
 namespace ananas::UI
 {
-    ClientsOverviewComponent::ClientsOverviewComponent(juce::ValueTree &treeToListenTo)
-        : tree(treeToListenTo)
+    ClientsOverviewComponent::ClientsOverviewComponent(juce::ValueTree &dynamicTree)
+        : clientTable(std::make_unique<ClientTable>(dynamicTree.getProperty(Utils::Identifiers::ShowModuleIDsPropertyID))),
+          tree(dynamicTree)
     {
         addAndMakeVisible(title);
         addAndMakeVisible(rebootAllClientsButton);
         addAndMakeVisible(overviewPanel);
-        addAndMakeVisible(clientTable);
+        addAndMakeVisible(clientTable.get());
 
         title.setFont(juce::Font{juce::FontOptions{18.f, juce::Font::bold}});
         title.setJustificationType(juce::Justification::centredLeft);
@@ -35,7 +36,7 @@ namespace ananas::UI
     {
         if (!isVisible()) return;
 
-        clientTable.update(var);
+        clientTable->update(var);
         overviewPanel.update(var);
     }
 
@@ -54,7 +55,7 @@ namespace ananas::UI
         title.setBounds(titleRow.removeFromLeft(85));
         rebootAllClientsButton.setBounds(titleRow.removeFromLeft(100).reduced(8));
         overviewPanel.setBounds(bounds.removeFromTop(45));
-        clientTable.setBounds(bounds);
+        clientTable->setBounds(bounds);
     }
 
     void ClientsOverviewComponent::valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged, const juce::Identifier &property)
@@ -167,11 +168,8 @@ namespace ananas::UI
     {
         auto bounds = getLocalBounds().reduced(10);
 
-        // Split into left and right halves
-        const int halfWidth = bounds.getWidth() / 2;
-
         // Left stat
-        const auto leftBounds = bounds.removeFromLeft(halfWidth);
+        const auto leftBounds = bounds.removeFromLeft(bounds.getWidth() / 4);
         juce::FlexBox leftFlex;
         leftFlex.flexDirection = juce::FlexBox::Direction::row;
         leftFlex.items.add(juce::FlexItem(totalClientsLabel).withWidth(90));
@@ -210,7 +208,7 @@ namespace ananas::UI
 
     //==========================================================================
 
-    ClientsOverviewComponent::ClientTable::ClientTable()
+    ClientsOverviewComponent::ClientTable::ClientTable(bool showModuleIDColumn)
     {
         addAndMakeVisible(table);
 
@@ -221,7 +219,9 @@ namespace ananas::UI
         addColumn(TableColumns::ClientTableBufferFillPercent);
         addColumn(TableColumns::ClientTableSamplingRate);
         addColumn(TableColumns::ClientTablePercentCPU);
-        addColumn(TableColumns::ClientTableModuleID);
+        if (showModuleIDColumn) {
+            addColumn(TableColumns::ClientTableModuleID);
+        }
 
         table.setModel(this);
         table.setOutlineThickness(1);

@@ -26,7 +26,6 @@ namespace ananas
     public:
         void update();
 
-
         [[nodiscard]] int getModuleId() const;
 
         void setModuleId(int id);

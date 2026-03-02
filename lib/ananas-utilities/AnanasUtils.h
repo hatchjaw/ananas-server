@@ -38,6 +38,8 @@ namespace ananas::Utils
         inline static const juce::Identifier DynamicTreeType{"EphemeralData"};
         inline static const juce::Identifier PersistentTreeType{"PersistentData"};
 
+        inline const static juce::Identifier ShowModuleIDsPropertyID{"ShowModuleIDs"};
+
         inline const static juce::Identifier SwitchesParamID{"Switches"};
 
         inline static const juce::Identifier SwitchIdentifierBase{"switch_"};
@@ -78,6 +80,8 @@ namespace ananas::Utils
         inline const static juce::Identifier ClientSamplingRatePropertyID{"samplingRate"};
         inline const static juce::Identifier ClientPercentCPUPropertyID{"percentCPU"};
         inline const static juce::Identifier ClientModuleIDPropertyID{"moduleID"};
+        inline const static juce::Identifier ClientMinYCoordinatePropertyID{"minY"};
+        inline const static juce::Identifier ClientMaxYCoordinatePropertyID{"maxY"};
 
         inline const static juce::Identifier ModulesParamID{"Modules"};
 

@@ -41,7 +41,6 @@ namespace ananas::UI
 
         void resetPtpForSwitch(const juce::Identifier &switchID) const;
 
-    private:
         class SwitchesTable final : public AnanasNetworkTable
         {
         public:
@@ -69,6 +68,12 @@ namespace ananas::UI
             std::function<void(juce::Identifier switchID)> onSwitchRemoved;
             std::function<void(juce::Identifier switchID)> onResetPtpForSwitch;
             bool isEditing{false};
+
+            class RemoveSwitchButton final : public juce::TextButton
+            {
+            public:
+                using TextButton::TextButton;
+            };
 
         private:
             struct Row
