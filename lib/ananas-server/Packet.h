@@ -37,7 +37,6 @@ namespace ananas
         uint consecutiveBadTimestampCount{0};
     };
 
-#pragma pack(push, 1)
     struct ClientAnnouncePacket
     {
         juce::uint32 serial;
@@ -48,20 +47,10 @@ namespace ananas
         juce::int32 audioPTPOffsetNs;
         juce::uint8 bufferFillPercent;
         bool ptpLock;
-        juce::int16 moduleID;
+        juce::int16 moduleID{-1};
+        float minYCoordinateM{0.f};
+        float maxYCoordinateM{0.f};
     };
-
-    // TODO: Separate announcement packets for modules
-    //  (Plus a template argument to the Server or ClientListener classes?)
-    //  Doesn't make sense for clients to send a module ID if they're not (WFS)
-    //  modules. Ambiguity here.
-    // struct ModuleAnnouncePacket : ClientAnnouncePacket
-    // {
-    //     juce::uint16 moduleID;
-    //     float minYCoordinateM;
-    //     float maxYCoordinateM;
-    // };
-#pragma pack(pop)
 
     struct AuthorityAnnouncePacket
     {

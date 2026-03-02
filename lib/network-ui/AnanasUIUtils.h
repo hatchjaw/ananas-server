@@ -30,8 +30,8 @@ namespace ananas::UI
         inline static const juce::StringRef AddSwitchButtonName{"Add switch button"};
         inline static const juce::StringRef AddSwitchButtonText{"+"};
         inline static const juce::StringRef AddSwitchButtonTooltip{"Click to add a new switch."};
-        inline static const juce::StringRef ResetSwitchButtonText{"Reset"};
-        inline static const juce::StringRef RemoveSwitchButtonText{"Remove"};
+        inline static const juce::StringRef ResetSwitchButtonText{"↻"};
+        inline static const juce::StringRef RemoveSwitchButtonText{"×"};
 
         inline static const juce::StringRef TimeAuthoritySectionTitle{"TIME AUTHORITY"};
 

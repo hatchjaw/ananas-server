@@ -216,6 +216,52 @@ namespace ananas::UI
         g.drawFittedText(columnName, area, j, 1);
     }
 
+    void AnanasLookAndFeel::drawButtonBackground(juce::Graphics &g, juce::Button &button, const juce::Colour &backgroundColour,
+                                                 bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+    {
+        auto cornerSize = 6.0f;
+        auto bounds = button.getLocalBounds().toFloat().reduced(0.5f, 0.5f);
+
+        auto baseColour = backgroundColour.withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
+                .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f);
+
+        if (dynamic_cast<SwitchesComponent::SwitchesTable::RemoveSwitchButton *>(&button)) {
+            baseColour = warningColour.withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
+                .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f);
+        }
+
+        if (shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted)
+            baseColour = baseColour.contrasting(shouldDrawButtonAsDown ? 0.2f : 0.05f);
+
+        g.setColour(baseColour);
+
+        auto flatOnLeft = button.isConnectedOnLeft();
+        auto flatOnRight = button.isConnectedOnRight();
+        auto flatOnTop = button.isConnectedOnTop();
+        auto flatOnBottom = button.isConnectedOnBottom();
+
+        if (flatOnLeft || flatOnRight || flatOnTop || flatOnBottom) {
+            juce::Path path;
+            path.addRoundedRectangle(bounds.getX(), bounds.getY(),
+                                     bounds.getWidth(), bounds.getHeight(),
+                                     cornerSize, cornerSize,
+                                     !(flatOnLeft || flatOnTop),
+                                     !(flatOnRight || flatOnTop),
+                                     !(flatOnLeft || flatOnBottom),
+                                     !(flatOnRight || flatOnBottom));
+
+            g.fillPath(path);
+
+            g.setColour(button.findColour(juce::ComboBox::outlineColourId));
+            g.strokePath(path, juce::PathStrokeType(1.0f));
+        } else {
+            g.fillRoundedRectangle(bounds, cornerSize);
+
+            g.setColour(button.findColour(juce::ComboBox::outlineColourId));
+            g.drawRoundedRectangle(bounds, cornerSize, 1.0f);
+        }
+    }
+
     juce::Font AnanasLookAndFeel::getTextButtonFont(juce::TextButton &text_button, int buttonHeight)
     {
         return withDefaultMetrics(juce::FontOptions{juce::jmin(16.0f, static_cast<float>(buttonHeight) * 0.6f), juce::Font::bold});
@@ -224,23 +270,23 @@ namespace ananas::UI
     void AnanasLookAndFeel::drawPresentationTimeInterval(juce::Graphics &g,
                                                          const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
                                                          const float backgroundProportion,
-                                                         const float maxValue)
+                                                         const float maxValue) const
     {
         const auto bounds{p.getLocalBounds().toFloat()};
         const auto maxWidth{bounds.getWidth() - 1};
         const auto rectWidth{maxWidth * backgroundProportion};
 
-        g.setColour(backgroundProportion <= getOneMicrosecondPosition()
+        g.setColour(backgroundProportion <= getOneMicrosecondProportion()
                         ? p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.25f)
                         : p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.25f));
         g.fillRect(0.0f, 0.0f, rectWidth, bounds.getHeight());
-        if (backgroundProportion > getOneMicrosecondPosition()) {
+        if (backgroundProportion > getOneMicrosecondProportion()) {
             g.setColour(p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId));
-            g.drawVerticalLine(maxWidth * .2f, 0.f, bounds.getHeight());
+            g.drawVerticalLine(maxWidth * getOneMicrosecondProportion(), 0.f, bounds.getHeight());
         }
 
         if (maxValue > 0.f) {
-            g.setColour(maxValue <= getOneMicrosecondPosition()
+            g.setColour(maxValue <= getOneMicrosecondProportion()
                             ? p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.5f)
                             : p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.5f));
             g.fillRect(maxWidth * maxValue - 1.f, 0.0f, getPresentationTimeIntervalPersistentMarkerWidth(), bounds.getHeight());

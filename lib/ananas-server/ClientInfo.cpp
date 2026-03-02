@@ -40,7 +40,7 @@ namespace ananas
     juce::ValueTree ModuleInfo::toValueTree() const
     {
         juce::ValueTree tree{"Module"};
-        tree.setProperty(Utils::Identifiers::ModuleIDPropertyID, static_cast<int>(id), nullptr);
+        tree.setProperty(Utils::Identifiers::ModuleIDPropertyID, id, nullptr);
         return tree;
     }
 
@@ -120,7 +120,9 @@ namespace ananas
                 audioPTPOffsetNs,
                 bufferFillPercent,
                 ptpLock,
-                moduleID
+                moduleID,
+                minY,
+                maxY
             ]{clientInfo.getInfo()};
             client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(serial));
             client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, ptpLock);
@@ -167,13 +169,16 @@ namespace ananas
 
     void ClientList::checkConnectivity()
     {
-        for (auto it{clients.begin()}, next{it}; it != clients.end(); it = next) {
-            ++next;
-            if (!it->second.isConnected()) {
-                std::cout << "Client " << it->first << " disconnected." << std::endl;
-                clients.erase(it);
-                sendChangeMessage();
+        std::vector<juce::String> toErase;
+        for (const auto &[ip, c]: clients) {
+            if (!c.isConnected()) {
+                std::cout << "Client " << ip << " disconnected." << std::endl;
+                toErase.push_back(ip);
             }
+        }
+        for (const auto &ip: toErase) {
+            clients.erase(ip);
+            sendChangeMessage();
         }
     }
 
@@ -189,9 +194,11 @@ namespace ananas
         if (iter == modules.end()) {
             ModuleInfo m{};
             iter = modules.insert(std::make_pair(moduleIP, m)).first;
+            std::cout << "Module " << moduleIP << " available." << std::endl;
         }
         iter->second.update();
         if (iter->second.justConnected()) {
+            std::cout << "Module " << iter->first << " just connected." << std::endl;
             sendChangeMessage();
         }
     }
@@ -243,6 +250,7 @@ namespace ananas
     {
         for (auto it{modules.begin()}; it != modules.end(); ++it) {
             if (it->second.justDisconnected()) {
+                std::cout << "Module " << it->first << " just disconnected." << std::endl;
                 sendChangeMessage();
             }
         }
