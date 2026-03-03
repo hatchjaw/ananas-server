@@ -4,7 +4,7 @@ add_library(ananas_ui STATIC
 
 set_target_properties(ananas_ui PROPERTIES
         POSITION_INDEPENDENT_CODE ON
-        VERSION 0.1.2
+        VERSION 0.2.0
         SOVERSION 1
 )
 
