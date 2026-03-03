@@ -1,6 +1,7 @@
 #ifndef ANANASPACKET_H
 #define ANANASPACKET_H
 
+#include <AnanasUtils.h>
 #include <juce_core/juce_core.h>
 
 namespace ananas
@@ -37,9 +38,12 @@ namespace ananas
         uint consecutiveBadTimestampCount{0};
     };
 
+#pragma pack(push, 1)
     struct ClientAnnouncePacket
     {
         juce::uint32 serial;
+        Utils::FirmwareType firmwareType;
+        Utils::VersionNumber firmwareVersion;
         float samplingRate;
         float percentCPU;
         juce::int32 presentationOffsetFrame;
@@ -48,9 +52,8 @@ namespace ananas
         juce::uint8 bufferFillPercent;
         bool ptpLock;
         juce::int16 moduleID{-1};
-        float minYCoordinateM{0.f};
-        float maxYCoordinateM{0.f};
     };
+#pragma pack(pop)
 
     struct AuthorityAnnouncePacket
     {

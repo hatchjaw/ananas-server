@@ -76,53 +76,58 @@ namespace ananas::UI
         };
 
         inline static const ColumnHeader ClientTableIpAddress{
-            1, "IP address", 150, 30, -1,
+            1, "IP address", 125, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centredLeft
         };
         inline static const ColumnHeader ClientTableSerialNumber{
-            2, "Serial number", 125, 30, -1,
+            2, "Serial number", 100, 30, -1,
+            juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
+            juce::Justification::centred
+        };
+        inline static const ColumnHeader ClientTableFirmwareTypeVersion{
+            3, "Firmware", 125, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
         inline static const ColumnHeader ClientTablePTPLock{
-            3, "PTP lock", 75, 30, -1,
+            4, "PTP lock", 75, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
         inline static const ColumnHeader ClientTablePresentationTimeOffset{
-            4, "Presentation time offset (ns)", 200, 30, -1,
+            5, "Presentation time offset (ns)", 190, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centredRight
         };
         inline static const ColumnHeader ClientTableBufferFillPercent{
-            5, "Buffer fill level", 200, 30, -1,
+            6, "Buffer fill level", 200, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
         inline static const ColumnHeader ClientTableSamplingRate{
-            6, "Reported sampling rate (Hz)", 200, 30, -1,
+            7, "Reported sampling rate (Hz)", 190, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
         inline static const ColumnHeader ClientTablePercentCPU{
-            7, "CPU %", 75, 30, -1,
+            8, "CPU %", 60, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centredRight
         };
         inline static const ColumnHeader ClientTableModuleID{
-            8, "Module ID", 75, 30, -1,
+            9, "Module ID", 75, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
 
         inline static const ColumnHeader AuthorityTableIpAddress{
-            1, "IP address", 150, 30, -1,
+            1, "IP address", 125, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centredLeft
         };
         inline static const ColumnHeader AuthorityTableSerialNumber{
-            2, "Serial number", 125, 30, -1,
+            2, "Serial number", 100, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };

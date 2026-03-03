@@ -104,6 +104,7 @@ namespace ananas::UI
             {
                 juce::String ip;
                 juce::String serialNumber;
+                juce::String firmwareTypeVersion;
                 bool ptpLock;
                 juce::int32 presentationTimeOffsetNs;
                 juce::int32 presentationTimeOffsetFrame;
