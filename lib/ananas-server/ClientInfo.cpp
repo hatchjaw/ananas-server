@@ -113,6 +113,8 @@ namespace ananas
             auto *client{new juce::DynamicObject()};
             const auto &[
                 serial,
+                firmwareType,
+                firmwareVersion,
                 samplingRate,
                 percentCPU,
                 presentationOffsetFrame,
@@ -120,11 +122,11 @@ namespace ananas
                 audioPTPOffsetNs,
                 bufferFillPercent,
                 ptpLock,
-                moduleID,
-                minY,
-                maxY
+                moduleID
             ]{clientInfo.getInfo()};
             client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(serial));
+            client->setProperty(Utils::Identifiers::ClientFirmwareTypeVersionPropertyID,
+                                FirmwareTypeToString(firmwareType) + " v" + VersionNumberToString(firmwareVersion));
             client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, ptpLock);
             client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID, presentationOffsetNs);
             client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID, presentationOffsetFrame);

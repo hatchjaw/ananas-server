@@ -5,6 +5,35 @@
 
 namespace ananas::Utils
 {
+    struct VersionNumber
+    {
+        uint8_t major;
+        uint8_t minor;
+        uint8_t revision;
+    };
+
+    enum class FirmwareType : juce::uint8
+    {
+        client = 0,
+        wfsModule = 1,
+        ambisonicsModule
+    };
+
+    static juce::String FirmwareTypeToString(const FirmwareType type)
+    {
+        switch (type) {
+            case FirmwareType::client: return "Client";
+            case FirmwareType::wfsModule: return "WFS";
+            case FirmwareType::ambisonicsModule: return "Ambisonics";
+            default: return "Unknown";
+        }
+    }
+
+    static juce::String VersionNumberToString(const VersionNumber version)
+    {
+        return juce::String{version.major} + "." + juce::String{version.minor} + "." + juce::String{version.revision};
+    }
+
     class Constants
     {
     public:
@@ -72,6 +101,7 @@ namespace ananas::Utils
         inline const static juce::Identifier ClientsShouldRebootParamID{"ClientsShouldReboot"};
 
         inline const static juce::Identifier ClientSerialNumberPropertyID{"serialNumber"};
+        inline const static juce::Identifier ClientFirmwareTypeVersionPropertyID{"firmwareTypeVersion"};
         inline const static juce::Identifier ClientPTPLockPropertyID{"ptpLock"};
         inline const static juce::Identifier ClientPresentationTimeOffsetNsPropertyID{"presentationTimeOffsetNs"};
         inline const static juce::Identifier ClientPresentationTimeOffsetFramePropertyID{"presentationTimeOffsetFrame"};

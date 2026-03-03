@@ -214,6 +214,7 @@ namespace ananas::UI
 
         addColumn(TableColumns::ClientTableIpAddress);
         addColumn(TableColumns::ClientTableSerialNumber);
+        addColumn(TableColumns::ClientTableFirmwareTypeVersion);
         addColumn(TableColumns::ClientTablePTPLock);
         addColumn(TableColumns::ClientTablePresentationTimeOffset);
         addColumn(TableColumns::ClientTableBufferFillPercent);
@@ -240,6 +241,7 @@ namespace ananas::UI
 
                 if (const auto *client = prop.value.getDynamicObject()) {
                     row.serialNumber = client->getProperty(Utils::Identifiers::ClientSerialNumberPropertyID).toString();
+                    row.firmwareTypeVersion = client->getProperty(Utils::Identifiers::ClientFirmwareTypeVersionPropertyID);
                     row.ptpLock = client->getProperty(Utils::Identifiers::ClientPTPLockPropertyID);
                     row.presentationTimeOffsetNs = client->getProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID);
                     row.presentationTimeOffsetFrame = client->getProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID);
@@ -288,6 +290,7 @@ namespace ananas::UI
             const auto &[
                 ip,
                 serialNumber,
+                firmwareTypeVersion,
                 ptpLock,
                 offsetTime,
                 offsetFrame,
@@ -304,23 +307,25 @@ namespace ananas::UI
                     break;
                 case 2: text = serialNumber;
                     break;
-                case 3: text = ptpLock ? "Yes" : "No";
+                case 3: text = firmwareTypeVersion;
+                    break;
+                case 4: text = ptpLock ? "Yes" : "No";
                     g.setColour(ptpLock ? findColour(okColourId) : findColour(warningColourId));
                     g.fillRect(2, 2, width - 4, height - 4);
                     break;
-                case 4: text = Strings::formatWithThousandsSeparator(offsetTime + audioPTPOffset) +
+                case 5: text = Strings::formatWithThousandsSeparator(offsetTime + audioPTPOffset) +
                                " (" + juce::String(offsetFrame) +
                                (offsetFrame == 1 ? " frame)" : " frames)");
                     break;
-                case 5: text = juce::String(bufferFillPercent) + " %";
+                case 6: text = juce::String(bufferFillPercent) + " %";
                     g.setColour(bufferFillPercent > 80 || bufferFillPercent < 20 ? findColour(warningColourId) : findColour(okColourId));
                     g.fillRect(2, 2, static_cast<int>((width - 4) * (bufferFillPercent / 100.f)), height - 4);
                     break;
-                case 6: text = Strings::formatWithThousandsSeparator(samplingRate, 6);
+                case 7: text = Strings::formatWithThousandsSeparator(samplingRate, 6);
                     break;
-                case 7: text = juce::String{percentCPU, 3};
+                case 8: text = juce::String{percentCPU, 3};
                     break;
-                case 8: text = juce::String{moduleID};
+                case 9: text = juce::String{moduleID};
                 default: break;
             }
 
