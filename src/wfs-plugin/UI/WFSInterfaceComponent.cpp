@@ -69,6 +69,8 @@ namespace ananas::WFS::UI
 
         // Listen to the persistent tree for module ID changes
         persistentTree.addListener(this);
+        // Trigger an initial property change so that combo boxes get populated.
+        persistentTree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
 
         // Set initial moduleIDs from the persistent tree... todo: needs to be fixed
         //updateModuleLists(persistentTree[ananas::Utils::Identifiers::ModulesParamID]);

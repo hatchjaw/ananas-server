@@ -19,13 +19,13 @@ namespace ananas::WFS::UI
 
     void ModuleComponent::resized()
     {
-        auto bounds{getLocalBounds()};
-
         if (showModuleSelector) {
-            const auto comboBoxBounds{bounds.removeFromTop(Dimensions::ModuleSelectorHeight)};
+            const auto comboBoxBounds{getLocalBounds().removeFromTop(Dimensions::ModuleSelectorHeight)};
             moduleSelector.setBounds(comboBoxBounds);
+            moduleSelector.setVisible(true);
         } else {
-            moduleSelector.setBounds(0, 0, 0, 0);
+            moduleSelector.setVisible(false);
+            setBounds(0, 0, 0, 0);
         }
     }
 
@@ -40,7 +40,7 @@ namespace ananas::WFS::UI
             for (const auto &prop: obj->getProperties()) {
                 const auto module{obj->getProperty(prop.name).getDynamicObject()};
 
-                if (module->getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID) == juce::var{index}) {
+                if (static_cast<int>(module->getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID)) == index) {
                     setSelectedModule(prop.name.toString());
                 }
             }
@@ -89,10 +89,8 @@ namespace ananas::WFS::UI
         moduleSelector.hidePopup();
     }
 
-    void ModuleComponent::setSelectedModule(const juce::var &var)
+    void ModuleComponent::setSelectedModule(const juce::String &ip)
     {
-        if (var.isString()) {
-            moduleSelector.setText(var.toString(), juce::dontSendNotification);
-        }
+        moduleSelector.setText(ip, juce::dontSendNotification);
     }
 } // ananas::WFS

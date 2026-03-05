@@ -25,7 +25,7 @@ namespace ananas::WFS::UI
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleComponent)
 
-        void setSelectedModule(const juce::var &var);
+        void setSelectedModule(const juce::String &ip);
 
         juce::ValueTree &tree;
         bool showModuleSelector{false};

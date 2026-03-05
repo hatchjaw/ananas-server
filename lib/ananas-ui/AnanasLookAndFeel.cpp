@@ -121,7 +121,9 @@ namespace ananas::UI
 
     int AnanasLookAndFeel::getTabButtonBestWidth(juce::TabBarButton &tabBarButton, const int tabDepth)
     {
-        return totalNumTabs > 0 ? totalWidth / totalNumTabs : LookAndFeel_V4::getTabButtonBestWidth(tabBarButton, tabDepth);
+        return totalNumTabs > 0
+                   ? totalWidth / totalNumTabs
+                   : LookAndFeel_V4::getTabButtonBestWidth(tabBarButton, tabDepth);
     }
 
     void AnanasLookAndFeel::setTotalWidth(const int width)
@@ -134,7 +136,11 @@ namespace ananas::UI
         totalNumTabs = numTabs;
     }
 
-    void AnanasLookAndFeel::drawOverlay(juce::Graphics &g, const OverlayableComponent::OverlayComponent &o, const juce::String &text) const
+    void AnanasLookAndFeel::drawOverlay(
+        juce::Graphics &g,
+        const OverlayableComponent::OverlayComponent &o,
+        const juce::String &text
+    ) const
     {
         const auto bounds{o.getLocalBounds()};
 
@@ -216,18 +222,25 @@ namespace ananas::UI
         g.drawFittedText(columnName, area, j, 1);
     }
 
-    void AnanasLookAndFeel::drawButtonBackground(juce::Graphics &g, juce::Button &button, const juce::Colour &backgroundColour,
-                                                 bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+    void AnanasLookAndFeel::drawButtonBackground(juce::Graphics &g,
+                                                 juce::Button &button,
+                                                 const juce::Colour &backgroundColour,
+                                                 const bool shouldDrawButtonAsHighlighted,
+                                                 const bool shouldDrawButtonAsDown)
     {
-        auto cornerSize = 6.0f;
-        auto bounds = button.getLocalBounds().toFloat().reduced(0.5f, 0.5f);
+        const auto cornerSize{6.0f};
+        const auto bounds{button.getLocalBounds().toFloat().reduced(0.5f, 0.5f)};
 
-        auto baseColour = backgroundColour.withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
-                .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f);
+        auto baseColour{
+            backgroundColour
+            .withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
+            .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f)
+        };
 
         if (dynamic_cast<SwitchesComponent::SwitchesTable::RemoveSwitchButton *>(&button)) {
-            baseColour = warningColour.withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
-                .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f);
+            baseColour = warningColour
+                    .withMultipliedSaturation(button.hasKeyboardFocus(true) ? 1.3f : 0.9f)
+                    .withMultipliedAlpha(button.isEnabled() ? 1.0f : 0.5f);
         }
 
         if (shouldDrawButtonAsDown || shouldDrawButtonAsHighlighted)
@@ -264,13 +277,18 @@ namespace ananas::UI
 
     juce::Font AnanasLookAndFeel::getTextButtonFont(juce::TextButton &text_button, int buttonHeight)
     {
-        return withDefaultMetrics(juce::FontOptions{juce::jmin(16.0f, static_cast<float>(buttonHeight) * 0.6f), juce::Font::bold});
+        return withDefaultMetrics(juce::FontOptions{
+            juce::jmin(16.0f, static_cast<float>(buttonHeight) * 0.6f),
+            juce::Font::bold
+        });
     }
 
-    void AnanasLookAndFeel::drawPresentationTimeInterval(juce::Graphics &g,
-                                                         const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
-                                                         const float backgroundProportion,
-                                                         const float maxValue) const
+    void AnanasLookAndFeel::drawPresentationTimeInterval(
+        juce::Graphics &g,
+        const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
+        const float backgroundProportion,
+        const float maxValue
+    ) const
     {
         const auto bounds{p.getLocalBounds().toFloat()};
         const auto maxWidth{bounds.getWidth() - 1};
