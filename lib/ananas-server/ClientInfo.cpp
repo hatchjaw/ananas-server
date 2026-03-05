@@ -226,7 +226,7 @@ namespace ananas
 
     juce::ValueTree ModuleList::toValueTree() const
     {
-        juce::ValueTree tree(Utils::Identifiers::SwitchesParamID);
+        juce::ValueTree tree(Utils::Identifiers::ModulesParamID);
 
         for (const auto &[ip, m]: modules) {
             auto moduleTree{m.toValueTree()};

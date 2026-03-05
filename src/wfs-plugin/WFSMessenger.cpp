@@ -91,6 +91,8 @@ namespace ananas::WFS
                 bundle.addElement(juce::OSCMessage{id, slot.value.load()});
                 send(bundle);
                 slot.changed.store(false);
+                // Todo: return; i.e. send at most one parameter update per
+                //  timer callback?
             }
         }
     }

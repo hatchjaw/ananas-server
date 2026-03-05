@@ -204,7 +204,7 @@ void PluginProcessor::changeListenerCallback(juce::ChangeBroadcaster *source)
             apvts.getRawParameterValue(ananas::WFS::Params::SpeakerSpacing.id)->load()
         );
 
-        for (uint n{0}; n < ananas::WFS::Constants::NumSources; ++n) {
+        for (size_t n{0}; n < ananas::WFS::Constants::NumSources; ++n) {
             auto idX{ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X)},
                     idY{ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y)};
             wfsMessenger.parameterChanged(idX, apvts.getRawParameterValue(idX)->load());
