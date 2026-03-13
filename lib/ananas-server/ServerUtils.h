@@ -1,6 +1,14 @@
 #ifndef SERVERUTILS_H
 #define SERVERUTILS_H
 
+#ifndef FRAMES_PER_PACKET
+#define FRAMES_PER_PACKET 16
+#endif
+
+#ifndef PRESENTATION_OFFSET
+#define PRESENTATION_OFFSET 80
+#endif
+
 #include <AnanasUtils.h>
 #include <juce_core/juce_core.h>
 
@@ -18,7 +26,7 @@ namespace ananas::Server
          * The number of frames (per-channel samples) to transmit in each
          * outgoing audio packet.
          */
-        constexpr static size_t FramesPerPacket{32};
+        constexpr static size_t FramesPerPacket{FRAMES_PER_PACKET};
 
         /**
          * Tweak this value such that clients stay in the middle of their
@@ -26,7 +34,7 @@ namespace ananas::Server
          * Increase the divider if clients are reporting a lot of available
          * packets; decrease it if they're reporting too few.
          */
-        constexpr static int64_t PacketOffsetNs{NSPS / 62};
+        constexpr static int64_t PacketOffsetNs{NSPS / PRESENTATION_OFFSET};
 
         /**
          * The number of audio packets stored by each client.
