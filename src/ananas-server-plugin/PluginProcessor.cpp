@@ -174,11 +174,11 @@ ananas::Server::Server &PluginProcessor::getServer() const
     return *server;
 }
 
-juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties(const size_t numSources)
+juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties(const size_t numChannels)
 {
     BusesProperties buses;
 
-    for (size_t i{1}; i <= numSources; ++i) {
+    for (size_t i{1}; i <= numChannels; ++i) {
         buses.addBus(true, ananas::Utils::Strings::getInputLabel(i), juce::AudioChannelSet::mono());
         buses.addBus(false, ananas::Utils::Strings::getOutputLabel(i), juce::AudioChannelSet::mono());
     }

@@ -68,7 +68,7 @@ private:
 
     constexpr static size_t NumChannelsToSend{NUM_CHANNELS_TO_SEND};
 
-    BusesProperties getBusesProperties(size_t numSources);
+    BusesProperties getBusesProperties(size_t numChannels);
 
     std::unique_ptr<ananas::Server::Server> server;
 

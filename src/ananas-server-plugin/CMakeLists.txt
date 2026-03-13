@@ -8,7 +8,9 @@ set(bundleID "org.emeraude.ananas-server")
 
 set(juceFormats Standalone)
 
-set(numChannels 2)
+# Up to 22 sources @ 32 frames
+# Up to 44 sources @ 16 frames
+set(numChannels 32)
 
 juce_add_plugin(ananasServer
         COMPANY_NAME "${companyName}"

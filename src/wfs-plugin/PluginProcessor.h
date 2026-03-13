@@ -1,6 +1,14 @@
 #ifndef PLUGINPROCESSOR_H
 #define PLUGINPROCESSOR_H
 
+#ifndef FRAMES_PER_PACKET
+#define FRAMES_PER_PACKET 16
+#endif
+
+#ifndef PRESENTATION_OFFSET
+#define PRESENTATION_OFFSET 80
+#endif
+
 #include <Server.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include "WFSMessenger.h"
@@ -73,11 +81,9 @@ private:
 
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
-    BusesProperties getBusesProperties(size_t numSources);
+    BusesProperties getBusesProperties(size_t numChannels);
 
     std::unique_ptr<ananas::Server::Server> server;
-
-    ananas::WFS::WFSMessenger wfsMessenger;
 
     // For handling (audio) parameters that are known at compile time.
     juce::AudioProcessorValueTreeState apvts;
@@ -85,6 +91,8 @@ private:
     juce::ValueTree dynamicTree;
     // For handling user-entered data that should be storable/retrievable.
     juce::ValueTree persistentTree;
+
+    ananas::WFS::WFSMessenger wfsMessenger;
 
     juce::HashMap<int, std::atomic<float> *> sourceAmplitudes;
 };

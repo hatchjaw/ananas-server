@@ -126,7 +126,7 @@ namespace ananas
             ]{clientInfo.getInfo()};
             client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(serial));
             client->setProperty(Utils::Identifiers::ClientFirmwareTypeVersionPropertyID,
-                                FirmwareTypeToString(firmwareType) + " v" + VersionNumberToString(firmwareVersion));
+                                Utils::FirmwareTypeToString(firmwareType) + " v" + Utils::VersionNumberToString(firmwareVersion));
             client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, ptpLock);
             client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID, presentationOffsetNs);
             client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID, presentationOffsetFrame);
