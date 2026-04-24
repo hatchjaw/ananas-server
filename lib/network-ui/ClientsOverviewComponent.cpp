@@ -5,7 +5,7 @@
 namespace ananas::UI
 {
     ClientsOverviewComponent::ClientsOverviewComponent(juce::ValueTree &dynamicTree)
-        : clientTable(std::make_unique<ClientTable>(dynamicTree.getProperty(Utils::Identifiers::ShowModuleIDsPropertyID))),
+        : clientTable(std::make_unique<ClientTable>()),
           tree(dynamicTree)
     {
         addAndMakeVisible(title);
@@ -208,7 +208,7 @@ namespace ananas::UI
 
     //==========================================================================
 
-    ClientsOverviewComponent::ClientTable::ClientTable(bool showModuleIDColumn)
+    ClientsOverviewComponent::ClientTable::ClientTable()
     {
         addAndMakeVisible(table);
 
@@ -220,9 +220,7 @@ namespace ananas::UI
         addColumn(TableColumns::ClientTableBufferFillPercent);
         addColumn(TableColumns::ClientTableSamplingRate);
         addColumn(TableColumns::ClientTablePercentCPU);
-        if (showModuleIDColumn) {
-            addColumn(TableColumns::ClientTableModuleID);
-        }
+        addColumn(TableColumns::ClientTableSecondarySourceCoordinates);
 
         table.setModel(this);
         table.setOutlineThickness(1);
@@ -249,7 +247,7 @@ namespace ananas::UI
                     row.bufferFillPercent = client->getProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID);
                     row.samplingRate = client->getProperty(Utils::Identifiers::ClientSamplingRatePropertyID);
                     row.percentCPU = client->getProperty(Utils::Identifiers::ClientPercentCPUPropertyID);
-                    row.moduleID = client->getProperty(Utils::Identifiers::ClientModuleIDPropertyID);
+                    row.secondarySourceCoordinates = client->getProperty(Utils::Identifiers::ClientSecondarySourceCoordinatesPropertyID);
                 }
 
                 rows.add(row);
@@ -298,7 +296,7 @@ namespace ananas::UI
                 bufferFillPercent,
                 samplingRate,
                 percentCPU,
-                moduleID
+                secondarySourceCoordinates
             ] = rows[rowNumber];
             juce::String text;
 
@@ -325,7 +323,7 @@ namespace ananas::UI
                     break;
                 case 8: text = juce::String{percentCPU, 3};
                     break;
-                case 9: text = juce::String{moduleID};
+                case 9: text = secondarySourceCoordinates;
                 default: break;
             }
 

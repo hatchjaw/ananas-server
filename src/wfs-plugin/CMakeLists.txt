@@ -12,8 +12,6 @@ set(juceFormats Standalone)
 # Up to 44 sources @ 16 frames
 set(numSources 16)
 
-set(numModules 8)
-
 juce_add_plugin(ananasWFS
         COMPANY_NAME "${companyName}"
         IS_SYNTH FALSE
@@ -37,7 +35,6 @@ target_compile_definitions(ananasWFS
         JUCE_USE_CURL=0
         JUCE_VST3_CAN_REPLACE_VST2=0
         NUM_SOURCES=${numSources}
-        NUM_MODULES=${numModules}
         SHOW_NO_NETWORK_OVERLAY=$<BOOL:${SHOW_NO_NETWORK_OVERLAY}>
 )
 
@@ -45,7 +42,8 @@ target_sources(ananasWFS
         PRIVATE
         PluginEditor.cpp
         PluginProcessor.cpp
-        WFSMessenger.cpp
+        SecondarySourceMessenger.cpp
+        VirtualSourceMessenger.cpp
         UI/WFSInterfaceComponent.cpp
         UI/XYControllerComponent.cpp
         UI/SpeakerIconComponent.cpp

@@ -55,7 +55,7 @@ namespace ananas::WFS::UI
 
     float XYControllerComponent::getSpeakerArrayWidth() const
     {
-        return state.getRawParameterValue(Params::SpeakerSpacing.id)->load() * 2.f * Constants::NumModules;
+        return state.getRawParameterValue(Params::SpeakerSpacing.id)->load() * 2.f * state.getRawParameterValue(Params::NumModules.id)->load();
     }
 
     void XYControllerComponent::parameterChanged(const juce::String &parameterID, const float newValue)
@@ -215,13 +215,13 @@ namespace ananas::WFS::UI
 
         // Set node value.
         setValueX(juce::jlimit(
-                      Params::SourcePositionRange.start,
-                      Params::SourcePositionRange.end,
+                      Params::VirtualSourcePositionRange.start,
+                      Params::VirtualSourcePositionRange.end,
                       newVal.x),
                   juce::sendNotificationSync);
         setValueY(juce::jlimit(
-                      Params::SourcePositionRange.start,
-                      Params::SourcePositionRange.end,
+                      Params::VirtualSourcePositionRange.start,
+                      Params::VirtualSourcePositionRange.end,
                       newVal.y),
                   juce::sendNotificationSync);
 
@@ -382,17 +382,17 @@ namespace ananas::WFS::UI
         Node &n,
         juce::UndoManager *um
     ) : node(n),
-        attachmentX(*state.getParameter(Params::getSourcePositionParamID(sourceIndex, SourcePositionAxis::X)), [this](const float f) { setValueX(f); }, um),
-        attachmentY(*state.getParameter(Params::getSourcePositionParamID(sourceIndex, SourcePositionAxis::Y)), [this](const float f) { setValueY(f); }, um)
+        attachmentX(*state.getParameter(Params::getVirtualSourcePositionParamID(sourceIndex, SourcePositionAxis::X)), [this](const float f) { setValueX(f); }, um),
+        attachmentY(*state.getParameter(Params::getVirtualSourcePositionParamID(sourceIndex, SourcePositionAxis::Y)), [this](const float f) { setValueY(f); }, um)
     {
         node.addListener(this);
         attachmentX.sendInitialUpdate();
         attachmentY.sendInitialUpdate();
-        const auto w{state.getRawParameterValue(Params::SpeakerSpacing.id)->load() * 2.f * Constants::NumModules};
+        const auto w{state.getRawParameterValue(Params::SpeakerSpacing.id)->load() * 2.f * state.getRawParameterValue(Params::NumModules.id)->load()};
         node.setTooltip(Utils::normalisedPointToCoordinateMetres(
             juce::Point{
-                state.getRawParameterValue(Params::getSourcePositionParamID(sourceIndex, SourcePositionAxis::X))->load(),
-                state.getRawParameterValue(Params::getSourcePositionParamID(sourceIndex, SourcePositionAxis::Y))->load(),
+                state.getRawParameterValue(Params::getVirtualSourcePositionParamID(sourceIndex, SourcePositionAxis::X))->load(),
+                state.getRawParameterValue(Params::getVirtualSourcePositionParamID(sourceIndex, SourcePositionAxis::Y))->load(),
             },
             juce::Point{-w / 2, static_cast<float>(Constants::MinYMetres)},
             juce::Point{w / 2, static_cast<float>(Constants::MaxYMetres)}

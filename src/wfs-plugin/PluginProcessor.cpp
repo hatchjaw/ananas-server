@@ -6,28 +6,20 @@
 PluginProcessor::PluginProcessor()
     : AudioProcessor(getBusesProperties(ananas::WFS::Constants::NumSources)),
       server(std::make_unique<ananas::Server::Server>(ananas::WFS::Constants::NumSources)),
-      wfsMessenger(ananas::WFS::Sockets::WfsMessengerSocketParams),
       apvts(*this, nullptr, ananas::WFS::Identifiers::StaticTreeType, createParameterLayout()),
       dynamicTree(ananas::Utils::Identifiers::DynamicTreeType),
-      persistentTree(ananas::Utils::Identifiers::PersistentTreeType)
+      persistentTree(ananas::Utils::Identifiers::PersistentTreeType),
+      virtualSourceMessenger(ananas::WFS::Sockets::VirtualSourceMessengerSocketParams, apvts)
 {
     server->getClientList()->addChangeListener(this);
     server->getModuleList()->addChangeListener(this);
     server->getAuthority()->addChangeListener(this);
     server->getSwitches()->addChangeListener(this);
-    persistentTree.addListener(&wfsMessenger);
-    apvts.addParameterListener(ananas::WFS::Params::SpeakerSpacing.id, &wfsMessenger);
+    persistentTree.addListener(&secondarySourceMessenger);
     for (uint n{0}; n < ananas::WFS::Constants::NumSources; ++n) {
-        apvts.addParameterListener(ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X), &wfsMessenger);
-        apvts.addParameterListener(ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y), &wfsMessenger);
-
         // Set up source amplitudes for visualisation.
-        sourceAmplitudes.set(static_cast<int>(n), new std::atomic{0.f});
+        virtualSourceAmplitudes.set(static_cast<int>(n), new std::atomic{0.f});
     }
-
-    // Indicate that the network overview's clients overview should show module
-    // IDs.
-    dynamicTree.setProperty(ananas::Utils::Identifiers::ShowModuleIDsPropertyID, true, nullptr);
 }
 
 PluginProcessor::~PluginProcessor()
@@ -36,21 +28,20 @@ PluginProcessor::~PluginProcessor()
     server->getModuleList()->removeChangeListener(this);
     server->getAuthority()->removeChangeListener(this);
     server->getSwitches()->removeChangeListener(this);
-    persistentTree.removeListener(&wfsMessenger);
-    apvts.removeParameterListener(ananas::WFS::Params::SpeakerSpacing.id, &wfsMessenger);
+    persistentTree.removeListener(&secondarySourceMessenger);
     for (uint n{0}; n < ananas::WFS::Constants::NumSources; ++n) {
-        apvts.removeParameterListener(ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X), &wfsMessenger);
-        apvts.removeParameterListener(ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y), &wfsMessenger);
+        apvts.removeParameterListener(ananas::WFS::Params::getVirtualSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X), &virtualSourceMessenger);
+        apvts.removeParameterListener(ananas::WFS::Params::getVirtualSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y), &virtualSourceMessenger);
     }
-    if (wfsMessenger.isThreadRunning()) {
-        wfsMessenger.stopThread(ananas::WFS::Constants::WFSMessengerThreadTimeout);
+    if (virtualSourceMessenger.isThreadRunning()) {
+        virtualSourceMessenger.stopThread(ananas::WFS::Constants::WFSMessengerThreadTimeout);
     }
 }
 
 void PluginProcessor::prepareToPlay(const double sampleRate, const int samplesPerBlock)
 {
     server->prepareToPlay(samplesPerBlock, sampleRate);
-    wfsMessenger.startThread();
+    virtualSourceMessenger.startThread();
 }
 
 void PluginProcessor::releaseResources()
@@ -70,7 +61,7 @@ void PluginProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiB
 
     // Store the max dB level for each channel for the current buffer.
     for (auto ch{0}; ch < buffer.getNumChannels(); ++ch) {
-        sourceAmplitudes[ch]->store(juce::Decibels::gainToDecibels(buffer.getMagnitude(ch, 0, buffer.getNumSamples())));
+        virtualSourceAmplitudes[ch]->store(juce::Decibels::gainToDecibels(buffer.getMagnitude(ch, 0, buffer.getNumSamples())));
     }
 }
 
@@ -199,16 +190,16 @@ void PluginProcessor::changeListenerCallback(juce::ChangeBroadcaster *source)
         persistentTree.setProperty(ananas::Utils::Identifiers::ModulesParamID, modules->toVar(), nullptr);
         persistentTree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
 
-        wfsMessenger.parameterChanged(
+        virtualSourceMessenger.parameterChanged(
             ananas::WFS::Params::SpeakerSpacing.id,
             apvts.getRawParameterValue(ananas::WFS::Params::SpeakerSpacing.id)->load()
         );
 
         for (size_t n{0}; n < ananas::WFS::Constants::NumSources; ++n) {
-            auto idX{ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X)},
-                    idY{ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y)};
-            wfsMessenger.parameterChanged(idX, apvts.getRawParameterValue(idX)->load());
-            wfsMessenger.parameterChanged(idY, apvts.getRawParameterValue(idY)->load());
+            auto idX{ananas::WFS::Params::getVirtualSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X)},
+                    idY{ananas::WFS::Params::getVirtualSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y)};
+            virtualSourceMessenger.parameterChanged(idX, apvts.getRawParameterValue(idX)->load());
+            virtualSourceMessenger.parameterChanged(idY, apvts.getRawParameterValue(idY)->load());
         }
     } else if (const auto *authority = dynamic_cast<ananas::AuthorityInfo *>(source)) {
         dynamicTree.setProperty(ananas::Utils::Identifiers::TimeAuthorityParamID, authority->toVar(), nullptr);
@@ -255,7 +246,7 @@ ananas::Server::Server &PluginProcessor::getServer() const
 
 juce::HashMap<int, std::atomic<float> *> &PluginProcessor::getSourceAmplitudes()
 {
-    return sourceAmplitudes;
+    return virtualSourceAmplitudes;
 }
 
 juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties(const size_t numChannels)
@@ -274,6 +265,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params{};
 
+    params.add(std::make_unique<juce::AudioParameterInt>(
+        ananas::WFS::Params::NumModules.id,
+        ananas::WFS::Params::NumModules.name,
+        ananas::WFS::Params::NumModules.minValue,
+        ananas::WFS::Params::NumModules.maxValue,
+        ananas::WFS::Params::NumModules.defaultValue
+    ));
+
     params.add(std::make_unique<juce::AudioParameterFloat>(
         ananas::WFS::Params::SpeakerSpacing.id,
         ananas::WFS::Params::SpeakerSpacing.name,
@@ -289,16 +288,16 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 
     for (uint n{0}; n < ananas::WFS::Constants::NumSources; ++n) {
         params.add(std::make_unique<juce::AudioParameterFloat>(
-            ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X),
-            ananas::WFS::Params::getSourcePositionParamName(n, ananas::WFS::SourcePositionAxis::X),
-            ananas::WFS::Params::SourcePositionRange,
-            ananas::WFS::Params::getSourcePositionDefaultX(n)
+            ananas::WFS::Params::getVirtualSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::X),
+            ananas::WFS::Params::getVirtualSourcePositionParamName(n, ananas::WFS::SourcePositionAxis::X),
+            ananas::WFS::Params::VirtualSourcePositionRange,
+            ananas::WFS::Params::getVirtualSourceDefaultX(n)
         ));
         params.add(std::make_unique<juce::AudioParameterFloat>(
-            ananas::WFS::Params::getSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y),
-            ananas::WFS::Params::getSourcePositionParamName(n, ananas::WFS::SourcePositionAxis::Y),
-            ananas::WFS::Params::SourcePositionRange,
-            ananas::WFS::Params::SourcePositionDefaultY
+            ananas::WFS::Params::getVirtualSourcePositionParamID(n, ananas::WFS::SourcePositionAxis::Y),
+            ananas::WFS::Params::getVirtualSourcePositionParamName(n, ananas::WFS::SourcePositionAxis::Y),
+            ananas::WFS::Params::VirtualSourcePositionRange,
+            ananas::WFS::Params::VirtualSourceDefaultY
         ));
     }
 

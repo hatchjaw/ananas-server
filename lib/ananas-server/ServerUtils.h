@@ -5,6 +5,8 @@
 #define FRAMES_PER_PACKET 16
 #endif
 
+// 1/60 @ 32 frames
+// 1/80 @ 16 frames
 #ifndef PRESENTATION_OFFSET
 #define PRESENTATION_OFFSET 80
 #endif

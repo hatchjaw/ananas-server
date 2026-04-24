@@ -9,7 +9,7 @@ add_library(ananas_network_overview
 
 set_target_properties(ananas_network_overview PROPERTIES
         POSITION_INDEPENDENT_CODE ON
-        VERSION 0.2.0
+        VERSION 0.3.0
         SOVERSION 1
 )
 

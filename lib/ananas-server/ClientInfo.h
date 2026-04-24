@@ -26,10 +26,6 @@ namespace ananas
     public:
         void update();
 
-        [[nodiscard]] int getModuleId() const;
-
-        void setModuleId(int id);
-
         [[nodiscard]] juce::ValueTree toValueTree() const;
 
         [[nodiscard]] bool isConnected() const;
@@ -38,12 +34,17 @@ namespace ananas
 
         [[nodiscard]] bool justConnected();
 
+        [[nodiscard]] std::pair<float, float> getSecondarySource0Position() const;
+
+        [[nodiscard]] std::pair<float, float> getSecondarySource1Position() const;
+
         static ModuleInfo fromValueTree(const juce::ValueTree &tree);
 
     private:
-        int id{0};
         juce::uint32 lastReceiveTime{0};
         bool wasConnected{false};
+        std::pair<float, float> secondarySource0Position;
+        std::pair<float, float> secondarySource1Position;
     };
 
     class ClientList final : public juce::Timer,

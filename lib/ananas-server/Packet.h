@@ -9,12 +9,14 @@ namespace ananas
     class AudioPacket : public juce::MemoryBlock
     {
     public:
-        struct alignas(16) Header
+#pragma pack(push, 1)
+        struct Header
         {
             int64_t timestamp;
             uint8_t numChannels;
             uint16_t numFrames;
         };
+#pragma pack(pop)
 
         void prepare(uint numChannels, int framesPerPacket, double sampleRate);
 
@@ -30,12 +32,12 @@ namespace ananas
 
     private:
         Header header{};
+        uint consecutiveBadTimestampCount{0};
         int64_t nsPerPacket{};
         long nsSleepInterval{};
         double nsPerPacketRemainder{};
         double timestampRemainder{0};
         double clientBufferDuration{};
-        uint consecutiveBadTimestampCount{0};
     };
 
 #pragma pack(push, 1)
@@ -51,7 +53,10 @@ namespace ananas
         juce::int32 audioPTPOffsetNs;
         juce::uint8 bufferFillPercent;
         bool ptpLock;
-        juce::int16 moduleID{-1};
+        float secondarySource0x{0.f};
+        float secondarySource0y{0.f};
+        float secondarySource1x{0.f};
+        float secondarySource1y{0.f};
     };
 #pragma pack(pop)
 

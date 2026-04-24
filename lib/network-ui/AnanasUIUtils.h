@@ -96,17 +96,17 @@ namespace ananas::UI
             juce::Justification::centred
         };
         inline static const ColumnHeader ClientTablePresentationTimeOffset{
-            5, "Presentation time offset (ns)", 190, 30, -1,
+            5, "Presentation offset (ns)", 160, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centredRight
         };
         inline static const ColumnHeader ClientTableBufferFillPercent{
-            6, "Buffer fill level", 200, 30, -1,
+            6, "Buffer fill level", 180, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
         inline static const ColumnHeader ClientTableSamplingRate{
-            7, "Reported sampling rate (Hz)", 190, 30, -1,
+            7, "Sampling rate (Hz)", 130, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
@@ -115,8 +115,8 @@ namespace ananas::UI
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centredRight
         };
-        inline static const ColumnHeader ClientTableModuleID{
-            9, "Module ID", 75, 30, -1,
+        inline static const ColumnHeader ClientTableSecondarySourceCoordinates{
+            9, "Speaker Coordinates (m)", 160, 30, -1,
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };

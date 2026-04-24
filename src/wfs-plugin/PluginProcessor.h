@@ -11,8 +11,8 @@
 
 #include <Server.h>
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "WFSMessenger.h"
-
+#include "VirtualSourceMessenger.h"
+#include "SecondarySourceMessenger.h"
 
 class PluginProcessor final : public juce::AudioProcessor,
                               public juce::ChangeListener
@@ -92,9 +92,11 @@ private:
     // For handling user-entered data that should be storable/retrievable.
     juce::ValueTree persistentTree;
 
-    ananas::WFS::WFSMessenger wfsMessenger;
+    ananas::WFS::SecondarySourceMessenger secondarySourceMessenger;
 
-    juce::HashMap<int, std::atomic<float> *> sourceAmplitudes;
+    ananas::WFS::VirtualSourceMessenger virtualSourceMessenger;
+
+    juce::HashMap<int, std::atomic<float> *> virtualSourceAmplitudes;
 };
 
 

@@ -85,7 +85,7 @@ namespace ananas::UI
         class ClientTable final : public AnanasNetworkTable
         {
         public:
-            explicit ClientTable(bool showModuleIDColumn);
+            ClientTable();
 
             void update(const juce::var &clientInfo);
 
@@ -112,7 +112,7 @@ namespace ananas::UI
                 juce::int32 bufferFillPercent;
                 float samplingRate;
                 float percentCPU;
-                juce::int32 moduleID;
+                juce::String secondarySourceCoordinates;
             };
 
             juce::Array<Row> rows;
