@@ -12,7 +12,8 @@ namespace ananas::WFS::UI
     ) : state(apvts),
         nodeIntensities(sourceAmplitudes)
     {
-        apvts.addParameterListener(Params::SpeakerSpacing.id, this);
+        state.addParameterListener(Params::SpeakerSpacing.id, this);
+        state.addParameterListener(Params::NumModules.id, this);
         calculateGridSpacingX();
 
         for (int n{0}; n < numNodesToCreate; ++n) {
@@ -26,6 +27,12 @@ namespace ananas::WFS::UI
         }
 
         startTimerHz(15);
+    }
+
+    XYControllerComponent::~XYControllerComponent()
+    {
+        state.removeParameterListener(Params::SpeakerSpacing.id, this);
+        state.removeParameterListener(Params::NumModules.id, this);
     }
 
     void XYControllerComponent::paint(juce::Graphics &g)
@@ -62,7 +69,7 @@ namespace ananas::WFS::UI
     {
         juce::ignoreUnused(newValue);
 
-        if (parameterID == Params::SpeakerSpacing.id) {
+        if (parameterID == Params::SpeakerSpacing.id || parameterID == Params::NumModules.id) {
             calculateGridSpacingX();
             for (const auto &node: nodes) {
                 node->updateTooltip();

@@ -15,6 +15,8 @@ namespace ananas::WFS::UI
                               juce::AudioProcessorValueTreeState &apvts,
                               juce::HashMap<int, std::atomic<float> *> &sourceAmplitudes);
 
+        ~XYControllerComponent();
+
         //======================================================================
 
         enum ColourIds
