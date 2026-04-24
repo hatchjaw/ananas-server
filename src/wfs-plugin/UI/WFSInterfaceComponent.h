@@ -22,7 +22,6 @@ namespace ananas::WFS::UI
     {
     public:
         WFSInterfaceComponent(int numSources,
-                              int numModules,
                               juce::AudioProcessorValueTreeState &apvts,
                               juce::ValueTree &persistentTreeToListenTo,
                               juce::HashMap<int, std::atomic<float> *> &sourceAmplitudes);
@@ -48,6 +47,9 @@ namespace ananas::WFS::UI
         XYControllerComponent xyController;
         juce::OwnedArray<ModuleComponent> modules;
         juce::OwnedArray<SpeakerIconComponent> speakerIcons;
+        juce::ComboBox numModulesSelector;
+        juce::Label numModulesLabel;
+        std::unique_ptr<juce::AudioProcessorValueTreeState::ComboBoxAttachment> numModulesAttachment;
         juce::Slider speakerSpacingSlider;
         juce::Label speakerSpacingLabel;
         std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> speakerSpacingAttachment;

@@ -6,10 +6,6 @@
 #include <juce_graphics/juce_graphics.h>
 #include <AnanasUtils.h>
 
-#ifndef NUM_MODULES
-#define NUM_MODULES 8
-#endif
-
 namespace ananas::WFS
 {
     enum CommandIDs
@@ -23,9 +19,8 @@ namespace ananas::WFS
     class Constants
     {
     public:
-        // For the following, see ananas-client wfsParams.lib
         constexpr static size_t NumSources{NUM_SOURCES};
-        constexpr static size_t NumModules{NUM_MODULES};
+        constexpr static size_t MaxNumModules{16};
         // TODO: receive min/max y-coordinates from clients?
         constexpr static int MaxYMetres{10};
         constexpr static int MinYMetres{-3};
@@ -48,7 +43,14 @@ namespace ananas::WFS
             juce::StringRef name;
         };
 
-        struct RangedParam : Param
+        struct RangedParamInt : Param
+        {
+            int minValue{0};
+            int maxValue{0};
+            int defaultValue{0};
+        };
+
+        struct RangedParamFloat : Param
         {
             juce::NormalisableRange<float> range;
             juce::NormalisableRange<double> rangeDouble;
@@ -60,8 +62,16 @@ namespace ananas::WFS
             bool defaultValue{true};
         };
 
-        inline static const RangedParam SpeakerSpacing{
-            "/spacing",
+        inline static const RangedParamInt NumModules{
+            "numModules",
+            "Number of Modules",
+            1,
+            Constants::MaxNumModules,
+            8
+        };
+
+        inline static const RangedParamFloat SpeakerSpacing{
+            "speakerSpacing",
             "Speaker Spacing (m)",
             {.05f, .3f, .001f},
             {.05, .3, .001},
@@ -74,28 +84,28 @@ namespace ananas::WFS
             true
         };
 
-        constexpr static float SourcePositionDefaultX{.5f};
-        constexpr static float SourcePositionDefaultY{.5f};
-        inline static const juce::NormalisableRange<float> SourcePositionRange{-1.f, 1.f, 1e-6f};
+        constexpr static float VirtualSourceDefaultX{.5f};
+        constexpr static float VirtualSourceDefaultY{.5f};
+        inline static const juce::NormalisableRange<float> VirtualSourcePositionRange{-1.f, 1.f, 1e-6f};
 
-        static juce::String getSourcePositionParamID(const uint index, SourcePositionAxis axis)
+        static juce::String getVirtualSourcePositionParamID(const uint index, SourcePositionAxis axis)
         {
-            return "/source/" + juce::String{index} + "/" + static_cast<char>(axis);
+            return "/vs/" + juce::String{index} + "/" + static_cast<char>(axis);
         }
 
-        static juce::String getSourcePositionParamName(const uint index, SourcePositionAxis axis)
+        static juce::String getVirtualSourcePositionParamName(const uint index, SourcePositionAxis axis)
         {
-            return "Source " + juce::String{index + 1} + " " + static_cast<char>(axis);
+            return "Virtual source " + juce::String{index + 1} + " " + static_cast<char>(axis);
         }
 
-        static float getSourcePositionDefaultX(const uint sourceIndex)
+        static juce::String getSecondarySourcePositionParamID(const uint index, SourcePositionAxis axis)
         {
-            return -1.f + (2.f * (static_cast<float>(sourceIndex) + SourcePositionDefaultX) / Constants::NumSources);
+            return "/ss/" + juce::String{index} + "/" + static_cast<char>(axis);
         }
 
-        static juce::String getModuleIndexParamID(const int index)
+        static float getVirtualSourceDefaultX(const uint sourceIndex)
         {
-            return "/module/" + juce::String{index};
+            return -1.f + (2.f * (static_cast<float>(sourceIndex) + VirtualSourceDefaultX) / Constants::NumSources);
         }
     };
 
@@ -165,8 +175,8 @@ namespace ananas::WFS
     class Sockets
     {
     public:
-        inline static const ananas::Utils::SenderThreadSocketParams WfsMessengerSocketParams{
-            "WFS Messenger",
+        inline static const ananas::Utils::SenderThreadSocketParams VirtualSourceMessengerSocketParams{
+            "Virtual Source Messenger",
             100,
             "224.4.224.5",
             49162,

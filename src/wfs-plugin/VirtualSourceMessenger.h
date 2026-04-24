@@ -1,29 +1,26 @@
-#ifndef WFSMESSENGER_H
-#define WFSMESSENGER_H
+#ifndef VIRTUALSOURCEMESSENGER_H
+#define VIRTUALSOURCEMESSENGER_H
 
 #include <AnanasUtils.h>
 #include <Server.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_osc/juce_osc.h>
 
-#include "WFSUtils.h"
-
 namespace ananas::WFS
 {
-    class WFSMessenger final : public juce::Thread,
+    class VirtualSourceMessenger final : public juce::Thread,
                                public juce::OSCSender,
                                public juce::AudioProcessorValueTreeState::Listener,
-                               public juce::ValueTree::Listener,
                                public juce::Timer
     {
     public:
-        explicit WFSMessenger(const ananas::Utils::SenderThreadSocketParams &p);
+        VirtualSourceMessenger(const Utils::SenderThreadSocketParams &p, juce::AudioProcessorValueTreeState& apvts);
+
+        ~VirtualSourceMessenger();
 
         bool connect();
 
         void run() override;
-
-        void valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged, const ::juce::Identifier &property) override;
 
         void parameterChanged(const juce::String &parameterID, float newValue) override;
 
@@ -43,9 +40,10 @@ namespace ananas::WFS
         juce::uint16 localPort, remotePort;
         bool connected{false};
         std::unordered_map<juce::String, ParamSlot> slots;
+        juce::AudioProcessorValueTreeState& state;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WFSMessenger);
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(VirtualSourceMessenger)
     };
 } // ananas::WFS
 
-#endif //WFSMESSENGER_H
+#endif //VIRTUALSOURCEMESSENGER_H

@@ -1,5 +1,6 @@
 #include "PluginEditor.h"
 #include <AnanasUtils.h>
+#include "WFSUtils.h"
 
 PluginEditor::PluginEditor(PluginProcessor &p)
     : AudioProcessorEditor(&p),
@@ -10,7 +11,6 @@ PluginEditor::PluginEditor(PluginProcessor &p)
       ),
       wfsInterface(
           ananas::WFS::Constants::NumSources,
-          ananas::WFS::Constants::NumModules,
           getProcessor().getParamState(),
           getProcessor().getPersistentTree(),
           getProcessor().getSourceAmplitudes()
@@ -100,7 +100,7 @@ void PluginEditor::getAllCommands(juce::Array<int> &commands)
         ananas::WFS::ToggleModuleSelectorDisplay
     });
 
-    for (size_t m{0}; m < ananas::WFS::Constants::NumModules; m++) {
+    for (size_t m{0}; m < 10; m++) {
         commands.add(ananas::WFS::RevealModuleSelector + static_cast<int>(m));
     }
 }

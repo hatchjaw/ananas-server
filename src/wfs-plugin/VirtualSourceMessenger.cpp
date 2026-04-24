@@ -1,21 +1,37 @@
-#include "WFSMessenger.h"
+#include "VirtualSourceMessenger.h"
 #include <AnanasUtils.h>
 #include "WFSUtils.h"
 
 namespace ananas::WFS
 {
-    WFSMessenger::WFSMessenger(const ananas::Utils::SenderThreadSocketParams &p)
+    VirtualSourceMessenger::VirtualSourceMessenger(
+        const ananas::Utils::SenderThreadSocketParams &p,
+        juce::AudioProcessorValueTreeState &apvts
+    )
         : Thread(p.name),
           ip(p.ip),
           localPort(p.localPort),
-          remotePort(p.remotePort)
+          remotePort(p.remotePort),
+          state(apvts)
     {
+        for (uint n{0}; n < Constants::NumSources; ++n) {
+            state.addParameterListener(Params::getVirtualSourcePositionParamID(n, SourcePositionAxis::X), this);
+            state.addParameterListener(Params::getVirtualSourcePositionParamID(n, SourcePositionAxis::Y), this);
+        }
         // Limit the rate of source position updates and their corresponding OSC
         // sends, to thirty per second.
         startTimerHz(30);
     }
 
-    bool WFSMessenger::connect()
+    VirtualSourceMessenger::~VirtualSourceMessenger()
+    {
+        for (uint n{0}; n < Constants::NumSources; ++n) {
+            state.removeParameterListener(Params::getVirtualSourcePositionParamID(n, SourcePositionAxis::X), this);
+            state.removeParameterListener(Params::getVirtualSourcePositionParamID(n, SourcePositionAxis::Y), this);
+        }
+    }
+
+    bool VirtualSourceMessenger::connect()
     {
         if (!socket.bindToPort(localPort, ananas::Utils::Strings::LocalInterfaceIP)) {
             std::cerr << "WFS Messenger failed to bind to port: " << std::strerror(errno) << std::endl;
@@ -31,7 +47,7 @@ namespace ananas::WFS
         return true;
     }
 
-    void WFSMessenger::run()
+    void VirtualSourceMessenger::run()
     {
         while (!connect() && !threadShouldExit()) {
             for (int i = 0; i < 50 && !threadShouldExit(); ++i)
@@ -41,45 +57,31 @@ namespace ananas::WFS
         runImpl();
     }
 
-    void WFSMessenger::valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged,
-                                                const juce::Identifier &property)
+    void VirtualSourceMessenger::parameterChanged(const juce::String &parameterID, float newValue)
     {
-        if (!connected) { return; }
-
-        if (property == ananas::Utils::Identifiers::ModulesParamID) {
-            if (auto *obj = treeWhosePropertyHasChanged[property].getDynamicObject()) {
-                for (const auto &prop: obj->getProperties()) {
-                    auto module{obj->getProperty(prop.name)};
-                    auto hasChanged{module.getProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, false)};
-                    if (hasChanged) {
-                        auto id{module.getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, 0)};
-                        auto path{Params::getModuleIndexParamID(id)};
-                        juce::OSCBundle bundle;
-                        DBG("Sending OSC: " << path << " " << prop.name);
-                        bundle.addElement(juce::OSCMessage{path, prop.name.toString()});
-                        send(bundle);
-
-                        if (auto *moduleObj{module.getDynamicObject()}) {
-                            moduleObj->setProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, false);
-                            obj->setProperty(prop.name, module);
-                        }
-                    }
-                }
-
-                treeWhosePropertyHasChanged.setProperty(property, juce::var{obj}, nullptr);
-            }
+        if (parameterID == Params::SpeakerSpacing.id) {
+            return;
         }
-    }
 
-    void WFSMessenger::parameterChanged(const juce::String &parameterID, float newValue)
-    {
+        // Scale the virtual source co-ordinate to soundfield dimensions...
+        if (parameterID.endsWith("x")) {
+            const auto numModules{state.getRawParameterValue(Params::NumModules.id)->load()};
+            const auto speakerSpacing{state.getRawParameterValue(Params::SpeakerSpacing.id)->load()};
+            const auto arrayHalfWidth{(numModules - .5f) * speakerSpacing};
+            newValue *= arrayHalfWidth;
+        } else if (newValue < 0.f) { // Ends with "y"
+            newValue *= -Constants::MinYMetres;
+        } else {
+            newValue *= Constants::MaxYMetres;
+        }
+
         // Indicate that a parameter change message should be sent at the next
         // timer callback.
         slots[parameterID].value.store(newValue);
         slots[parameterID].changed.store(true);
     }
 
-    void WFSMessenger::timerCallback()
+    void VirtualSourceMessenger::timerCallback()
     {
         if (!connected) { return; }
 
@@ -87,7 +89,7 @@ namespace ananas::WFS
         for (auto &[id, slot]: slots) {
             if (slot.changed.load()) {
                 juce::OSCBundle bundle;
-                // DBG("Sending OSC: " << id << " " << slot.value.load());
+                DBG("Sending OSC: " << id << " " << slot.value.load());
                 bundle.addElement(juce::OSCMessage{id, slot.value.load()});
                 send(bundle);
                 slot.changed.store(false);
@@ -99,7 +101,7 @@ namespace ananas::WFS
         }
     }
 
-    void WFSMessenger::runImpl() const
+    void VirtualSourceMessenger::runImpl() const
     {
         while (!threadShouldExit()) {
             // for (int i = 0; i < 10 && !threadShouldExit(); ++i)

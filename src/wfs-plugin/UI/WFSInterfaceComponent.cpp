@@ -8,7 +8,6 @@ namespace ananas::WFS::UI
 {
     WFSInterfaceComponent::WFSInterfaceComponent(
         const int numSources,
-        const int numModules,
         juce::AudioProcessorValueTreeState &apvts,
         juce::ValueTree &persistentTreeToListenTo,
         juce::HashMap<int, std::atomic<float> *> &sourceAmplitudes
@@ -16,17 +15,29 @@ namespace ananas::WFS::UI
         xyController(numSources, apvts, sourceAmplitudes),
         persistentTree(persistentTreeToListenTo)
     {
-        // Make speaker icons visible
-        for (int n{0}; n < 2 * numModules; ++n) {
-            const auto s{speakerIcons.add(new SpeakerIconComponent)};
-            addAndMakeVisible(s, -1);
-        }
-
-        // Make XYController visible
+        // Display the XY-controller
         addAndMakeVisible(xyController);
 
+        // Display and attach the number-of-modules selector.
+        addAndMakeVisible(numModulesLabel);
+        numModulesLabel.attachToComponent(&numModulesSelector, true);
+        numModulesLabel.setText(Params::NumModules.name, juce::dontSendNotification);
+        numModulesLabel.setJustificationType(juce::Justification::centredRight);
+
+        addAndMakeVisible(numModulesSelector);
+        for (size_t n{0}; n < Constants::MaxNumModules; ++n) {
+            numModulesSelector.addItem(juce::String{n + 1}, n + 1);
+        }
+
+        numModulesAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(
+            state,
+            Params::NumModules.id,
+            numModulesSelector
+        );
+
+        // Display and attach the speaker spacing selector.
         addAndMakeVisible(speakerSpacingLabel);
-        speakerSpacingLabel.attachToComponent(&speakerSpacingSlider, false);
+        speakerSpacingLabel.attachToComponent(&speakerSpacingSlider, true);
         speakerSpacingLabel.setText(Params::SpeakerSpacing.name, juce::dontSendNotification);
         speakerSpacingLabel.setJustificationType(juce::Justification::centredRight);
 
@@ -46,6 +57,7 @@ namespace ananas::WFS::UI
             speakerSpacingSlider
         );
 
+        // Display and attach the show-module-selectors checkbox.
         addAndMakeVisible(showModuleSelectorsButton);
         showModuleSelectorsButton.setButtonText(Params::ShowModuleSelectors.name);
 
@@ -55,30 +67,32 @@ namespace ananas::WFS::UI
             showModuleSelectorsButton
         );
 
-        for (int n{0}; n < numModules; ++n) {
-            const auto m{modules.add(new ModuleComponent(n, persistentTree))};
-            addAndMakeVisible(m);
-            m->setBroughtToFrontOnMouseClick(true);
-        }
+        // Listen for changes to the number of modules.
+        state.addParameterListener(Params::NumModules.id, this);
 
-        // Set initial module selector display state.
-        parameterChanged(Params::ShowModuleSelectors.id, state.getRawParameterValue(Params::ShowModuleSelectors.id)->load());
+        // Listen for changes to the speaker spacing.
+        state.addParameterListener(Params::SpeakerSpacing.id, this);
 
         // Listen for changes to module selector display state.
         state.addParameterListener(Params::ShowModuleSelectors.id, this);
 
-        // Listen to the persistent tree for module ID changes
+        // Set initial module display state.
+        parameterChanged(Params::NumModules.id, state.getRawParameterValue(Params::NumModules.id)->load());
+
+        // Set initial module selector display state.
+        parameterChanged(Params::ShowModuleSelectors.id, state.getRawParameterValue(Params::ShowModuleSelectors.id)->load());
+
+        // Listen to the persistent tree for module selection changes.
         persistentTree.addListener(this);
         // Trigger an initial property change so that combo boxes get populated.
         persistentTree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
-
-        // Set initial moduleIDs from the persistent tree... todo: needs to be fixed
-        //updateModuleLists(persistentTree[ananas::Utils::Identifiers::ModulesParamID]);
     }
 
     WFSInterfaceComponent::~WFSInterfaceComponent()
     {
         state.removeParameterListener(Params::ShowModuleSelectors.id, this);
+        state.removeParameterListener(Params::SpeakerSpacing.id, this);
+        state.removeParameterListener(Params::NumModules.id, this);
         persistentTree.removeListener(this);
         showModuleSelectorsButton.setLookAndFeel(nullptr);
     }
@@ -97,7 +111,12 @@ namespace ananas::WFS::UI
         };
         speakerSpacingSlider.setBounds(optionsRow.removeFromRight(100).reduced(1, 3));
         speakerSpacingLabel.setBounds(optionsRow.removeFromRight(200));
+
+        numModulesSelector.setBounds(optionsRow.removeFromRight(75).reduced(1, 12));
+        numModulesLabel.setBounds(optionsRow.removeFromRight(200));
+
         showModuleSelectorsButton.setBounds(optionsRow.removeFromLeft(300));
+
         bounds = bounds.reduced(10);
         xyController.setBounds(bounds);
 
@@ -166,7 +185,50 @@ namespace ananas::WFS::UI
             for (auto *m: modules) {
                 m->shouldShowModuleSelector(show);
             }
+        } else if (parameterID == Params::NumModules.id) {
+            modules.clear();
+            speakerIcons.clear();
+            const auto showModuleSelectors{state.getRawParameterValue(Params::ShowModuleSelectors.id)->load() > .5f};
+            const auto numModules{static_cast<int>(newValue)};
+            const auto speakerSpacing{state.getRawParameterValue(Params::SpeakerSpacing.id)->load()};
+            const auto arrayWidth{newValue * 2.f * speakerSpacing};
+            auto x{-arrayWidth / 2.f + speakerSpacing / 2.f};
+            // Make module selectors visible
+            for (int n{0}; n < numModules; ++n) {
+                const auto ss0x{x};
+                const auto ss0y{0.f};
+                x += speakerSpacing;
+                const auto ss1x{x};
+                const auto ss1y{0.f};
+                x += speakerSpacing;
+                const auto m{modules.add(new ModuleComponent(ss0x, ss0y, ss1x, ss1y, persistentTree))};
+                addAndMakeVisible(m);
+                m->setBroughtToFrontOnMouseClick(true);
+                m->shouldShowModuleSelector(showModuleSelectors);
+            }
+            // Make speaker icons visible
+            for (int n{0}; n < 2 * numModules; ++n) {
+                const auto s{speakerIcons.add(new SpeakerIconComponent)};
+                addAndMakeVisible(s, -1);
+            }
+            updateModuleLists(persistentTree[ananas::Utils::Identifiers::ModulesParamID]);
+        } else if (parameterID == Params::SpeakerSpacing.id) {
+            const auto numModules{state.getRawParameterValue(Params::NumModules.id)->load()};
+            const auto speakerSpacing{newValue};
+            const auto arrayWidth{numModules * 2.f * speakerSpacing};
+            auto x{-arrayWidth / 2.f + speakerSpacing / 2.f};
+            for (int n{0}; n < static_cast<int>(numModules); ++n) {
+                const auto ss0x{x};
+                const auto ss0y{0.f};
+                x += speakerSpacing;
+                const auto ss1x{x};
+                const auto ss1y{0.f};
+                x += speakerSpacing;
+                modules[n]->setSecondarySourceCoordinates(ss0x, ss0y, ss1x, ss1y);
+                modules[n]->setCoordinatesForModule();
+            }
         }
+
         resized();
     }
 

@@ -19,7 +19,8 @@ namespace ananas
         {
             client = 0,
             wfsModule = 1,
-            ambisonicsModule
+            ambisonicsModule,
+            passthrough
         };
 
         static juce::String FirmwareTypeToString(const FirmwareType type)
@@ -28,6 +29,7 @@ namespace ananas
                 case FirmwareType::client: return "Client";
                 case FirmwareType::wfsModule: return "WFS";
                 case FirmwareType::ambisonicsModule: return "Ambisonics";
+                case FirmwareType::passthrough: return "Passthrough";
                 default: return "Unknown";
             }
         }
@@ -70,8 +72,6 @@ namespace ananas
             inline static const juce::Identifier DynamicTreeType{"EphemeralData"};
             inline static const juce::Identifier PersistentTreeType{"PersistentData"};
 
-            inline const static juce::Identifier ShowModuleIDsPropertyID{"ShowModuleIDs"};
-
             inline const static juce::Identifier SwitchesParamID{"Switches"};
 
             inline static const juce::Identifier SwitchIdentifierBase{"switch_"};
@@ -112,14 +112,15 @@ namespace ananas
             inline const static juce::Identifier ClientBufferFillPercentPropertyID{"bufferFillPercent"};
             inline const static juce::Identifier ClientSamplingRatePropertyID{"samplingRate"};
             inline const static juce::Identifier ClientPercentCPUPropertyID{"percentCPU"};
-            inline const static juce::Identifier ClientModuleIDPropertyID{"moduleID"};
-            inline const static juce::Identifier ClientMinYCoordinatePropertyID{"minY"};
-            inline const static juce::Identifier ClientMaxYCoordinatePropertyID{"maxY"};
+            inline const static juce::Identifier ClientSecondarySourceCoordinatesPropertyID{"secondarySourceCoordinates"};
 
             inline const static juce::Identifier ModulesParamID{"Modules"};
 
-            inline const static juce::Identifier ModuleIDPropertyID{"ModuleID"};
-            inline const static juce::Identifier ModuleIDHasChangedPropertyID{"ModuleIDHasChanged"};
+            inline const static juce::Identifier ModuleSecondarySource0xPropertyID{"ModuleSecondarySource0x"};
+            inline const static juce::Identifier ModuleSecondarySource0yPropertyID{"ModuleSecondarySource0y"};
+            inline const static juce::Identifier ModuleSecondarySource1xPropertyID{"ModuleSecondarySource1x"};
+            inline const static juce::Identifier ModuleSecondarySource1yPropertyID{"ModuleSecondarySource1y"};
+            inline const static juce::Identifier ModulePositionHasChangedPropertyID{"ModulePositionHasChanged"};
             inline const static juce::Identifier ModuleIsConnectedPropertyID{"ModuleIsConnected"};
         };
 

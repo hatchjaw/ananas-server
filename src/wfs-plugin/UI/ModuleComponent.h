@@ -8,19 +8,21 @@ namespace ananas::WFS::UI
     class ModuleComponent final : public juce::Component
     {
     public:
-        explicit ModuleComponent(int moduleIndex, juce::ValueTree &persistentTree);
+        ModuleComponent(float ss0x, float ss0y, float ss1x, float ss1y, juce::ValueTree &persistentTree);
 
         void resized() override;
 
         void setAvailableModules(const juce::StringArray &ips);
 
-        void setIndexForModule() const;
+        void setCoordinatesForModule() const;
 
         void shouldShowModuleSelector(bool show);
 
         void expandModuleList();
 
         void collapseModuleList();
+
+        void setSecondarySourceCoordinates(float ss0x, float ss0y, float ss1x, float ss1y);
 
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ModuleComponent)
@@ -30,7 +32,8 @@ namespace ananas::WFS::UI
         juce::ValueTree &tree;
         bool showModuleSelector{false};
         juce::ComboBox moduleSelector;
-        int index{0};
+        std::pair<float, float> secondarySource0Position;
+        std::pair<float, float> secondarySource1Position;
     };
 } // ananas::WFS
 

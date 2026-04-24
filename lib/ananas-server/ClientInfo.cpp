@@ -27,20 +27,13 @@ namespace ananas
         lastReceiveTime = juce::Time::getMillisecondCounter();
     }
 
-    int ModuleInfo::getModuleId() const
-    {
-        return id;
-    }
-
-    void ModuleInfo::setModuleId(int id)
-    {
-        this->id = id;
-    }
-
     juce::ValueTree ModuleInfo::toValueTree() const
     {
         juce::ValueTree tree{"Module"};
-        tree.setProperty(Utils::Identifiers::ModuleIDPropertyID, id, nullptr);
+        tree.setProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID, secondarySource0Position.first, nullptr);
+        tree.setProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID, secondarySource0Position.second, nullptr);
+        tree.setProperty(Utils::Identifiers::ModuleSecondarySource1xPropertyID, secondarySource1Position.first, nullptr);
+        tree.setProperty(Utils::Identifiers::ModuleSecondarySource1yPropertyID, secondarySource1Position.second, nullptr);
         return tree;
     }
 
@@ -71,12 +64,38 @@ namespace ananas
         return didJustConnect;
     }
 
+    std::pair<float, float> ModuleInfo::getSecondarySource0Position() const
+    {
+        return secondarySource0Position;
+    }
+
+    std::pair<float, float> ModuleInfo::getSecondarySource1Position() const
+    {
+        return secondarySource1Position;
+    }
+
     ModuleInfo ModuleInfo::fromValueTree(const juce::ValueTree &tree)
     {
         ModuleInfo info;
-        if (const auto &prop{tree.getProperty(Utils::Identifiers::ModuleIDPropertyID)}; prop.isInt()) {
-            const int val{prop};
-            info.id = static_cast<uint>(val);
+        const auto &prop0{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID)};
+        if (prop0.isDouble()) {
+            const float val{prop0};
+            info.secondarySource0Position.first = val;
+        }
+        const auto &prop1{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID)};
+        if (prop1.isDouble()) {
+            const float val{prop1};
+            info.secondarySource0Position.second = val;
+        }
+        const auto &prop2{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID)};
+        if (prop2.isDouble()) {
+            const float val{prop2};
+            info.secondarySource1Position.first = val;
+        }
+        const auto &prop3{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID)};
+        if (prop3.isDouble()) {
+            const float val{prop3};
+            info.secondarySource1Position.second = val;
         }
         return info;
     }
@@ -122,7 +141,10 @@ namespace ananas
                 audioPTPOffsetNs,
                 bufferFillPercent,
                 ptpLock,
-                moduleID
+                secondarySource0x,
+                secondarySource0y,
+                secondarySource1x,
+                secondarySource1y
             ]{clientInfo.getInfo()};
             client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(serial));
             client->setProperty(Utils::Identifiers::ClientFirmwareTypeVersionPropertyID,
@@ -134,7 +156,9 @@ namespace ananas
             client->setProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID, bufferFillPercent);
             client->setProperty(Utils::Identifiers::ClientSamplingRatePropertyID, samplingRate);
             client->setProperty(Utils::Identifiers::ClientPercentCPUPropertyID, percentCPU);
-            client->setProperty(Utils::Identifiers::ClientModuleIDPropertyID, moduleID);
+            client->setProperty(Utils::Identifiers::ClientSecondarySourceCoordinatesPropertyID,
+                                "(" + juce::String{secondarySource0x} + ", " + juce::String{secondarySource0y} +
+                                "), (" + juce::String{secondarySource1x} + ", " + juce::String{secondarySource1y} + ")");
             object->setProperty(ip, client);
         }
 
@@ -216,7 +240,10 @@ namespace ananas
 
         for (const auto &[ip, m]: modules) {
             auto *module{new juce::DynamicObject()};
-            module->setProperty(Utils::Identifiers::ModuleIDPropertyID, static_cast<int>(m.getModuleId()));
+            module->setProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID, static_cast<int>(m.getSecondarySource0Position().first));
+            module->setProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID, static_cast<int>(m.getSecondarySource0Position().second));
+            module->setProperty(Utils::Identifiers::ModuleSecondarySource1xPropertyID, static_cast<int>(m.getSecondarySource1Position().first));
+            module->setProperty(Utils::Identifiers::ModuleSecondarySource1yPropertyID, static_cast<int>(m.getSecondarySource1Position().second));
             module->setProperty(Utils::Identifiers::ModuleIsConnectedPropertyID, m.isConnected());
             object->setProperty(ip, module);
         }

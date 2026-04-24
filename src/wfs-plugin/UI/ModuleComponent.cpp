@@ -5,15 +5,22 @@
 
 namespace ananas::WFS::UI
 {
-    ModuleComponent::ModuleComponent(const int moduleIndex, juce::ValueTree &persistentTree)
+    ModuleComponent::ModuleComponent(
+        const float ss0x,
+        const float ss0y,
+        const float ss1x,
+        const float ss1y,
+        juce::ValueTree &persistentTree
+    )
         : tree(persistentTree),
-          index(moduleIndex)
+          secondarySource0Position(std::make_pair(ss0x, ss0y)),
+          secondarySource1Position(std::make_pair(ss1x, ss1y))
     {
         addAndMakeVisible(moduleSelector);
 
         moduleSelector.onChange = [this]
         {
-            setIndexForModule();
+            setCoordinatesForModule();
         };
     }
 
@@ -40,14 +47,17 @@ namespace ananas::WFS::UI
             for (const auto &prop: obj->getProperties()) {
                 const auto module{obj->getProperty(prop.name).getDynamicObject()};
 
-                if (static_cast<int>(module->getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID)) == index) {
+                if (module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource0xPropertyID) == juce::var{secondarySource0Position.first} &&
+                    module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource0yPropertyID) == juce::var{secondarySource0Position.second} &&
+                    module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource1xPropertyID) == juce::var{secondarySource1Position.first} &&
+                    module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource1yPropertyID) == juce::var{secondarySource1Position.second}) {
                     setSelectedModule(prop.name.toString());
                 }
             }
         }
     }
 
-    void ModuleComponent::setIndexForModule() const
+    void ModuleComponent::setCoordinatesForModule() const
     {
         const auto selected{moduleSelector.getText()};
 
@@ -57,16 +67,25 @@ namespace ananas::WFS::UI
                 const auto module{obj->getProperty(prop.name).getDynamicObject()};
 
                 if (prop.name.toString() == selected) {
-                    // If the module's IP matches this selector's text, set the module's index equal
-                    // to the index of this selector.
-                    module->setProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, index);
-                    module->setProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, true);
+                    // If the module's IP matches this selector's text, set the module's secondary
+                    // source positions equal to the positions associated with the selector.
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource0xPropertyID, secondarySource0Position.first);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource0yPropertyID, secondarySource0Position.second);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource1xPropertyID, secondarySource1Position.first);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource1yPropertyID, secondarySource1Position.second);
+                    module->setProperty(ananas::Utils::Identifiers::ModulePositionHasChangedPropertyID, true);
                     tree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
-                } else if (module->getProperty(ananas::Utils::Identifiers::ModuleIDPropertyID) == juce::var{index}) {
+                } else if (module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource0xPropertyID) == juce::var{secondarySource0Position.first} &&
+                           module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource0yPropertyID) == juce::var{secondarySource0Position.second} &&
+                           module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource1xPropertyID) == juce::var{secondarySource1Position.first} &&
+                           module->getProperty(ananas::Utils::Identifiers::ModuleSecondarySource1yPropertyID) == juce::var{secondarySource1Position.second}) {
                     // If the module's ID matches the index of this selector, it's being replaced,
-                    // so set its ID to -1.
-                    module->setProperty(ananas::Utils::Identifiers::ModuleIDPropertyID, -1);
-                    module->setProperty(ananas::Utils::Identifiers::ModuleIDHasChangedPropertyID, true);
+                    // so set its position to the origin...
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource0xPropertyID, 0.f);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource0yPropertyID, 0.f);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource1xPropertyID, 0.f);
+                    module->setProperty(ananas::Utils::Identifiers::ModuleSecondarySource1yPropertyID, 0.f);
+                    module->setProperty(ananas::Utils::Identifiers::ModulePositionHasChangedPropertyID, true);
                     tree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
                 }
             }
@@ -87,6 +106,14 @@ namespace ananas::WFS::UI
     void ModuleComponent::collapseModuleList()
     {
         moduleSelector.hidePopup();
+    }
+
+    void ModuleComponent::setSecondarySourceCoordinates(const float ss0x, const float ss0y, const float ss1x, const float ss1y)
+    {
+        secondarySource0Position.first = ss0x;
+        secondarySource0Position.second = ss0y;
+        secondarySource1Position.first = ss1x;
+        secondarySource1Position.second = ss1y;
     }
 
     void ModuleComponent::setSelectedModule(const juce::String &ip)
