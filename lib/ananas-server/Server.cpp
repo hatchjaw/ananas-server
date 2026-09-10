@@ -63,7 +63,7 @@ namespace ananas::Server
     void Server::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
     {
         // These checks are kind of overkill, since the order in which threads
-        // were added to the OwnedArray is known, but as a santiy check...
+        // were added to the OwnedArray is known, but as a sanity check...
         if (auto *s = dynamic_cast<AudioSender *>(threads[0])) {
             if (auto *t = dynamic_cast<TimestampListener *>(threads[1])) {
                 // If a new timestamp is available, send it to the audio sender
