@@ -16,10 +16,26 @@ namespace ananas::WFS::UI
 
         void drawXYControllerNode(juce::Graphics &g, const XYControllerComponent::Node &node, float intensity) const;
 
-        void drawSpeakerIcon(juce::Graphics &g, const SpeakerIconComponent & s) const;
+        void drawSpeakerIcon(juce::Graphics &g, const SpeakerIconComponent &s) const;
 
     private:
-        juce::Path createSpeakerIconPath() const;
+        [[nodiscard]] juce::Path createSpeakerIconPath() const;
+
+        [[nodiscard]] virtual float getSpeakerIconCoilStartX() const { return 26.f; }
+
+        [[nodiscard]] virtual float getSpeakerIconCoilStartY() const { return 0.f; }
+
+        [[nodiscard]] virtual float getSpeakerIconCoilWidth() const { return 48.f; }
+
+        [[nodiscard]] virtual float getSpeakerIconConeEndY() const { return 100.f; }
+
+        [[nodiscard]] virtual float getSpeakerIconConeRightX() const { return 100.f; }
+
+        [[nodiscard]] virtual float getSpeakerIconConeLeftX() const { return 0.f; }
+
+        [[nodiscard]] virtual float getSpeakerIconCoilHeight() const { return 25.f; }
+
+        [[nodiscard]] virtual float getSpeakerOutlineThickness() const { return 0.f; }
 
         virtual float getNodeBorderBrightnessMin() const { return .2f; }
 
@@ -32,22 +48,6 @@ namespace ananas::WFS::UI
         virtual float getNodeBorderThickness() const { return 3.f; }
 
         virtual float getNodeIndexFontSize() const { return 18.f; }
-
-        virtual float getSpeakerIconCoilStartX() const { return 26.f; }
-
-        virtual float getSpeakerIconCoilStartY() const { return 0.f; }
-
-        virtual float getSpeakerIconCoilWidth() const { return 48.f; }
-
-        virtual float getSpeakerIconConeEndY() const { return 100.f; }
-
-        virtual float getSpeakerIconConeRightX() const { return 100.f; }
-
-        virtual float getSpeakerIconConeLeftX() const { return 0.f; }
-
-        virtual float getSpeakerIconCoilHeight() const { return 25.f; }
-
-        virtual float getSpeakerOutlineThickness() const { return 0.f; }
     };
 }
 

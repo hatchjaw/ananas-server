@@ -1,0 +1,266 @@
+#include "PluginProcessor.h"
+#include "PluginEditor.h"
+#include <AnanasUtils.h>
+#include "HOAUtils.h"
+
+PluginProcessor::PluginProcessor()
+    : AudioProcessor(getBusesProperties(ananas::HOA::Constants::NumChannels)),
+      server(std::make_unique<ananas::Server::Server>(ananas::HOA::Constants::NumChannels)),
+      apvts(*this, nullptr, ananas::HOA::Identifiers::StaticTreeType, createParameterLayout()),
+      dynamicTree(ananas::Utils::Identifiers::DynamicTreeType),
+      persistentTree(ananas::Utils::Identifiers::PersistentTreeType)
+{
+    server->getClientList()->addChangeListener(this);
+    server->getModuleList()->addChangeListener(this);
+    server->getAuthority()->addChangeListener(this);
+    server->getSwitches()->addChangeListener(this);
+}
+
+PluginProcessor::~PluginProcessor()
+{
+    server->getClientList()->removeChangeListener(this);
+    server->getModuleList()->removeChangeListener(this);
+    server->getAuthority()->removeChangeListener(this);
+    server->getSwitches()->removeChangeListener(this);
+}
+
+void PluginProcessor::prepareToPlay(const double sampleRate, const int samplesPerBlock)
+{
+    server->prepareToPlay(samplesPerBlock, sampleRate);
+}
+
+void PluginProcessor::releaseResources()
+{
+    server->releaseResources();
+}
+
+void PluginProcessor::processBlock(juce::AudioBuffer<float> &buffer, juce::MidiBuffer &midiMessages)
+{
+    ignoreUnused(midiMessages);
+
+    juce::ScopedNoDenormals noDenormals;
+
+    const juce::AudioSourceChannelInfo block{buffer};
+
+    server->getNextAudioBlock(block);
+}
+
+void PluginProcessor::processBlock(juce::AudioBuffer<double> &buffer, juce::MidiBuffer &midiMessages)
+{
+    juce::AudioBuffer<float> floatBuffer;
+
+    floatBuffer.makeCopyOf(buffer);
+
+    processBlock(floatBuffer, midiMessages);
+}
+
+juce::AudioProcessorEditor *PluginProcessor::createEditor()
+{
+    return new PluginEditor(*this);
+}
+
+bool PluginProcessor::hasEditor() const
+{
+    return true;
+}
+
+const juce::String PluginProcessor::getName() const
+{
+    return JucePlugin_Name;
+}
+
+bool PluginProcessor::acceptsMidi() const
+{
+#if JucePlugin_WantsMidiInput
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool PluginProcessor::producesMidi() const
+{
+#if JucePlugin_ProducesMidiOutput
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool PluginProcessor::isMidiEffect() const
+{
+#if JucePlugin_IsMidiEffect
+    return true;
+#else
+    return false;
+#endif
+}
+
+double PluginProcessor::getTailLengthSeconds() const
+{
+    return 0.0;
+}
+
+int PluginProcessor::getNumPrograms()
+{
+    return 1;
+}
+
+int PluginProcessor::getCurrentProgram()
+{
+    return 0;
+}
+
+void PluginProcessor::setCurrentProgram(int index)
+{
+    juce::ignoreUnused(index);
+}
+
+const juce::String PluginProcessor::getProgramName(int index)
+{
+    juce::ignoreUnused(index);
+    return {};
+}
+
+void PluginProcessor::changeProgramName(int index, const juce::String &newName)
+{
+    ignoreUnused(index, newName);
+}
+
+void PluginProcessor::getStateInformation(juce::MemoryBlock &destData)
+{
+    auto state{apvts.copyState()};
+
+    state.addChild(getServer().getSwitches()->toValueTree(), -1, nullptr);
+
+    state.addChild(getServer().getModuleList()->toValueTree(), -1, nullptr);
+
+    const auto xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
+}
+
+void PluginProcessor::setStateInformation(const void *data, int size)
+{
+    const auto xmlState{getXmlFromBinary(data, size)};
+
+    if (xmlState != nullptr) {
+        const auto tree{juce::ValueTree::fromXml(*xmlState)};
+
+        if (tree.isValid()) {
+            apvts.replaceState(tree);
+
+            const auto switchListTree{tree.getChildWithName(ananas::Utils::Identifiers::SwitchesParamID)};
+            if (switchListTree.isValid()) {
+                getServer().getSwitches()->fromValueTree(switchListTree);
+            }
+
+            const auto moduleListTree{tree.getChildWithName(ananas::Utils::Identifiers::ModulesParamID)};
+            if (moduleListTree.isValid()) {
+                getServer().getModuleList()->fromValueTree(moduleListTree);
+            }
+        }
+    }
+}
+
+void PluginProcessor::changeListenerCallback(juce::ChangeBroadcaster *source)
+{
+    if (const auto *clients = dynamic_cast<ananas::ClientList *>(source)) {
+        dynamicTree.setProperty(ananas::Utils::Identifiers::ConnectedClientsParamID, clients->toVar(), nullptr);
+    } else if (const auto *modules = dynamic_cast<ananas::ModuleList *>(source)) {
+        persistentTree.setProperty(ananas::Utils::Identifiers::ModulesParamID, modules->toVar(), nullptr);
+        persistentTree.sendPropertyChangeMessage(ananas::Utils::Identifiers::ModulesParamID);
+    } else if (const auto *authority = dynamic_cast<ananas::AuthorityInfo *>(source)) {
+        dynamicTree.setProperty(ananas::Utils::Identifiers::TimeAuthorityParamID, authority->toVar(), nullptr);
+    } else if (const auto *switches = dynamic_cast<ananas::SwitchList *>(source)) {
+        persistentTree.setProperty(ananas::Utils::Identifiers::SwitchesParamID, switches->toVar(), nullptr);
+        dynamicTree.setProperty(ananas::Utils::Identifiers::SwitchesParamID, switches->toVar(), nullptr);
+    }
+}
+
+juce::AudioProcessorValueTreeState &PluginProcessor::getParamState()
+{
+    return apvts;
+}
+
+const juce::AudioProcessorValueTreeState &PluginProcessor::getParamState() const
+{
+    return apvts;
+}
+
+juce::ValueTree &PluginProcessor::getDynamicTree()
+{
+    return dynamicTree;
+}
+
+const juce::ValueTree &PluginProcessor::getDynamicTree() const
+{
+    return dynamicTree;
+}
+
+juce::ValueTree &PluginProcessor::getPersistentTree()
+{
+    return persistentTree;
+}
+
+const juce::ValueTree &PluginProcessor::getPersistentTree() const
+{
+    return persistentTree;
+}
+
+ananas::Server::Server &PluginProcessor::getServer() const
+{
+    return *server;
+}
+
+juce::AudioProcessor::BusesProperties PluginProcessor::getBusesProperties(const size_t numChannels)
+{
+    BusesProperties buses;
+
+    for (size_t i{1}; i <= numChannels; ++i) {
+        buses.addBus(true, ananas::Utils::Strings::getInputLabel(i), juce::AudioChannelSet::mono());
+        buses.addBus(false, ananas::Utils::Strings::getOutputLabel(i), juce::AudioChannelSet::mono());
+    }
+
+    return buses;
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParameterLayout()
+{
+    juce::AudioProcessorValueTreeState::ParameterLayout params{};
+
+    params.add(std::make_unique<juce::AudioParameterBool>(
+        ananas::HOA::Params::ShowModuleSelectors.id,
+        ananas::HOA::Params::ShowModuleSelectors.name,
+        ananas::HOA::Params::ShowModuleSelectors.defaultValue
+    ));
+
+    for (size_t n{0}; n < ananas::HOA::Constants::NumChannels; ++n) {
+        params.add(std::make_unique<juce::AudioParameterFloat>(
+            ananas::HOA::Params::getSpeakerCoordinateParamID(n, ananas::HOA::SpeakerCoordinateAxis::X),
+            ananas::HOA::Params::getSpeakerCoordinateParamName(n, ananas::HOA::SpeakerCoordinateAxis::X),
+            ananas::HOA::Params::SpeakerCoordinateParamRange,
+            ananas::HOA::Params::SpeakerCoordinateParamDefault
+        ));
+        params.add(std::make_unique<juce::AudioParameterFloat>(
+            ananas::HOA::Params::getSpeakerCoordinateParamID(n, ananas::HOA::SpeakerCoordinateAxis::Y),
+            ananas::HOA::Params::getSpeakerCoordinateParamName(n, ananas::HOA::SpeakerCoordinateAxis::Y),
+            ananas::HOA::Params::SpeakerCoordinateParamRange,
+            ananas::HOA::Params::SpeakerCoordinateParamDefault
+        ));
+        params.add(std::make_unique<juce::AudioParameterFloat>(
+            ananas::HOA::Params::getSpeakerCoordinateParamID(n, ananas::HOA::SpeakerCoordinateAxis::Z),
+            ananas::HOA::Params::getSpeakerCoordinateParamName(n, ananas::HOA::SpeakerCoordinateAxis::Z),
+            ananas::HOA::Params::SpeakerCoordinateParamRange,
+            ananas::HOA::Params::SpeakerCoordinateParamDefault
+        ));
+    }
+
+    return params;
+}
+
+//==============================================================================
+// This creates new instances of the plugin.
+juce::AudioProcessor *JUCE_CALLTYPE createPluginFilter()
+{
+    return new PluginProcessor();
+}
