@@ -42,6 +42,7 @@ target_sources(ananasHOA
         UI/SoundFieldComponent.cpp
         UI/ModuleComponent.cpp
         UI/SpeakerIconComponent.cpp
+        UI/SpeakerCoordinatesComponent.cpp
 )
 
 target_link_libraries(ananasHOA

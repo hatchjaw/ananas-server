@@ -12,8 +12,7 @@ namespace ananas::HOA
     {
         SwitchToHoaTab = 0x1001,
         SwitchToNetworkTab = 0x1002,
-        ToggleModuleSelectorDisplay = 0x1003,
-        RevealModuleSelector = 0x1004
+        RevealModuleSelector = 0x1003
     };
 
     class Constants
@@ -57,18 +56,12 @@ namespace ananas::HOA
             bool defaultValue{true};
         };
 
-        inline static const BoolParam ShowModuleSelectors{
-            "showModuleSelectors",
-            "Show module selectors",
-            true
-        };
-
-        static juce::String getSpeakerCoordinateParamID(const uint index, SpeakerCoordinateAxis axis)
+        static juce::String getSpeakerCoordinateParamID(const size_t index, SpeakerCoordinateAxis axis)
         {
             return "speaker" + juce::String{index} + static_cast<char>(axis);
         }
 
-        static juce::String getSpeakerCoordinateParamName(const uint index, SpeakerCoordinateAxis axis)
+        static juce::String getSpeakerCoordinateParamName(const size_t index, SpeakerCoordinateAxis axis)
         {
             return "Speaker " + juce::String{index} + " " + static_cast<char>(axis);
         }
@@ -124,7 +117,6 @@ namespace ananas::HOA
         public:
             constexpr static int SwitchToHoaTabKeycode{'['};
             constexpr static int SwitchToNetworkTabKeycode{']'};
-            constexpr static int ToggleModuleSelectorsKeycode{'m'};
             constexpr static int RevealModuleSelectorListKeycode{'1'};
         };
     }

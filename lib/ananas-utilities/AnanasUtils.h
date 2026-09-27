@@ -122,6 +122,9 @@ namespace ananas
             inline const static juce::Identifier ModuleSecondarySource1yPropertyID{"ModuleSecondarySource1y"};
             inline const static juce::Identifier ModulePositionHasChangedPropertyID{"ModulePositionHasChanged"};
             inline const static juce::Identifier ModuleIsConnectedPropertyID{"ModuleIsConnected"};
+
+            inline const static juce::Identifier ModuleDecoderMatrixRow1PropertyID{"ModuleDecoderMatrixRow1"};
+            inline const static juce::Identifier ModuleDecoderMatrixRow2PropertyID{"ModuleDecoderMatrixRow2"};
         };
 
         struct ThreadParams

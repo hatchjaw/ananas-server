@@ -6,7 +6,7 @@
 namespace ananas::HOA::UI
 {
     HOAInterfaceComponent::HOAInterfaceComponent(
-        const int numChannels,
+        const size_t numChannels,
         juce::AudioProcessorValueTreeState &apvts,
         juce::ValueTree &persistentTreeToListenTo)
         : state(apvts),
@@ -14,9 +14,14 @@ namespace ananas::HOA::UI
     {
         addAndMakeVisible(soundFieldComponent);
 
-        for (int n{0}; n < numChannels; ++n) {
-            const auto s{speakerIcons.add(new SpeakerIconComponent(n))};
+        for (size_t n{0}; n < numChannels; ++n) {
+            const auto s{speakerIcons.add(new SpeakerIconComponent(n, apvts))};
             addAndMakeVisible(s);
+        }
+
+        for (size_t n{0}; n < numChannels / 2; ++n) {
+            const auto m{modules.add(new ModuleComponent(n))};
+            addAndMakeVisible(m);
         }
 
         // Listen to the persistent tree for module selection changes.
@@ -41,9 +46,12 @@ namespace ananas::HOA::UI
         bounds = bounds.reduced(10);
         soundFieldComponent.setBounds(bounds);
 
-        for (const auto &s : speakerIcons)
-        {
+        for (const auto &s: speakerIcons) {
             s->setBounds(s->getTheBounds());
+        }
+
+        for (const auto &m: modules) {
+            m->setBounds(m->getTheBounds());
         }
 
 #if SHOW_NO_NETWORK_OVERLAY
@@ -62,14 +70,14 @@ namespace ananas::HOA::UI
                 }
             }
         }
-        // for (const auto &m: modules) {
-        //     m->setAvailableModules(ips);
-        // }
+        for (const auto &m: modules) {
+            m->setAvailableModules(ips);
+        }
     }
 
     void HOAInterfaceComponent::valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged, const juce::Identifier &property)
     {
-        if (property == ananas::Utils::Identifiers::ModulesParamID) {
+        if (property == Utils::Identifiers::ModulesParamID) {
             updateModuleLists(treeWhosePropertyHasChanged[property]);
         }
     }
@@ -80,9 +88,9 @@ namespace ananas::HOA::UI
 
     void HOAInterfaceComponent::expandModuleList(int moduleID)
     {
-        // for (auto *m: modules) {
-        //     m->collapseModuleList();
-        // }
-        // modules[moduleID]->expandModuleList();
+        for (auto *m: modules) {
+            m->collapseModuleList();
+        }
+        modules[moduleID]->expandModuleList();
     }
 }

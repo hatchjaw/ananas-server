@@ -95,8 +95,7 @@ void PluginEditor::getAllCommands(juce::Array<int> &commands)
 {
     commands.addArray({
         ananas::HOA::SwitchToHoaTab,
-        ananas::HOA::SwitchToNetworkTab,
-        ananas::HOA::ToggleModuleSelectorDisplay
+        ananas::HOA::SwitchToNetworkTab
     });
 
     for (size_t m{0}; m < 10; m++) {
@@ -125,25 +124,13 @@ void PluginEditor::getCommandInfo(const juce::CommandID commandID, juce::Applica
             result.addDefaultKeypress(ananas::HOA::UI::Shortcuts::SwitchToNetworkTabKeycode, juce::ModifierKeys::noModifiers);
             break;
 
-        case ananas::HOA::ToggleModuleSelectorDisplay:
-            result.setInfo(
-                ananas::HOA::Strings::ToggleModuleSelectorsShortName,
-                ananas::HOA::Strings::ToggleModuleSelectorsDescription,
-                ananas::HOA::Strings::OptionsCommandCategoryName,
-                hoaInterface.isVisible() ? 0 : juce::ApplicationCommandInfo::CommandFlags::isDisabled);
-            result.addDefaultKeypress(ananas::HOA::UI::Shortcuts::ToggleModuleSelectorsKeycode, juce::ModifierKeys::noModifiers);
-            break;
-
         default:
             const auto moduleID{commandID - ananas::HOA::RevealModuleSelector - 1};
-            const auto moduleSelectorsAreVisible{
-                getProcessor().getParamState().getRawParameterValue(ananas::HOA::Params::ShowModuleSelectors.id)->load() > .5f
-            };
             result.setInfo(
                 ananas::HOA::Strings::getRevealModuleSelectorShortName(moduleID),
                 ananas::HOA::Strings::getRevealModuleSelectorDescription(moduleID),
                 ananas::HOA::Strings::ModulesCommandCategoryName,
-                hoaInterface.isVisible() && moduleSelectorsAreVisible ? 0 : juce::ApplicationCommandInfo::CommandFlags::isDisabled);
+                hoaInterface.isVisible() ? 0 : juce::ApplicationCommandInfo::CommandFlags::isDisabled);
             result.addDefaultKeypress(
                 ananas::HOA::UI::Shortcuts::RevealModuleSelectorListKeycode + commandID - ananas::HOA::RevealModuleSelector,
                 juce::ModifierKeys::noModifiers
@@ -162,12 +149,6 @@ bool PluginEditor::perform(const InvocationInfo &info)
         case ananas::HOA::SwitchToNetworkTab:
             tabbedComponent.setCurrentTabIndex(1);
             return true;
-
-        case ananas::HOA::ToggleModuleSelectorDisplay: {
-            const auto showModuleSelectors{getProcessor().getParamState().getParameter(ananas::HOA::Params::ShowModuleSelectors.id)};
-            showModuleSelectors->setValueNotifyingHost(fabsf(showModuleSelectors->getValue() - 1.f));
-            return true;
-        }
 
         default:
             hoaInterface.expandModuleList(info.commandID - ananas::HOA::RevealModuleSelector);

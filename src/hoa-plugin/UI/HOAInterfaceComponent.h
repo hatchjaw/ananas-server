@@ -23,7 +23,7 @@ namespace ananas::HOA::UI
             public juce::AudioProcessorValueTreeState::Listener
     {
     public:
-        HOAInterfaceComponent(int numChannels,
+        HOAInterfaceComponent(size_t numChannels,
                               juce::AudioProcessorValueTreeState &apvts,
                               juce::ValueTree &persistentTreeToListenTo);
 

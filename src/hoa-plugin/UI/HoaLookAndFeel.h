@@ -25,7 +25,7 @@ namespace ananas::HOA::UI
 
         juce::Path createSpeakerIconPath() const;
 
-        virtual float getSpeakerOutlineThickness() const { return 0.f; };
+        virtual float getSpeakerOutlineThickness() const { return 1.f; };
     };
 }
 
