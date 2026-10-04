@@ -19,6 +19,8 @@ namespace ananas::HOA
     {
     public:
         constexpr static size_t NumChannels{16};
+        constexpr static size_t AmbisonicsOrder{3};
+        constexpr static size_t NumSpeakers{16};
     };
 
     enum class SpeakerCoordinateAxis : char
@@ -66,6 +68,11 @@ namespace ananas::HOA
             return "Speaker " + juce::String{index} + " " + static_cast<char>(axis);
         }
 
+        static juce::String getDecoderCoefficientParamID(const int row, const size_t index)
+        {
+            return "/dm/" + juce::String{row} + "/" + juce::String{index};
+        }
+
         inline static const juce::NormalisableRange<float> SpeakerCoordinateParamRange{
             -10.f, 10.f
         };
@@ -103,6 +110,8 @@ namespace ananas::HOA
     class Sockets
     {
     public:
+        static constexpr uint16_t DecoderMatrixCoefficientMessengerLocalPort{49165};
+        static constexpr uint16_t DecoderMatrixCoefficientMessengerRemotePort{49165};
     };
 
     namespace UI

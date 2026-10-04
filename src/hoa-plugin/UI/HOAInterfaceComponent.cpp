@@ -20,7 +20,7 @@ namespace ananas::HOA::UI
         }
 
         for (size_t n{0}; n < numChannels / 2; ++n) {
-            const auto m{modules.add(new ModuleComponent(n))};
+            const auto m{modules.add(new ModuleComponent(n, persistentTree))};
             addAndMakeVisible(m);
         }
 

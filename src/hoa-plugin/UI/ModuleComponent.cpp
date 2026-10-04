@@ -14,11 +14,11 @@ namespace ananas::HOA::UI
 
         moduleSelector.onChange = [this]
         {
-            setDecoderMaxtrixRowsForModule();
+            setDecoderMatrixRowsForModule();
         };
     }
 
-    void ModuleComponent::setDecoderMaxtrixRowsForModule() const
+    void ModuleComponent::setDecoderMatrixRowsForModule() const
     {
         const auto selected{moduleSelector.getText()};
 
@@ -30,12 +30,18 @@ namespace ananas::HOA::UI
                 if (prop.name.toString() == selected) {
                     // If the module's IP matches this selector's text, set the module's decoder
                     // matrix rows equal to those associated with this selector.
-                    module->setProperty(Utils::Identifiers::ModuleDecoderMatrixRow1PropertyID, decoderMatrixRows.first);
-                    module->setProperty(Utils::Identifiers::ModuleDecoderMatrixRow2PropertyID, decoderMatrixRows.second);
+                    module->setProperty(Utils::Identifiers::ModuleDecoderMatrixRow0PropertyID, static_cast<int>(decoderMatrixRows.first));
+                    module->setProperty(Utils::Identifiers::ModuleDecoderMatrixRow1PropertyID, static_cast<int>(decoderMatrixRows.second));
+                    module->setProperty(Utils::Identifiers::ModulePositionHasChangedPropertyID, true);
                     tree.sendPropertyChangeMessage(Utils::Identifiers::ModulesParamID);
                 }
             }
         }
+    }
+
+    void ModuleComponent::setSelectedModule(const juce::String &ip)
+    {
+        moduleSelector.setText(ip, juce::dontSendNotification);
     }
 
     void ModuleComponent::resized()
@@ -57,29 +63,45 @@ namespace ananas::HOA::UI
     {
         moduleSelector.clear(juce::dontSendNotification);
         moduleSelector.addItemList(ips, 1);
+
+        const auto modules{tree.getProperty(ananas::Utils::Identifiers::ModulesParamID)};
+
+        if (auto *obj = modules.getDynamicObject()) {
+            for (const auto &prop: obj->getProperties()) {
+                const auto module{obj->getProperty(prop.name).getDynamicObject()};
+
+                if (module->getProperty(Utils::Identifiers::ModuleDecoderMatrixRow0PropertyID) ==
+                    juce::var{static_cast<int>(decoderMatrixRows.first)}
+                    &&
+                    module->getProperty(Utils::Identifiers::ModuleDecoderMatrixRow1PropertyID) ==
+                    juce::var{static_cast<int>(decoderMatrixRows.second)}) {
+                    setSelectedModule(prop.name.toString());
+                }
+            }
+        }
     }
 
     juce::Rectangle<int> ModuleComponent::getTheBounds() const
     {
         switch (index) {
             case 0:
-                return {700, 80, 100, 25};
+                return {675, 80, 150, 25};
             case 1:
-                return {900, 560, 100, 25};
+                return {875, 560,150, 25};
             case 2:
-                return {400, 765, 100, 25};
+                return {375, 765,150, 25};
             case 3:
-                return {190, 280, 100, 25};
+                return {165, 280,150, 25};
             case 4:
-                return {550, 185, 100, 25};
+                return {525, 165,150, 25};
             case 5:
-                return {800, 425, 100, 25};
+                return {775, 425,150, 25};
             case 6:
-                return {550, 660, 100, 25};
+                return {525, 680,150, 25};
             case 7:
-                return {300, 425, 100, 25};
+                return {275, 425,150, 25};
             default:
-                return {550, 425, 100, 25};
+                return {525, 425,150, 25};
         }
     }
 }

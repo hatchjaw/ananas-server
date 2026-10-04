@@ -8,12 +8,14 @@ PluginProcessor::PluginProcessor()
       server(std::make_unique<ananas::Server::Server>(ananas::HOA::Constants::NumChannels)),
       apvts(*this, nullptr, ananas::HOA::Identifiers::StaticTreeType, createParameterLayout()),
       dynamicTree(ananas::Utils::Identifiers::DynamicTreeType),
-      persistentTree(ananas::Utils::Identifiers::PersistentTreeType)
+      persistentTree(ananas::Utils::Identifiers::PersistentTreeType),
+      decoderMatrixCoefficientMessenger(apvts)
 {
     server->getClientList()->addChangeListener(this);
     server->getModuleList()->addChangeListener(this);
     server->getAuthority()->addChangeListener(this);
     server->getSwitches()->addChangeListener(this);
+    persistentTree.addListener(&decoderMatrixCoefficientMessenger);
 }
 
 PluginProcessor::~PluginProcessor()
@@ -22,6 +24,7 @@ PluginProcessor::~PluginProcessor()
     server->getModuleList()->removeChangeListener(this);
     server->getAuthority()->removeChangeListener(this);
     server->getSwitches()->removeChangeListener(this);
+    persistentTree.removeListener(&decoderMatrixCoefficientMessenger);
 }
 
 void PluginProcessor::prepareToPlay(const double sampleRate, const int samplesPerBlock)
@@ -228,7 +231,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params{};
 
-    for (size_t n{0}; n < ananas::HOA::Constants::NumChannels; ++n) {
+    for (size_t n{0}; n < ananas::HOA::Constants::NumSpeakers; ++n) {
         params.add(std::make_unique<juce::AudioParameterFloat>(
             ananas::HOA::Params::getSpeakerCoordinateParamID(n, ananas::HOA::SpeakerCoordinateAxis::X),
             ananas::HOA::Params::getSpeakerCoordinateParamName(n, ananas::HOA::SpeakerCoordinateAxis::X),

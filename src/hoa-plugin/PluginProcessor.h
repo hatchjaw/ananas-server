@@ -7,6 +7,7 @@
 
 #include <Server.h>
 #include <juce_audio_processors/juce_audio_processors.h>
+#include "DecoderMatrixCoefficientMessenger.h"
 
 class PluginProcessor final : public juce::AudioProcessor,
                               public juce::ChangeListener
@@ -83,6 +84,8 @@ private:
     juce::ValueTree dynamicTree;
     // For handling user-entered data that should be storable/retrievable.
     juce::ValueTree persistentTree;
+
+    ananas::HOA::DecoderMatrixCoefficientMessenger decoderMatrixCoefficientMessenger;
 };
 
 

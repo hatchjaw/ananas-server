@@ -5,7 +5,7 @@
 
 namespace ananas::HOA::UI
 {
-    class ModuleComponent : public juce::Component
+    class ModuleComponent final : public juce::Component
     {
     public:
         ModuleComponent(size_t idx, juce::ValueTree &persistentTree);
@@ -16,17 +16,20 @@ namespace ananas::HOA::UI
 
         void expandModuleList();
 
+
         void setAvailableModules(const juce::StringArray &ips);
 
         [[nodiscard]] juce::Rectangle<int> getTheBounds() const;
 
-        void setDecoderMaxtrixRowsForModule() const;
+        void setDecoderMatrixRowsForModule() const;
 
     private:
+        void setSelectedModule(const juce::String &ip);
+
         juce::ValueTree &tree;
         juce::ComboBox moduleSelector;
         size_t index{0};
-        std::pair<int, int> decoderMatrixRows;
+        std::pair<size_t, size_t> decoderMatrixRows;
     };
 }
 

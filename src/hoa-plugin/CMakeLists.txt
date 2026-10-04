@@ -33,10 +33,13 @@ target_compile_definitions(ananasHOA
         SHOW_NO_NETWORK_OVERLAY=$<BOOL:${SHOW_NO_NETWORK_OVERLAY}>
 )
 
+target_include_directories(ananasHOA PRIVATE ../../eigen)
+
 target_sources(ananasHOA
         PRIVATE
         PluginEditor.cpp
         PluginProcessor.cpp
+        DecoderMatrixCoefficientMessenger.cpp
         UI/HoaLookAndFeel.cpp
         UI/HOAInterfaceComponent.cpp
         UI/SoundFieldComponent.cpp
