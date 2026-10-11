@@ -24,8 +24,8 @@ namespace ananas::HOA::UI
         const auto diameter{juce::jmin(bounds.getWidth(), bounds.getHeight())};
         auto circleBounds{juce::Rectangle(diameter, diameter)};
         circleBounds.setCentre(bounds.getCentre());
-        g.drawEllipse(circleBounds.reduced(getFirstAzymuthalRingReduction()), getAzymuthalLineThickness());
-        g.drawEllipse(circleBounds.reduced(getSecondAzymuthalRingReduction()), getAzymuthalLineThickness());
+        g.drawEllipse(circleBounds.reduced(getFirstAzimuthalRingReduction()), getAzimuthalLineThickness());
+        g.drawEllipse(circleBounds.reduced(getSecondAzimuthalRingReduction()), getAzimuthalLineThickness());
     }
 
     void HoaLookAndFeel::drawSpeakerIcon(juce::Graphics &g, const SpeakerIconComponent &s) const

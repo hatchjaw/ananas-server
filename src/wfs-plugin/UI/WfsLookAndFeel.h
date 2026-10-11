@@ -2,12 +2,13 @@
 #define WFSLOOKANDFEEL_H
 
 #include <AnanasLookAndFeel.h>
+#include <Packet.h>
 #include "SpeakerIconComponent.h"
 #include "XYControllerComponent.h"
 
 namespace ananas::WFS::UI
 {
-    class WfsLookAndFeel : public ananas::UI::AnanasLookAndFeel
+    class WfsLookAndFeel final : public ananas::UI::AnanasLookAndFeel<WfsClientAnnouncePacket>
     {
     public:
         WfsLookAndFeel();
@@ -37,17 +38,17 @@ namespace ananas::WFS::UI
 
         [[nodiscard]] virtual float getSpeakerOutlineThickness() const { return 0.f; }
 
-        virtual float getNodeBorderBrightnessMin() const { return .2f; }
+        [[nodiscard]] virtual float getNodeBorderBrightnessMin() const { return .2f; }
 
-        virtual float getNodeBorderBrightnessMax() const { return .9f; }
+        [[nodiscard]] virtual float getNodeBorderBrightnessMax() const { return .9f; }
 
-        virtual float getNodeBorderSaturationRange() const { return .9f; }
+        [[nodiscard]] virtual float getNodeBorderSaturationRange() const { return .9f; }
 
-        virtual float getNodeBorderAlpha() const { return .75f; }
+        [[nodiscard]] virtual float getNodeBorderAlpha() const { return .75f; }
 
-        virtual float getNodeBorderThickness() const { return 3.f; }
+        [[nodiscard]] virtual float getNodeBorderThickness() const { return 3.f; }
 
-        virtual float getNodeIndexFontSize() const { return 18.f; }
+        [[nodiscard]] virtual float getNodeIndexFontSize() const { return 18.f; }
     };
 }
 

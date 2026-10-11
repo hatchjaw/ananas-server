@@ -39,7 +39,7 @@ private:
     juce::TooltipWindow tooltipWindow;
     ananas::HOA::UI::HoaLookAndFeel lookAndFeel;
     juce::TabbedComponent tabbedComponent{juce::TabbedButtonBar::TabsAtTop};
-    ananas::UI::NetworkOverviewComponent networkOverview;
+    ananas::UI::NetworkOverviewComponent<ananas::HoaClientAnnouncePacket> networkOverview;
     ananas::HOA::UI::HOAInterfaceComponent hoaInterface;
     juce::ApplicationCommandManager commandManager;
 };

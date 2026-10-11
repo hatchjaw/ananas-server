@@ -73,6 +73,11 @@ namespace ananas::HOA
             return "/dm/" + juce::String{row} + "/" + juce::String{index};
         }
 
+        static juce::String getDecoderRowParamID(const int row)
+        {
+            return "/row/" + juce::String{row};
+        }
+
         inline static const juce::NormalisableRange<float> SpeakerCoordinateParamRange{
             -10.f, 10.f
         };

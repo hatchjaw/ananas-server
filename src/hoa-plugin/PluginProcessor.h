@@ -67,7 +67,7 @@ public:
 
     const juce::ValueTree &getPersistentTree() const;
 
-    ananas::Server::Server &getServer() const;
+    ananas::Server::Server<ananas::HoaClientAnnouncePacket> &getServer() const;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginProcessor)
@@ -76,7 +76,7 @@ private:
 
     BusesProperties getBusesProperties(size_t numChannels);
 
-    std::unique_ptr<ananas::Server::Server> server;
+    std::unique_ptr<ananas::Server::Server<ananas::HoaClientAnnouncePacket>> server;
 
     // For handling (audio) parameters that are known at compile time.
     juce::AudioProcessorValueTreeState apvts;

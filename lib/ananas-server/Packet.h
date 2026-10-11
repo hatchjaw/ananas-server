@@ -54,10 +54,20 @@ namespace ananas
         juce::int32 audioPTPOffsetNs;
         juce::uint8 bufferFillPercent;
         bool ptpLock;
+    };
+
+    struct WfsClientAnnouncePacket : ClientAnnouncePacket
+    {
         float secondarySource0x{0.f};
         float secondarySource0y{0.f};
         float secondarySource1x{0.f};
         float secondarySource1y{0.f};
+    };
+
+    struct HoaClientAnnouncePacket : ClientAnnouncePacket
+    {
+        juce::int32 decoderMatrixRow0{0};
+        juce::int32 decoderMatrixRow1{0};
     };
 #pragma pack(pop)
 

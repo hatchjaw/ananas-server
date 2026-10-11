@@ -53,16 +53,20 @@ namespace ananas::HOA
 
                         // decoderMatrix.row(i) is speaker i's decoder row — push to the device responsible for it
                         std::array<float, Constants::NumChannels> row{};
+
                         const int idx0{row0};
                         jassert(idx0 >= 0 && idx0 < decoderMatrix.rows());
+                        bundle.addElement(juce::OSCMessage{Params::getDecoderRowParamID(0), idx0});
                         Eigen::Map<Eigen::VectorXf>(row.data(), Constants::NumChannels) = decoderMatrix.row(idx0);
                         for (size_t n{0}; n < row.size(); ++n) {
                             DBG("Sending OSC: " << Params::getDecoderCoefficientParamID(0, n) <<
                                 " " << juce::String{row[n]} << " to " << prop.name.toString());
                             bundle.addElement(juce::OSCMessage{Params::getDecoderCoefficientParamID(0, n), row[n]});
                         }
+
                         const int idx1{row1};
                         jassert(idx1 >= 0 && idx1 < decoderMatrix.rows());
+                        bundle.addElement(juce::OSCMessage{Params::getDecoderRowParamID(1), idx1});
                         Eigen::Map<Eigen::VectorXf>(row.data(), Constants::NumChannels) = decoderMatrix.row(idx1);
                         for (size_t n{0}; n < row.size(); ++n) {
                             DBG("Sending OSC: " << Params::getDecoderCoefficientParamID(1, n) <<
@@ -135,7 +139,7 @@ namespace ananas::HOA
         for (int j = 0; j < L; ++j)
             Ys.col(j) = Eigen::Map<const Eigen::VectorXf>(sphericalHarmonics[j].data(), K);
 
-        Eigen::JacobiSVD<Eigen::MatrixXf> svd(Ys);
+        Eigen::JacobiSVD<Eigen::MatrixXf> svd(Ys, Eigen::ComputeThinU | Eigen::ComputeThinV);
         const auto &sv = svd.singularValues();
 
         juce::String svText;
@@ -145,6 +149,12 @@ namespace ananas::HOA
         DBG("Singular values: " << svText);
         DBG("Condition number: " << (sv(0) / sv(sv.size() - 1)));
 
-        decoderMatrix = Ys.completeOrthogonalDecomposition().pseudoInverse(); // L x K
+        // decoderMatrix = Ys.completeOrthogonalDecomposition().pseudoInverse(); // L x K
+
+        // Regularized (damped) pseudo-inverse: tikhonov damping tames the
+        // near-zero singular values from the array's elevation under-sampling
+        const float lambda = 0.01f;   // tune: larger = more damping, smaller peak coefficients
+        Eigen::VectorXf sInv = sv.array() / (sv.array().square() + lambda * lambda);
+        decoderMatrix = svd.matrixV() * sInv.asDiagonal() * svd.matrixU().transpose(); // L x K
     }
 }

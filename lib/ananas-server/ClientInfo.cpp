@@ -4,45 +4,66 @@
 
 namespace ananas
 {
-    void ClientInfo::update(const ClientAnnouncePacket *packet)
+    template<typename AnnouncePacketType>
+    void ClientInfo<AnnouncePacketType>::update(const AnnouncePacketType *packet)
     {
         lastReceiveTime = juce::Time::getMillisecondCounter();
         info = *packet;
     }
 
-    bool ClientInfo::isConnected() const
+    template<typename AnnouncePacketType>
+    bool ClientInfo<AnnouncePacketType>::isConnected() const
     {
         return juce::Time::getMillisecondCounter() - lastReceiveTime < Server::Sockets::ClientListenerSocketParams.disconnectionThresholdMs;
     }
 
-    ClientAnnouncePacket ClientInfo::getInfo() const
+    template<typename AnnouncePacketType>
+    AnnouncePacketType ClientInfo<AnnouncePacketType>::getInfo() const
     {
         return info;
     }
 
+    template
+    class ClientInfo<ClientAnnouncePacket>;
+
+    template
+    class ClientInfo<WfsClientAnnouncePacket>;
+
+    template
+    class ClientInfo<HoaClientAnnouncePacket>;
+
     //==========================================================================
 
-    void ModuleInfo::update()
+    template<typename AnnouncePacketType>
+    void ModuleInfo<AnnouncePacketType>::update()
     {
         lastReceiveTime = juce::Time::getMillisecondCounter();
     }
 
-    juce::ValueTree ModuleInfo::toValueTree() const
+    template<typename AnnouncePacketType>
+    juce::ValueTree ModuleInfo<AnnouncePacketType>::toValueTree() const
     {
         juce::ValueTree tree{"Module"};
-        tree.setProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID, secondarySource0Position.first, nullptr);
-        tree.setProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID, secondarySource0Position.second, nullptr);
-        tree.setProperty(Utils::Identifiers::ModuleSecondarySource1xPropertyID, secondarySource1Position.first, nullptr);
-        tree.setProperty(Utils::Identifiers::ModuleSecondarySource1yPropertyID, secondarySource1Position.second, nullptr);
+        if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+            tree.setProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID, secondarySource0Position.first, nullptr);
+            tree.setProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID, secondarySource0Position.second, nullptr);
+            tree.setProperty(Utils::Identifiers::ModuleSecondarySource1xPropertyID, secondarySource1Position.first, nullptr);
+            tree.setProperty(Utils::Identifiers::ModuleSecondarySource1yPropertyID, secondarySource1Position.second, nullptr);
+        } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+            tree.setProperty(Utils::Identifiers::ModuleDecoderMatrixRow0PropertyID, decoderMatrixRow0, nullptr);
+            tree.setProperty(Utils::Identifiers::ModuleDecoderMatrixRow1PropertyID, decoderMatrixRow1, nullptr);
+        }
         return tree;
     }
 
-    bool ModuleInfo::isConnected() const
+    template<typename AnnouncePacketType>
+    bool ModuleInfo<AnnouncePacketType>::isConnected() const
     {
         return juce::Time::getMillisecondCounter() - lastReceiveTime < Server::Sockets::ClientListenerSocketParams.disconnectionThresholdMs;
     }
 
-    bool ModuleInfo::justDisconnected()
+    template<typename AnnouncePacketType>
+    bool ModuleInfo<AnnouncePacketType>::justDisconnected()
     {
         const auto didJustDisconnect{!isConnected() && wasConnected};
 
@@ -53,7 +74,8 @@ namespace ananas
         return didJustDisconnect;
     }
 
-    bool ModuleInfo::justConnected()
+    template<typename AnnouncePacketType>
+    bool ModuleInfo<AnnouncePacketType>::justConnected()
     {
         const auto didJustConnect{isConnected() && !wasConnected};
 
@@ -64,54 +86,109 @@ namespace ananas
         return didJustConnect;
     }
 
-    std::pair<float, float> ModuleInfo::getSecondarySource0Position() const
+    template<typename AnnouncePacketType>
+    std::pair<float, float> ModuleInfo<AnnouncePacketType>::getSecondarySource0Position() const
     {
-        return secondarySource0Position;
+        if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+            return secondarySource0Position;
+        } else {
+            return std::make_pair(0.0f, 0.0f);
+        }
     }
 
-    std::pair<float, float> ModuleInfo::getSecondarySource1Position() const
+    template<typename AnnouncePacketType>
+    std::pair<float, float> ModuleInfo<AnnouncePacketType>::getSecondarySource1Position() const
     {
-        return secondarySource1Position;
+        if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+            return secondarySource1Position;
+        } else {
+            return std::make_pair(0.0f, 0.0f);
+        }
     }
 
-    ModuleInfo ModuleInfo::fromValueTree(const juce::ValueTree &tree)
+    template <typename AnnouncePacketType>
+    juce::int32 ModuleInfo<AnnouncePacketType>::getDecoderMatrixRow0() const
+    {
+        if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+            return decoderMatrixRow0;
+        } else {
+            return 0;
+        }
+    }
+
+    template<typename AnnouncePacketType>
+    juce::int32 ModuleInfo<AnnouncePacketType>::getDecoderMatrixRow1() const
+    {
+        if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+            return decoderMatrixRow1;
+        } else {
+            return 0;
+        }
+    }
+
+    template<typename AnnouncePacketType>
+    ModuleInfo<AnnouncePacketType> ModuleInfo<AnnouncePacketType>::fromValueTree(const juce::ValueTree &tree)
     {
         ModuleInfo info;
-        const auto &prop0{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID)};
-        if (prop0.isDouble()) {
-            const float val{prop0};
-            info.secondarySource0Position.first = val;
-        }
-        const auto &prop1{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID)};
-        if (prop1.isDouble()) {
-            const float val{prop1};
-            info.secondarySource0Position.second = val;
-        }
-        const auto &prop2{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID)};
-        if (prop2.isDouble()) {
-            const float val{prop2};
-            info.secondarySource1Position.first = val;
-        }
-        const auto &prop3{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID)};
-        if (prop3.isDouble()) {
-            const float val{prop3};
-            info.secondarySource1Position.second = val;
+        if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+            const auto &prop0{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID)};
+            if (prop0.isDouble()) {
+                const float val{prop0};
+                info.secondarySource0Position.first = val;
+            }
+            const auto &prop1{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID)};
+            if (prop1.isDouble()) {
+                const float val{prop1};
+                info.secondarySource0Position.second = val;
+            }
+            const auto &prop2{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID)};
+            if (prop2.isDouble()) {
+                const float val{prop2};
+                info.secondarySource1Position.first = val;
+            }
+            const auto &prop3{tree.getProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID)};
+            if (prop3.isDouble()) {
+                const float val{prop3};
+                info.secondarySource1Position.second = val;
+            }
+        } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+            const auto &prop0{tree.getProperty(Utils::Identifiers::ModuleDecoderMatrixRow0PropertyID)};
+            if (prop0.isInt()) {
+                const int val{prop0};
+                info.decoderMatrixRow0 = val;
+            }
+            const auto &prop1{tree.getProperty(Utils::Identifiers::ModuleDecoderMatrixRow1PropertyID)};
+            if (prop1.isInt()) {
+                const int val{prop1};
+                info.decoderMatrixRow1 = val;
+            }
         }
         return info;
     }
 
+    template
+    class ModuleInfo<ClientAnnouncePacket>;
+
+    template
+    class ModuleInfo<WfsClientAnnouncePacket>;
+
+    template
+    class ModuleInfo<HoaClientAnnouncePacket>;
+
     //==========================================================================
 
-    ClientList::ClientList()
+    template<typename AnnouncePacketType>
+    ClientList<AnnouncePacketType>::ClientList()
     {
         startTimer(Server::Constants::ClientConnectednessCheckIntervalMs);
     }
 
-    void ClientList::handlePacket(const juce::String &clientIP, const ClientAnnouncePacket *packet)
+    template<typename AnnouncePacketType>
+    void ClientList<AnnouncePacketType>::handlePacket(const juce::String &clientIP, const AnnouncePacketType *packet)
     {
         auto iter{clients.find(clientIP)};
         if (iter == clients.end()) {
-            ClientInfo c{};
+            ClientInfo<AnnouncePacketType> c{};
             iter = clients.insert(std::make_pair(clientIP, c)).first;
             std::cout << "Client " << iter->first << " connected." << std::endl;
         }
@@ -120,68 +197,64 @@ namespace ananas
         sendChangeMessage();
     }
 
-    void ClientList::timerCallback()
+    template<typename AnnouncePacketType>
+    void ClientList<AnnouncePacketType>::timerCallback()
     {
         checkConnectivity();
     }
 
-    juce::var ClientList::toVar() const
+    template<typename AnnouncePacketType>
+    juce::var ClientList<AnnouncePacketType>::toVar() const
     {
         const auto object{new juce::DynamicObject()};
 
         for (const auto &[ip, clientInfo]: clients) {
             auto *client{new juce::DynamicObject()};
-            const auto &[
-                serial,
-                firmwareType,
-                firmwareVersion,
-                samplingRate,
-                percentCPU,
-                presentationOffsetFrame,
-                presentationOffsetNs,
-                audioPTPOffsetNs,
-                bufferFillPercent,
-                ptpLock,
-                secondarySource0x,
-                secondarySource0y,
-                secondarySource1x,
-                secondarySource1y
-            ]{clientInfo.getInfo()};
-            client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(serial));
+            const auto &info{clientInfo.getInfo()};
+            client->setProperty(Utils::Identifiers::ClientSerialNumberPropertyID, static_cast<int>(info.serial));
             client->setProperty(Utils::Identifiers::ClientFirmwareTypeVersionPropertyID,
-                                Utils::FirmwareTypeToString(firmwareType) + " v" + Utils::VersionNumberToString(firmwareVersion));
-            client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, ptpLock);
-            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID, presentationOffsetNs);
-            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID, presentationOffsetFrame);
-            client->setProperty(Utils::Identifiers::ClientAudioPTPOffsetPropertyID, audioPTPOffsetNs);
-            client->setProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID, bufferFillPercent);
-            client->setProperty(Utils::Identifiers::ClientSamplingRatePropertyID, samplingRate);
-            client->setProperty(Utils::Identifiers::ClientPercentCPUPropertyID, percentCPU);
-            client->setProperty(Utils::Identifiers::ClientSecondarySourceCoordinatesPropertyID,
-                                "(" + juce::String{secondarySource0x} + ", " + juce::String{secondarySource0y} +
-                                "), (" + juce::String{secondarySource1x} + ", " + juce::String{secondarySource1y} + ")");
+                                Utils::FirmwareTypeToString(info.firmwareType) + " v" + Utils::VersionNumberToString(info.firmwareVersion));
+            client->setProperty(Utils::Identifiers::ClientPTPLockPropertyID, info.ptpLock);
+            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetNsPropertyID, info.presentationOffsetNs);
+            client->setProperty(Utils::Identifiers::ClientPresentationTimeOffsetFramePropertyID, info.presentationOffsetFrame);
+            client->setProperty(Utils::Identifiers::ClientAudioPTPOffsetPropertyID, info.audioPTPOffsetNs);
+            client->setProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID, info.bufferFillPercent);
+            client->setProperty(Utils::Identifiers::ClientSamplingRatePropertyID, info.samplingRate);
+            client->setProperty(Utils::Identifiers::ClientPercentCPUPropertyID, info.percentCPU);
+            if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+                client->setProperty(Utils::Identifiers::ClientSecondarySourceCoordinatesPropertyID,
+                                    "(" + juce::String{info.secondarySource0x} + ", " + juce::String{info.secondarySource0y} +
+                                    "), (" + juce::String{info.secondarySource1x} + ", " + juce::String{info.secondarySource1y} + ")");
+            } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+                client->setProperty(Utils::Identifiers::ClientDecoderMatrixRowsPropertyID, juce::String{info.decoderMatrixRow0} + ", " +
+                                                                                           juce::String{info.decoderMatrixRow1});
+            }
             object->setProperty(ip, client);
         }
 
         return object;
     }
 
-    bool ClientList::getShouldReboot() const
+    template<typename AnnouncePacketType>
+    bool ClientList<AnnouncePacketType>::getShouldReboot() const
     {
         return shouldReboot;
     }
 
-    void ClientList::setShouldReboot(const bool should)
+    template<typename AnnouncePacketType>
+    void ClientList<AnnouncePacketType>::setShouldReboot(const bool should)
     {
         shouldReboot = should;
     }
 
-    uint ClientList::getCount() const
+    template<typename AnnouncePacketType>
+    uint ClientList<AnnouncePacketType>::getCount() const
     {
         return clients.size();
     }
 
-    juce::ValueTree ClientList::toValueTree()
+    template<typename AnnouncePacketType>
+    juce::ValueTree ClientList<AnnouncePacketType>::toValueTree()
     {
         juce::ValueTree tree(Utils::Identifiers::ConnectedClientsParamID);
 
@@ -194,7 +267,8 @@ namespace ananas
         return tree;
     }
 
-    void ClientList::checkConnectivity()
+    template<typename AnnouncePacketType>
+    void ClientList<AnnouncePacketType>::checkConnectivity()
     {
         std::vector<juce::String> toErase;
         for (const auto &[ip, c]: clients) {
@@ -209,18 +283,29 @@ namespace ananas
         }
     }
 
+    template
+    class ClientList<ClientAnnouncePacket>;
+
+    template
+    class ClientList<WfsClientAnnouncePacket>;
+
+    template
+    class ClientList<HoaClientAnnouncePacket>;
+
     //==========================================================================
 
-    ModuleList::ModuleList()
+    template <typename AnnouncePacketType>
+    ModuleList<AnnouncePacketType>::ModuleList()
     {
         startTimer(Server::Constants::ClientConnectednessCheckIntervalMs);
     }
 
-    void ModuleList::handlePacket(const juce::String &moduleIP)
+    template <typename AnnouncePacketType>
+    void ModuleList<AnnouncePacketType>::handlePacket(const juce::String &moduleIP)
     {
         auto iter{modules.find(moduleIP)};
         if (iter == modules.end()) {
-            ModuleInfo m{};
+            ModuleInfo<AnnouncePacketType> m{};
             iter = modules.insert(std::make_pair(moduleIP, m)).first;
             std::cout << "Module " << moduleIP << " available." << std::endl;
         }
@@ -231,21 +316,28 @@ namespace ananas
         }
     }
 
-    void ModuleList::timerCallback()
+    template <typename AnnouncePacketType>
+    void ModuleList<AnnouncePacketType>::timerCallback()
     {
         checkConnectivity();
     }
 
-    juce::var ModuleList::toVar() const
+    template <typename AnnouncePacketType>
+    juce::var ModuleList<AnnouncePacketType>::toVar() const
     {
         const auto object{new juce::DynamicObject()};
 
         for (const auto &[ip, m]: modules) {
             auto *module{new juce::DynamicObject()};
-            module->setProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID, static_cast<int>(m.getSecondarySource0Position().first));
-            module->setProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID, static_cast<int>(m.getSecondarySource0Position().second));
-            module->setProperty(Utils::Identifiers::ModuleSecondarySource1xPropertyID, static_cast<int>(m.getSecondarySource1Position().first));
-            module->setProperty(Utils::Identifiers::ModuleSecondarySource1yPropertyID, static_cast<int>(m.getSecondarySource1Position().second));
+            if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+                module->setProperty(Utils::Identifiers::ModuleSecondarySource0xPropertyID, static_cast<int>(m.getSecondarySource0Position().first));
+                module->setProperty(Utils::Identifiers::ModuleSecondarySource0yPropertyID, static_cast<int>(m.getSecondarySource0Position().second));
+                module->setProperty(Utils::Identifiers::ModuleSecondarySource1xPropertyID, static_cast<int>(m.getSecondarySource1Position().first));
+                module->setProperty(Utils::Identifiers::ModuleSecondarySource1yPropertyID, static_cast<int>(m.getSecondarySource1Position().second));
+            } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+                module->setProperty(Utils::Identifiers::ModuleDecoderMatrixRow0PropertyID, static_cast<int>(m.getDecoderMatrixRow0()));
+                module->setProperty(Utils::Identifiers::ModuleDecoderMatrixRow1PropertyID, static_cast<int>(m.getDecoderMatrixRow1()));
+            }
             module->setProperty(Utils::Identifiers::ModuleIsConnectedPropertyID, m.isConnected());
             object->setProperty(ip, module);
         }
@@ -253,7 +345,8 @@ namespace ananas
         return object;
     }
 
-    juce::ValueTree ModuleList::toValueTree() const
+    template <typename AnnouncePacketType>
+    juce::ValueTree ModuleList<AnnouncePacketType>::toValueTree() const
     {
         juce::ValueTree tree(Utils::Identifiers::ModulesParamID);
 
@@ -266,18 +359,20 @@ namespace ananas
         return tree;
     }
 
-    void ModuleList::fromValueTree(const juce::ValueTree &tree)
+    template <typename AnnouncePacketType>
+    void ModuleList<AnnouncePacketType>::fromValueTree(const juce::ValueTree &tree)
     {
         modules.clear();
 
         for (int i{0}; i < tree.getNumChildren(); ++i) {
             auto moduleTree{tree.getChild(i)};
             juce::Identifier ip{moduleTree.getProperty("ip")};
-            modules[ip.toString()] = ModuleInfo::fromValueTree(moduleTree);
+            modules[ip.toString()] = ModuleInfo<AnnouncePacketType>::fromValueTree(moduleTree);
         }
     }
 
-    void ModuleList::checkConnectivity()
+    template <typename AnnouncePacketType>
+    void ModuleList<AnnouncePacketType>::checkConnectivity()
     {
         for (auto it{modules.begin()}; it != modules.end(); ++it) {
             if (it->second.justDisconnected()) {
@@ -286,4 +381,13 @@ namespace ananas
             }
         }
     }
+
+    template
+    class ModuleList<ClientAnnouncePacket>;
+
+    template
+    class ModuleList<WfsClientAnnouncePacket>;
+
+    template
+    class ModuleList<HoaClientAnnouncePacket>;
 }
