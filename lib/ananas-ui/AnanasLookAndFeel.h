@@ -7,10 +7,10 @@
 
 namespace ananas::UI
 {
-    class AnanasLookAndFeel : public juce::LookAndFeel_V4
+    class AnanasLookAndFeelBase : public juce::LookAndFeel_V4
     {
     public:
-        AnanasLookAndFeel();
+        AnanasLookAndFeelBase();
 
         juce::Typeface::Ptr getTypefaceForFont(const juce::Font &) override;
 
@@ -39,14 +39,13 @@ namespace ananas::UI
 
         juce::Font getTextButtonFont(juce::TextButton &, int buttonHeight) override;
 
-        void drawPresentationTimeInterval(juce::Graphics &g,
-                                          const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
-                                          float backgroundProportion,
-                                          float maxValue) const;
-
         [[nodiscard]] virtual float getMaxMicrosecondsToDisplay() const { return 10.f; }
 
     protected:
+        [[nodiscard]] virtual float getOneMicrosecondProportion() const { return 1.f / getMaxMicrosecondsToDisplay(); }
+
+        [[nodiscard]] virtual float getPresentationTimeIntervalPersistentMarkerWidth() const { return 2.f; }
+
         juce::Typeface::Ptr typefaceSans, typefaceBold;
         juce::Colour darkColour, lightColour, okColour, warningColour;
 
@@ -63,12 +62,22 @@ namespace ananas::UI
 
         [[nodiscard]] virtual float getOverlayBoxTextSize() const { return 20.f; }
 
-        [[nodiscard]] virtual float getOneMicrosecondProportion() const { return 1.f / getMaxMicrosecondsToDisplay(); }
-
-        [[nodiscard]] virtual float getPresentationTimeIntervalPersistentMarkerWidth() const { return 2.f; }
-
         int totalWidth{};
         int totalNumTabs{};
+    };
+
+    //==========================================================================
+
+    template<typename AnnouncePacketType>
+    class AnanasLookAndFeel : public AnanasLookAndFeelBase
+    {
+    public:
+        AnanasLookAndFeel();
+
+        void drawPresentationTimeInterval(juce::Graphics &g,
+                                          const typename ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval &p,
+                                          float backgroundProportion,
+                                          float maxValue) const;
     };
 }
 

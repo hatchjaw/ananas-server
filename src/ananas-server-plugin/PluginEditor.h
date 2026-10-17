@@ -26,9 +26,9 @@ private:
 
     [[nodiscard]] const PluginProcessor &getProcessor() const;
 
-    ananas::UI::AnanasLookAndFeel lookAndFeel;
+    ananas::UI::AnanasLookAndFeel<ananas::ClientAnnouncePacket> lookAndFeel;
     juce::TooltipWindow tooltipWindow;
-    ananas::UI::NetworkOverviewComponent networkOverview;
+    ananas::UI::NetworkOverviewComponent<ananas::ClientAnnouncePacket> networkOverview;
 };
 
 

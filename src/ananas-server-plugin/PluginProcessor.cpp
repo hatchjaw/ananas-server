@@ -4,7 +4,7 @@
 
 PluginProcessor::PluginProcessor()
     : AudioProcessor(getBusesProperties(NumChannelsToSend)),
-      server(std::make_unique<ananas::Server::Server>(NumChannelsToSend)),
+      server(std::make_unique<ananas::Server::Server<ananas::ClientAnnouncePacket>>(NumChannelsToSend)),
       dynamicTree(ananas::Utils::Identifiers::DynamicTreeType),
       persistentTree(ananas::Utils::Identifiers::PersistentTreeType)
 {
@@ -137,9 +137,9 @@ void PluginProcessor::setStateInformation(const void *data, int size)
 
 void PluginProcessor::changeListenerCallback(juce::ChangeBroadcaster *source)
 {
-    if (const auto *clients = dynamic_cast<ananas::ClientList *>(source)) {
+    if (const auto *clients = dynamic_cast<ananas::ClientList<ananas::ClientAnnouncePacket> *>(source)) {
         dynamicTree.setProperty(ananas::Utils::Identifiers::ConnectedClientsParamID, clients->toVar(), nullptr);
-    } else if (const auto *modules = dynamic_cast<ananas::ModuleList *>(source)) {
+    } else if (const auto *modules = dynamic_cast<ananas::ModuleList<ananas::ClientAnnouncePacket> *>(source)) {
         persistentTree.setProperty(ananas::Utils::Identifiers::ModulesParamID, modules->toVar(), nullptr);
     } else if (const auto *authority = dynamic_cast<ananas::AuthorityInfo *>(source)) {
         dynamicTree.setProperty(ananas::Utils::Identifiers::TimeAuthorityParamID, authority->toVar(), nullptr);
@@ -169,7 +169,7 @@ const juce::ValueTree &PluginProcessor::getPersistentTree() const
     return persistentTree;
 }
 
-ananas::Server::Server &PluginProcessor::getServer() const
+ananas::Server::Server<ananas::ClientAnnouncePacket> &PluginProcessor::getServer() const
 {
     return *server;
 }

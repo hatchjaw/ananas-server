@@ -1,10 +1,11 @@
 #include "AnanasLookAndFeel.h"
 #include <AnanasFonts.h>
 #include <NetworkOverviewComponent.h>
+#include <Packet.h>
 
 namespace ananas::UI
 {
-    AnanasLookAndFeel::AnanasLookAndFeel()
+    AnanasLookAndFeelBase::AnanasLookAndFeelBase()
         : typefaceSans{
               juce::Typeface::createSystemTypefaceFor(BinaryData::FF_Unit_Pro_Regular_otf,
                                                       BinaryData::FF_Unit_Pro_Regular_otfSize)
@@ -70,9 +71,6 @@ namespace ananas::UI
         setColour(OverlayableComponent::OverlayComponent::boxBorderColourId, juce::Colours::slategrey);
         setColour(OverlayableComponent::OverlayComponent::boxTextColourId, darkColour);
 
-        // Network overview
-        setColour(NetworkOverviewComponent::backgroundColourId, juce::Colours::transparentWhite);
-
         // Network overview tables
         setColour(juce::TableListBox::backgroundColourId, juce::Colours::transparentWhite);
         setColour(juce::TableListBox::outlineColourId, darkColour);
@@ -87,24 +85,9 @@ namespace ananas::UI
 
         // Time authority
         setColour(TimeAuthorityComponent::backgroundColourId, juce::Colours::transparentWhite);
-
-        // Clients
-        setColour(ClientsOverviewComponent::backgroundColourId, juce::Colours::transparentWhite);
-        setColour(
-            ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId,
-            okColour
-        );
-        setColour(
-            ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId,
-            warningColour
-        );
-        setColour(
-            ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId,
-            juce::Colours::white
-        );
     }
 
-    juce::Typeface::Ptr AnanasLookAndFeel::getTypefaceForFont(const juce::Font &font)
+    juce::Typeface::Ptr AnanasLookAndFeelBase::getTypefaceForFont(const juce::Font &font)
     {
         if (typefaceSans == nullptr)
             return LookAndFeel_V4::getTypefaceForFont(font);
@@ -119,24 +102,24 @@ namespace ananas::UI
         return typefaceSans;
     }
 
-    int AnanasLookAndFeel::getTabButtonBestWidth(juce::TabBarButton &tabBarButton, const int tabDepth)
+    int AnanasLookAndFeelBase::getTabButtonBestWidth(juce::TabBarButton &tabBarButton, const int tabDepth)
     {
         return totalNumTabs > 0
                    ? totalWidth / totalNumTabs
                    : LookAndFeel_V4::getTabButtonBestWidth(tabBarButton, tabDepth);
     }
 
-    void AnanasLookAndFeel::setTotalWidth(const int width)
+    void AnanasLookAndFeelBase::setTotalWidth(const int width)
     {
         totalWidth = width;
     }
 
-    void AnanasLookAndFeel::setNumberOfTabs(const int numTabs)
+    void AnanasLookAndFeelBase::setNumberOfTabs(const int numTabs)
     {
         totalNumTabs = numTabs;
     }
 
-    void AnanasLookAndFeel::drawOverlay(
+    void AnanasLookAndFeelBase::drawOverlay(
         juce::Graphics &g,
         const OverlayableComponent::OverlayComponent &o,
         const juce::String &text
@@ -180,7 +163,7 @@ namespace ananas::UI
         g.drawText(text, box, juce::Justification::centred);
     }
 
-    void AnanasLookAndFeel::drawTableHeaderColumn(
+    void AnanasLookAndFeelBase::drawTableHeaderColumn(
         juce::Graphics &g,
         juce::TableHeaderComponent &header,
         const juce::String &columnName,
@@ -222,7 +205,7 @@ namespace ananas::UI
         g.drawFittedText(columnName, area, j, 1);
     }
 
-    void AnanasLookAndFeel::drawButtonBackground(juce::Graphics &g,
+    void AnanasLookAndFeelBase::drawButtonBackground(juce::Graphics &g,
                                                  juce::Button &button,
                                                  const juce::Colour &backgroundColour,
                                                  const bool shouldDrawButtonAsHighlighted,
@@ -275,7 +258,7 @@ namespace ananas::UI
         }
     }
 
-    juce::Font AnanasLookAndFeel::getTextButtonFont(juce::TextButton &text_button, int buttonHeight)
+    juce::Font AnanasLookAndFeelBase::getTextButtonFont(juce::TextButton &text_button, int buttonHeight)
     {
         return withDefaultMetrics(juce::FontOptions{
             juce::jmin(16.0f, static_cast<float>(buttonHeight) * 0.6f),
@@ -283,9 +266,34 @@ namespace ananas::UI
         });
     }
 
-    void AnanasLookAndFeel::drawPresentationTimeInterval(
+    //==========================================================================
+
+    template<typename AnnouncePacketType>
+    AnanasLookAndFeel<AnnouncePacketType>::AnanasLookAndFeel()
+    {
+        // Network overview
+        setColour(NetworkOverviewComponent<AnnouncePacketType>::backgroundColourId, juce::Colours::transparentWhite);
+
+        // Clients
+        setColour(ClientsOverviewComponent<AnnouncePacketType>::backgroundColourId, juce::Colours::transparentWhite);
+        setColour(
+            ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::okColourId,
+            okColour
+        );
+        setColour(
+            ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::warningColourId,
+            warningColour
+        );
+        setColour(
+            ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId,
+            juce::Colours::white
+        );
+    }
+
+    template <typename AnnouncePacketType>
+    void AnanasLookAndFeel<AnnouncePacketType>::drawPresentationTimeInterval(
         juce::Graphics &g,
-        const ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval &p,
+        const typename ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval &p,
         const float backgroundProportion,
         const float maxValue
     ) const
@@ -295,19 +303,29 @@ namespace ananas::UI
         const auto rectWidth{maxWidth * backgroundProportion};
 
         g.setColour(backgroundProportion <= getOneMicrosecondProportion()
-                        ? p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.25f)
-                        : p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.25f));
+                        ? p.findColour(ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.25f)
+                        : p.findColour(ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.25f));
         g.fillRect(0.0f, 0.0f, rectWidth, bounds.getHeight());
         if (backgroundProportion > getOneMicrosecondProportion()) {
-            g.setColour(p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId));
+            g.setColour(p.findColour(ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::oneMicrosecondIndicatorColourId));
             g.drawVerticalLine(maxWidth * getOneMicrosecondProportion(), 0.f, bounds.getHeight());
         }
 
         if (maxValue > 0.f) {
             g.setColour(maxValue <= getOneMicrosecondProportion()
-                            ? p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.5f)
-                            : p.findColour(ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(.5f));
+                            ? p.findColour(ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::okColourId).withAlpha(.5f)
+                            : p.findColour(ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::warningColourId).withAlpha(
+                            .5f));
             g.fillRect(maxWidth * maxValue - 1.f, 0.0f, getPresentationTimeIntervalPersistentMarkerWidth(), bounds.getHeight());
         }
     }
+
+    template
+    class AnanasLookAndFeel<ClientAnnouncePacket>;
+
+    template
+    class AnanasLookAndFeel<WfsClientAnnouncePacket>;
+
+    template
+    class AnanasLookAndFeel<HoaClientAnnouncePacket>;
 }

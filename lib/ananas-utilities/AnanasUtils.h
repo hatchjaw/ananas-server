@@ -113,6 +113,7 @@ namespace ananas
             inline const static juce::Identifier ClientSamplingRatePropertyID{"samplingRate"};
             inline const static juce::Identifier ClientPercentCPUPropertyID{"percentCPU"};
             inline const static juce::Identifier ClientSecondarySourceCoordinatesPropertyID{"secondarySourceCoordinates"};
+            inline const static juce::Identifier ClientDecoderMatrixRowsPropertyID{"decoderMatrixRows"};
 
             inline const static juce::Identifier ModulesParamID{"Modules"};
 
@@ -120,6 +121,8 @@ namespace ananas
             inline const static juce::Identifier ModuleSecondarySource0yPropertyID{"ModuleSecondarySource0y"};
             inline const static juce::Identifier ModuleSecondarySource1xPropertyID{"ModuleSecondarySource1x"};
             inline const static juce::Identifier ModuleSecondarySource1yPropertyID{"ModuleSecondarySource1y"};
+            inline const static juce::Identifier ModuleDecoderMatrixRow0PropertyID{"ModuleDecoderMatrixRow1"};
+            inline const static juce::Identifier ModuleDecoderMatrixRow1PropertyID{"ModuleDecoderMatrixRow2"};
             inline const static juce::Identifier ModulePositionHasChangedPropertyID{"ModulePositionHasChanged"};
             inline const static juce::Identifier ModuleIsConnectedPropertyID{"ModuleIsConnected"};
         };

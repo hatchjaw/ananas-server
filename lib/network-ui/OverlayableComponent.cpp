@@ -18,7 +18,7 @@ namespace ananas::UI
     {
         // if (!isVisible()) return;
 
-        if (const auto *server = dynamic_cast<Server::Server *>(source)) {
+        if (const auto *server = dynamic_cast<Server::ServerBase *>(source)) {
             // If the server is connected and the overlay is present, get rid
             // of the overlay.
             if (const auto connected{server->isConnected()}; connected && overlay != nullptr) {
@@ -49,7 +49,7 @@ namespace ananas::UI
 
     void OverlayableComponent::OverlayComponent::paint(juce::Graphics &g)
     {
-        if (const auto *lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())})
+        if (const auto *lnf{dynamic_cast<AnanasLookAndFeelBase *>(&getLookAndFeel())})
             lnf->drawOverlay(g, *this, text);
     }
 
