@@ -9,7 +9,7 @@ add_library(ananas_server
 
 set_target_properties(ananas_server PROPERTIES
         POSITION_INDEPENDENT_CODE ON
-        VERSION 0.4.0
+        VERSION 0.5.0
         SOVERSION 1
 )
 
