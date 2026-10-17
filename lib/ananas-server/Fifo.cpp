@@ -65,11 +65,7 @@ namespace ananas
         // probably fine, but in theory this could block the audio thread.
         const auto readHandle{fifo.read(numFrames)};
 
-        // if (readHandle.blockSize1 + readHandle.blockSize2 != 128) {
-        //     // DBG("Read num samples: " << readHandle.blockSize1 + readHandle.blockSize2);
-        // }
-
-        const auto blockTwoOffset{readHandle.blockSize1 * buffer->getNumChannels() * sizeof(int16_t)}; // 2 is numChannels...
+        const auto blockTwoOffset{readHandle.blockSize1 * buffer->getNumChannels() * sizeof(int16_t)};
 
         for (auto ch{0}; ch < buffer->getNumChannels(); ++ch) {
             converter->convertSamples(dest, ch, buffer->getReadPointer(ch, readHandle.startIndex1), 0, readHandle.blockSize1);

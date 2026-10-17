@@ -3,35 +3,25 @@
 #include <AnanasUtils.h>
 #include <AuthorityInfo.h>
 
+#include "../../src/wfs-plugin/UI/WFSInterfaceComponent.h"
+
 namespace ananas::Server
 {
-    Server::Server(const uint numChannelsToSend) : numChannels(numChannelsToSend),
-                                                   fifo(numChannelsToSend)
+    ServerBase::ServerBase(const uint numChannelsToSend) : numChannels(numChannelsToSend),
+                                                           fifo(numChannelsToSend)
     {
-        // Add all the threads.
-        threads.add(new AudioSender(Sockets::AudioSenderSocketParams, fifo));
-        threads.add(new TimestampListener(Sockets::TimestampListenerSocketParams));
-        threads.add(new ClientListener(Sockets::ClientListenerSocketParams, clients, modules));
-        threads.add(new AuthorityListener(Sockets::AuthorityListenerSocketParams, authority));
-        threads.add(new RebootSender(Sockets::RebootSenderSocketParams, clients));
-        threads.add(new SwitchInspector(Threads::SwitchInspectorThreadParams, switches));
-
-        // The server should listen for change messages sent by all threads.
-        for (const auto &t: threads) {
-            t->addChangeListener(this);
-        }
     }
 
-    Server::~Server()
+    ServerBase::~ServerBase()
     {
-        releaseResources();
+        ServerBase::releaseResources();
 
         for (const auto &t: threads) {
             t->removeChangeListener(this);
         }
     }
 
-    void Server::prepareToPlay(const int samplesPerBlockExpected, const double sampleRate)
+    void ServerBase::prepareToPlay(const int samplesPerBlockExpected, const double sampleRate)
     {
         for (const auto &t: threads) {
             if (auto *s = dynamic_cast<AudioSender *>(t)) {
@@ -44,7 +34,7 @@ namespace ananas::Server
         }
     }
 
-    void Server::releaseResources()
+    void ServerBase::releaseResources()
     {
         for (const auto &t: threads) {
             if (t->isThreadRunning()) {
@@ -60,10 +50,10 @@ namespace ananas::Server
         }
     }
 
-    void Server::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
+    void ServerBase::getNextAudioBlock(const juce::AudioSourceChannelInfo &bufferToFill)
     {
         // These checks are kind of overkill, since the order in which threads
-        // were added to the OwnedArray is known, but as a santiy check...
+        // were added to the OwnedArray is known, but as a sanity check...
         if (auto *s = dynamic_cast<AudioSender *>(threads[0])) {
             if (auto *t = dynamic_cast<TimestampListener *>(threads[1])) {
                 // If a new timestamp is available, send it to the audio sender
@@ -77,14 +67,14 @@ namespace ananas::Server
         fifo.write(bufferToFill.buffer);
     }
 
-    void Server::changeListenerCallback(ChangeBroadcaster *source)
+    void ServerBase::changeListenerCallback(ChangeBroadcaster *source)
     {
         // If one of the threads announces a change, broadcast that change to
         // any listeners.
         sendChangeMessage();
     }
 
-    bool Server::isConnected() const
+    bool ServerBase::isConnected() const
     {
         return std::all_of(threads.begin(), threads.end(), [](const AnanasThread *t)
         {
@@ -92,22 +82,12 @@ namespace ananas::Server
         });
     }
 
-    ClientList *Server::getClientList()
-    {
-        return &clients;
-    }
-
-    ModuleList *Server::getModuleList()
-    {
-        return &modules;
-    }
-
-    AuthorityInfo *Server::getAuthority()
+    AuthorityInfo *ServerBase::getAuthority()
     {
         return &authority;
     }
 
-    SwitchList *Server::getSwitches()
+    SwitchList *ServerBase::getSwitches()
     {
         return &switches;
     }
@@ -115,12 +95,12 @@ namespace ananas::Server
 
     //==========================================================================
 
-    Server::AnanasThread::AnanasThread(const Utils::ThreadParams &p)
+    ServerBase::AnanasThread::AnanasThread(const Utils::ThreadParams &p)
         : Thread(p.name), timeoutMs(p.timeoutMs)
     {
     }
 
-    void Server::AnanasThread::run()
+    void ServerBase::AnanasThread::run()
     {
         while (!connect() && !threadShouldExit()) {
             for (uint i{0}; i < Constants::ThreadConnectWaitIterations && !threadShouldExit(); ++i)
@@ -133,32 +113,32 @@ namespace ananas::Server
         }
     }
 
-    int Server::AnanasThread::getTimeout() const
+    int ServerBase::AnanasThread::getTimeout() const
     {
         return timeoutMs;
     }
 
-    bool Server::AnanasThread::isConnected() const
+    bool ServerBase::AnanasThread::isConnected() const
     {
         return connected;
     }
 
     //==========================================================================
 
-    Server::UDPMulticastThread::UDPMulticastThread(const Utils::ThreadSocketParams &p)
+    ServerBase::UDPMulticastThread::UDPMulticastThread(const Utils::ThreadSocketParams &p)
         : AnanasThread(p),
           ip(p.ip),
           localPort(p.localPort)
     {
     }
 
-    Server::UDPMulticastThread::~UDPMulticastThread()
+    ServerBase::UDPMulticastThread::~UDPMulticastThread()
     {
         socket.leaveMulticast(ip);
         socket.shutdown();
     }
 
-    bool Server::UDPMulticastThread::connect()
+    bool ServerBase::UDPMulticastThread::connect()
     {
         if (-1 == socket.getBoundPort()) {
             if (!socket.setEnablePortReuse(true)) {
@@ -189,7 +169,7 @@ namespace ananas::Server
 
     //==========================================================================
 
-    Server::SenderThread::SenderThread(const Utils::SenderThreadSocketParams &p)
+    ServerBase::SenderThread::SenderThread(const Utils::SenderThreadSocketParams &p)
         : UDPMulticastThread(p),
           remotePort(p.remotePort)
     {
@@ -197,13 +177,13 @@ namespace ananas::Server
 
     //==========================================================================
 
-    Server::AudioSender::AudioSender(const Utils::SenderThreadSocketParams &p, Fifo &fifo)
+    ServerBase::AudioSender::AudioSender(const Utils::SenderThreadSocketParams &p, Fifo &fifo)
         : SenderThread(p),
           fifo(fifo)
     {
     }
 
-    bool Server::AudioSender::prepare(const uint numChannels, const int samplesPerBlockExpected, const double sampleRate)
+    bool ServerBase::AudioSender::prepare(const uint numChannels, const int samplesPerBlockExpected, const double sampleRate)
     {
         juce::ignoreUnused(sampleRate);
 
@@ -214,23 +194,23 @@ namespace ananas::Server
         return startThread();
     }
 
-    void Server::AudioSender::setPacketTime(const timespec ts)
+    void ServerBase::AudioSender::setPacketTime(const timespec ts)
     {
         packet.setTime(ts);
     }
 
-    int64_t Server::AudioSender::getPacketTime() const
+    int64_t ServerBase::AudioSender::getPacketTime() const
     {
         return packet.getTime();
     }
 
-    bool Server::AudioSender::stopThread(const int timeOutMilliseconds)
+    bool ServerBase::AudioSender::stopThread(const int timeOutMilliseconds)
     {
         fifo.abortRead();
         return Thread::stopThread(timeOutMilliseconds);
     }
 
-    void Server::AudioSender::runImpl()
+    void ServerBase::AudioSender::runImpl()
     {
         std::cout << getThreadName() << " sending audio packets..." << std::endl << std::flush;
 
@@ -252,13 +232,13 @@ namespace ananas::Server
 
     //==========================================================================
 
-    Server::AnnouncementListenerThread::AnnouncementListenerThread(
+    ServerBase::AnnouncementListenerThread::AnnouncementListenerThread(
         const Utils::ListenerThreadSocketParams &p
     ) : UDPMulticastThread(p)
     {
     }
 
-    bool Server::AnnouncementListenerThread::connect()
+    bool ServerBase::AnnouncementListenerThread::connect()
     {
         if (-1 == socket.getBoundPort()) {
             // JUCE doesn't handle multicast in a manner that's compatible with
@@ -303,7 +283,7 @@ namespace ananas::Server
         return true;
     }
 
-    void Server::AnnouncementListenerThread::runImpl()
+    void ServerBase::AnnouncementListenerThread::runImpl()
     {
         std::cout << getThreadName() << " listening..." << std::endl << std::flush;
 
@@ -326,23 +306,23 @@ namespace ananas::Server
 
     //==============================================================================
 
-    Server::TimestampListener::TimestampListener(
+    ServerBase::TimestampListener::TimestampListener(
         const Utils::ListenerThreadSocketParams &p
     ) : AnnouncementListenerThread(p)
     {
     }
 
-    bool Server::TimestampListener::isNewTimestampAvailable()
+    bool ServerBase::TimestampListener::isNewTimestampAvailable()
     {
         return newTimestampAvailable.exchange(false, std::memory_order_acquire);
     }
 
-    timespec Server::TimestampListener::getTimestamp() const noexcept
+    timespec ServerBase::TimestampListener::getTimestamp() const noexcept
     {
         return timestamp.load(std::memory_order_acquire);
     }
 
-    void Server::TimestampListener::handlePacket()
+    void ServerBase::TimestampListener::handlePacket()
     {
         // Check for Follow_Up message (0x08)
         if ((buffer[0] & 0x0f) == Constants::PTPFollowUpMessageType) {
@@ -366,25 +346,27 @@ namespace ananas::Server
 
     //==============================================================================
 
-    Server::ClientListener::ClientListener(
+    template<typename AnnouncePacketType>
+    ServerBase::ClientListener<AnnouncePacketType>::ClientListener(
         const Utils::ListenerThreadSocketParams &p,
-        ClientList &clients,
-        ModuleList &modules
+        ClientList<AnnouncePacketType> &clients,
+        ModuleList<AnnouncePacketType> &modules
     ) : AnnouncementListenerThread(p),
         clients(clients),
         modules(modules)
     {
     }
 
-    void Server::ClientListener::handlePacket()
+    template<typename AnnouncePacketType>
+    void ServerBase::ClientListener<AnnouncePacketType>::handlePacket()
     {
-        clients.handlePacket(senderIP, reinterpret_cast<const ClientAnnouncePacket *>(buffer));
+        clients.handlePacket(senderIP, reinterpret_cast<const AnnouncePacketType *>(buffer));
         modules.handlePacket(senderIP);
     }
 
     //==============================================================================
 
-    Server::AuthorityListener::AuthorityListener(
+    ServerBase::AuthorityListener::AuthorityListener(
         const Utils::ListenerThreadSocketParams &p,
         AuthorityInfo &authority
     ) : AnnouncementListenerThread(p),
@@ -392,22 +374,24 @@ namespace ananas::Server
     {
     }
 
-    void Server::AuthorityListener::handlePacket()
+    void ServerBase::AuthorityListener::handlePacket()
     {
         authority.handlePacket(senderIP, reinterpret_cast<AuthorityAnnouncePacket *>(buffer));
     }
 
     //==========================================================================
 
-    Server::RebootSender::RebootSender(
+    template <typename AnnouncePacketType>
+    ServerBase::RebootSender<AnnouncePacketType>::RebootSender(
         const Utils::SenderThreadSocketParams &p,
-        ClientList &clients
+        ClientList<AnnouncePacketType> &clients
     ): SenderThread(p),
        clients(clients)
     {
     }
 
-    void Server::RebootSender::runImpl()
+    template <typename AnnouncePacketType>
+    void ServerBase::RebootSender<AnnouncePacketType>::runImpl()
     {
         while (!threadShouldExit()) {
             if (clients.getShouldReboot()) {
@@ -421,9 +405,18 @@ namespace ananas::Server
         }
     }
 
+    template
+    class ServerBase::RebootSender<ClientAnnouncePacket>;
+
+    template
+    class ServerBase::RebootSender<WfsClientAnnouncePacket>;
+
+    template
+    class ServerBase::RebootSender<HoaClientAnnouncePacket>;
+
     //==========================================================================
 
-    Server::SwitchInspector::SwitchInspector(
+    ServerBase::SwitchInspector::SwitchInspector(
         const Utils::ThreadParams &p,
         SwitchList &switches
     ) : AnanasThread(p),
@@ -431,9 +424,9 @@ namespace ananas::Server
     {
     }
 
-    void Server::SwitchInspector::runImpl()
+    void ServerBase::SwitchInspector::runImpl()
     {
-        std::cout << getThreadName() <<  " inspecting..." << std::endl << std::flush;
+        std::cout << getThreadName() << " inspecting..." << std::endl << std::flush;
 
         while (!threadShouldExit()) {
             auto switchesVar{switches.toVar()};
@@ -475,17 +468,17 @@ namespace ananas::Server
         std::cout << getThreadName() << " stopping." << std::endl;
     }
 
-    bool Server::SwitchInspector::connect()
+    bool ServerBase::SwitchInspector::connect()
     {
         sendChangeMessage();
         return true;
     }
 
-    juce::var Server::SwitchInspector::curlRequest(const juce::String &ip,
-                                                   const juce::String &username,
-                                                   const juce::String &password,
-                                                   const juce::StringRef &path,
-                                                   const juce::String &postData)
+    juce::var ServerBase::SwitchInspector::curlRequest(const juce::String &ip,
+                                                       const juce::String &username,
+                                                       const juce::String &password,
+                                                       const juce::StringRef &path,
+                                                       const juce::String &postData)
     {
         const juce::URL url("http://" + ip + path);
 
@@ -508,4 +501,45 @@ namespace ananas::Server
         }
         return juce::var{};
     }
+
+    //==========================================================================
+
+    template<typename AnnouncePacketType>
+    Server<AnnouncePacketType>::Server(const uint numChannelsToSend)
+        : ServerBase(numChannelsToSend)
+    {
+        // Add all the threads.
+        threads.add(new AudioSender(Sockets::AudioSenderSocketParams, fifo));
+        threads.add(new TimestampListener(Sockets::TimestampListenerSocketParams));
+        threads.add(new ClientListener<AnnouncePacketType>(Sockets::ClientListenerSocketParams, clients, modules));
+        threads.add(new AuthorityListener(Sockets::AuthorityListenerSocketParams, authority));
+        threads.add(new RebootSender<AnnouncePacketType>(Sockets::RebootSenderSocketParams, clients));
+        threads.add(new SwitchInspector(Threads::SwitchInspectorThreadParams, switches));
+
+        // The server should listen for change messages sent by all threads.
+        for (const auto &t: threads) {
+            t->addChangeListener(this);
+        }
+    }
+
+    template<typename AnnouncePacketType>
+    ClientList<AnnouncePacketType> *Server<AnnouncePacketType>::getClientList()
+    {
+        return &clients;
+    }
+
+    template<typename AnnouncePacketType>
+    ModuleList<AnnouncePacketType> *Server<AnnouncePacketType>::getModuleList()
+    {
+        return &modules;
+    }
+
+    template
+    class Server<ClientAnnouncePacket>;
+
+    template
+    class Server<WfsClientAnnouncePacket>;
+
+    template
+    class Server<HoaClientAnnouncePacket>;
 }

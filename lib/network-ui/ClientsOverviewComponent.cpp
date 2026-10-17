@@ -1,10 +1,12 @@
 #include "ClientsOverviewComponent.h"
 #include <AnanasLookAndFeel.h>
 #include <AnanasUtils.h>
+#include <Packet.h>
 
 namespace ananas::UI
 {
-    ClientsOverviewComponent::ClientsOverviewComponent(juce::ValueTree &dynamicTree)
+    template<typename AnnouncePacketType>
+    ClientsOverviewComponent<AnnouncePacketType>::ClientsOverviewComponent(juce::ValueTree &dynamicTree)
         : clientTable(std::make_unique<ClientTable>()),
           tree(dynamicTree)
     {
@@ -27,12 +29,14 @@ namespace ananas::UI
         tree.addListener(this);
     }
 
-    ClientsOverviewComponent::~ClientsOverviewComponent()
+    template<typename AnnouncePacketType>
+    ClientsOverviewComponent<AnnouncePacketType>::~ClientsOverviewComponent()
     {
         tree.removeListener(this);
     }
 
-    void ClientsOverviewComponent::update(const juce::var &var)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::update(const juce::var &var)
     {
         if (!isVisible()) return;
 
@@ -40,12 +44,14 @@ namespace ananas::UI
         overviewPanel.update(var);
     }
 
-    void ClientsOverviewComponent::paint(juce::Graphics &g)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::paint(juce::Graphics &g)
     {
         g.fillAll(findColour(backgroundColourId));
     }
 
-    void ClientsOverviewComponent::resized()
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::resized()
     {
         auto bounds{getLocalBounds()};
         auto titleRow{
@@ -58,7 +64,8 @@ namespace ananas::UI
         clientTable->setBounds(bounds);
     }
 
-    void ClientsOverviewComponent::valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged, const juce::Identifier &property)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::valueTreePropertyChanged(juce::ValueTree &treeWhosePropertyHasChanged, const juce::Identifier &property)
     {
         if (!isVisible()) return;
 
@@ -68,19 +75,31 @@ namespace ananas::UI
         }
     }
 
-    void ClientsOverviewComponent::handleAsyncUpdate()
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::handleAsyncUpdate()
     {
         repaint();
     }
 
-    void ClientsOverviewComponent::triggerClientReboot() const
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::triggerClientReboot() const
     {
         tree.setProperty(Utils::Identifiers::ClientsShouldRebootParamID, true, nullptr);
     }
 
+    template
+    class ClientsOverviewComponent<ClientAnnouncePacket>;
+
+    template
+    class ClientsOverviewComponent<WfsClientAnnouncePacket>;
+
+    template
+    class ClientsOverviewComponent<HoaClientAnnouncePacket>;
+
     //==========================================================================
 
-    ClientsOverviewComponent::OverviewPanel::OverviewPanel()
+    template<typename AnnouncePacketType>
+    ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::OverviewPanel()
     {
         addAndMakeVisible(totalClientsLabel);
         addAndMakeVisible(totalClientsValue);
@@ -91,14 +110,16 @@ namespace ananas::UI
         presentationTimeIntervalLabel.setText(Strings::PresentationTimeIntervalLabel, juce::dontSendNotification);
     }
 
-    juce::String ClientsOverviewComponent::OverviewPanel::getPresentationTimeIntervalText(const int presentationTimeInterval)
+    template<typename AnnouncePacketType>
+    juce::String ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::getPresentationTimeIntervalText(const int presentationTimeInterval)
     {
         return presentationTimeInterval < 1000
                    ? juce::String{presentationTimeInterval} + " ns"
                    : Strings::formatWithThousandsSeparator(static_cast<float>(presentationTimeInterval) / 1000.f) + " µs";
     }
 
-    void ClientsOverviewComponent::OverviewPanel::update(const juce::var &var)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::update(const juce::var &var)
     {
         if (!isVisible()) return;
 
@@ -133,7 +154,7 @@ namespace ananas::UI
             }
 
             auto maxNanoseconds{5000.f};
-            if (const auto lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())}) {
+            if (const auto lnf{dynamic_cast<AnanasLookAndFeelBase *>(&getLookAndFeel())}) {
                 maxNanoseconds = lnf->getMaxMicrosecondsToDisplay() * 1000.f;
             }
 
@@ -159,12 +180,14 @@ namespace ananas::UI
         }
     }
 
-    void ClientsOverviewComponent::OverviewPanel::paint(juce::Graphics &g)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::paint(juce::Graphics &g)
     {
         g.fillAll(juce::Colours::transparentWhite);
     }
 
-    void ClientsOverviewComponent::OverviewPanel::resized()
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::resized()
     {
         auto bounds = getLocalBounds().reduced(10);
 
@@ -186,20 +209,23 @@ namespace ananas::UI
 
     //==========================================================================
 
-    void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::setBackgroundWidth(const float proportion)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::setBackgroundWidth(const float proportion)
     {
         backgroundProportion = proportion;
         repaint();
     }
 
-    void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::setMax(const float maxSeen)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::setMax(const float maxSeen)
     {
         maxValue = maxSeen;
     }
 
-    void ClientsOverviewComponent::OverviewPanel::PresentationTimeInterval::paint(juce::Graphics &g)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::OverviewPanel::PresentationTimeInterval::paint(juce::Graphics &g)
     {
-        if (auto *lnf{dynamic_cast<AnanasLookAndFeel *>(&getLookAndFeel())}) {
+        if (auto *lnf{dynamic_cast<AnanasLookAndFeel<AnnouncePacketType> *>(&getLookAndFeel())}) {
             lnf->drawPresentationTimeInterval(g, *this, backgroundProportion, maxValue);
         }
 
@@ -208,7 +234,8 @@ namespace ananas::UI
 
     //==========================================================================
 
-    ClientsOverviewComponent::ClientTable::ClientTable()
+    template<typename AnnouncePacketType>
+    ClientsOverviewComponent<AnnouncePacketType>::ClientTable::ClientTable()
     {
         addAndMakeVisible(table);
 
@@ -220,13 +247,18 @@ namespace ananas::UI
         addColumn(TableColumns::ClientTableBufferFillPercent);
         addColumn(TableColumns::ClientTableSamplingRate);
         addColumn(TableColumns::ClientTablePercentCPU);
-        addColumn(TableColumns::ClientTableSecondarySourceCoordinates);
+        if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+            addColumn(TableColumns::ClientTableSecondarySourceCoordinates);
+        } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+            addColumn(TableColumns::ClientTableDecoderMatrixRows);
+        }
 
         table.setModel(this);
         table.setOutlineThickness(1);
     }
 
-    void ClientsOverviewComponent::ClientTable::update(const juce::var &clientInfo)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::ClientTable::update(const juce::var &clientInfo)
     {
         if (!isVisible()) return;
 
@@ -247,7 +279,11 @@ namespace ananas::UI
                     row.bufferFillPercent = client->getProperty(Utils::Identifiers::ClientBufferFillPercentPropertyID);
                     row.samplingRate = client->getProperty(Utils::Identifiers::ClientSamplingRatePropertyID);
                     row.percentCPU = client->getProperty(Utils::Identifiers::ClientPercentCPUPropertyID);
-                    row.secondarySourceCoordinates = client->getProperty(Utils::Identifiers::ClientSecondarySourceCoordinatesPropertyID);
+                    if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+                        row.secondarySourceCoordinates = client->getProperty(Utils::Identifiers::ClientSecondarySourceCoordinatesPropertyID);
+                    } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+                        row.decoderMatrixRows = client->getProperty(Utils::Identifiers::ClientDecoderMatrixRowsPropertyID);
+                    }
                 }
 
                 rows.add(row);
@@ -258,12 +294,15 @@ namespace ananas::UI
         repaint();
     }
 
-    int ClientsOverviewComponent::ClientTable::getNumRows()
+    template<typename AnnouncePacketType>
+    int ClientsOverviewComponent<AnnouncePacketType>::ClientTable::getNumRows()
     {
         return rows.size();
     }
 
-    void ClientsOverviewComponent::ClientTable::paintRowBackground(juce::Graphics &g, const int rowNumber, int width, int height, const bool rowIsSelected)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::ClientTable::paintRowBackground(juce::Graphics &g, const int rowNumber, int width, int height,
+                                                                                       const bool rowIsSelected)
     {
         juce::ignoreUnused(width, height);
 
@@ -275,12 +314,13 @@ namespace ananas::UI
             g.fillAll(juce::Colours::white);
     }
 
-    void ClientsOverviewComponent::ClientTable::paintCell(juce::Graphics &g,
-                                                          const int rowNumber,
-                                                          const int columnId,
-                                                          const int width,
-                                                          const int height,
-                                                          bool rowIsSelected)
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::ClientTable::paintCell(juce::Graphics &g,
+                                                                              const int rowNumber,
+                                                                              const int columnId,
+                                                                              const int width,
+                                                                              const int height,
+                                                                              bool rowIsSelected)
     {
         juce::ignoreUnused(rowIsSelected);
 
@@ -296,7 +336,8 @@ namespace ananas::UI
                 bufferFillPercent,
                 samplingRate,
                 percentCPU,
-                secondarySourceCoordinates
+                secondarySourceCoordinates,
+                decoderMatrixRows
             ] = rows[rowNumber];
             juce::String text;
 
@@ -323,7 +364,11 @@ namespace ananas::UI
                     break;
                 case 8: text = juce::String{percentCPU, 3};
                     break;
-                case 9: text = secondarySourceCoordinates;
+                case 9: if constexpr (std::is_same_v<AnnouncePacketType, WfsClientAnnouncePacket>) {
+                        text = secondarySourceCoordinates;
+                    } else if constexpr (std::is_same_v<AnnouncePacketType, HoaClientAnnouncePacket>) {
+                        text = decoderMatrixRows;
+                    }
                 default: break;
             }
 
@@ -333,7 +378,8 @@ namespace ananas::UI
         }
     }
 
-    void ClientsOverviewComponent::ClientTable::resized()
+    template<typename AnnouncePacketType>
+    void ClientsOverviewComponent<AnnouncePacketType>::ClientTable::resized()
     {
         table.setBounds(getLocalBounds().reduced(10));
     }

@@ -2,7 +2,7 @@ add_library(ananas_utilities INTERFACE)
 
 set_target_properties(ananas_utilities PROPERTIES
         POSITION_INDEPENDENT_CODE ON
-        VERSION 0.3.0
+        VERSION 0.5.0
         SOVERSION 1
 )
 

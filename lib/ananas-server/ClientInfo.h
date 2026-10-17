@@ -7,20 +7,24 @@
 
 namespace ananas
 {
+    template<typename AnnouncePacketType>
     class ClientInfo
     {
     public:
-        void update(const ClientAnnouncePacket *packet);
+        void update(const AnnouncePacketType *packet);
 
         [[nodiscard]] bool isConnected() const;
 
-        [[nodiscard]] ClientAnnouncePacket getInfo() const;
+        [[nodiscard]] AnnouncePacketType getInfo() const;
 
     private:
-        ClientAnnouncePacket info{};
+        AnnouncePacketType info{};
         uint32_t lastReceiveTime{0};
     };
 
+    //==========================================================================
+
+    template<typename AnnouncePacketType>
     class ModuleInfo
     {
     public:
@@ -38,6 +42,10 @@ namespace ananas
 
         [[nodiscard]] std::pair<float, float> getSecondarySource1Position() const;
 
+        [[nodiscard]] juce::int32 getDecoderMatrixRow0() const;
+
+        [[nodiscard]] juce::int32 getDecoderMatrixRow1() const;
+
         static ModuleInfo fromValueTree(const juce::ValueTree &tree);
 
     private:
@@ -45,15 +53,20 @@ namespace ananas
         bool wasConnected{false};
         std::pair<float, float> secondarySource0Position;
         std::pair<float, float> secondarySource1Position;
+        juce::int32 decoderMatrixRow0{0};
+        juce::int32 decoderMatrixRow1{0};
     };
 
+    //==========================================================================
+
+    template<typename AnnouncePacketType>
     class ClientList final : public juce::Timer,
                              public juce::ChangeBroadcaster
     {
     public:
         ClientList();
 
-        void handlePacket(const juce::String &clientIP, const ClientAnnouncePacket *packet);
+        void handlePacket(const juce::String &clientIP, const AnnouncePacketType *packet);
 
         void timerCallback() override;
 
@@ -70,10 +83,14 @@ namespace ananas
     private:
         void checkConnectivity();
 
-        std::map<juce::String, ClientInfo> clients;
+        std::map<juce::String, ClientInfo<AnnouncePacketType> > clients;
         bool shouldReboot{false};
     };
 
+
+    //==========================================================================
+
+    template<typename AnnouncePacketType>
     class ModuleList final : public juce::ChangeBroadcaster,
                              public juce::Timer
     {
@@ -93,7 +110,7 @@ namespace ananas
     private:
         void checkConnectivity();
 
-        std::map<juce::String, ModuleInfo> modules;
+        std::map<juce::String, ModuleInfo<AnnouncePacketType> > modules;
     };
 }
 

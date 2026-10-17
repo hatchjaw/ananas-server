@@ -10,6 +10,7 @@
 
 namespace ananas::UI
 {
+    template <typename AnnouncePacketType>
     class NetworkOverviewComponent final :
 #if SHOW_NO_NETWORK_OVERLAY
             public OverlayableComponent
@@ -38,7 +39,7 @@ namespace ananas::UI
 
         SwitchesComponent switches;
         TimeAuthorityComponent timeAuthority;
-        ClientsOverviewComponent clientOverview;
+        ClientsOverviewComponent<AnnouncePacketType> clientOverview;
     };
 }
 

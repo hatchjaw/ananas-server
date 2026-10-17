@@ -39,7 +39,7 @@ private:
     juce::TooltipWindow tooltipWindow;
     ananas::WFS::UI::WfsLookAndFeel lookAndFeel;
     juce::TabbedComponent tabbedComponent{juce::TabbedButtonBar::TabsAtTop};
-    ananas::UI::NetworkOverviewComponent networkOverview;
+    ananas::UI::NetworkOverviewComponent<ananas::WfsClientAnnouncePacket> networkOverview;
     ananas::WFS::UI::WFSInterfaceComponent wfsInterface;
     juce::ApplicationCommandManager commandManager;
 };

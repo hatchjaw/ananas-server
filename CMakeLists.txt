@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.30)
 
-project(ananas VERSION 0.4.0)
+project(ananas VERSION 0.5.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -32,3 +32,5 @@ add_subdirectory(lib/network-ui)
 add_subdirectory(src/ananas-server-plugin)
 
 add_subdirectory(src/wfs-plugin)
+
+add_subdirectory(src/hoa-plugin)

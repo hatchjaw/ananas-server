@@ -11,14 +11,14 @@
 
 namespace ananas::Server
 {
-    class Server final : public juce::AudioSource,
-                         public juce::ChangeListener,
-                         public juce::ChangeBroadcaster
+    class ServerBase : public juce::AudioSource,
+                       public juce::ChangeListener,
+                       public juce::ChangeBroadcaster
     {
     public:
-        explicit Server(uint numChannelsToSend);
+        explicit ServerBase(uint numChannelsToSend);
 
-        ~Server() override;
+        ~ServerBase() override;
 
         void prepareToPlay(int samplesPerBlockExpected, double sampleRate) override;
 
@@ -30,15 +30,11 @@ namespace ananas::Server
 
         [[nodiscard]] bool isConnected() const;
 
-        ClientList *getClientList();
-
-        ModuleList *getModuleList();
-
         AuthorityInfo *getAuthority();
 
         SwitchList *getSwitches();
 
-    private:
+    protected:
         //======================================================================
 
         class AnanasThread : public juce::Thread,
@@ -163,17 +159,18 @@ namespace ananas::Server
 
         //======================================================================
 
+        template<typename AnnouncePacketType>
         class ClientListener final : public AnnouncementListenerThread
         {
         public:
-            ClientListener(const Utils::ListenerThreadSocketParams &p, ClientList &clients, ModuleList &modules);
+            ClientListener(const Utils::ListenerThreadSocketParams &p, ClientList<AnnouncePacketType> &clients, ModuleList<AnnouncePacketType> &modules);
 
         protected:
             void handlePacket() override;
 
         private:
-            ClientList &clients;
-            ModuleList &modules;
+            ClientList<AnnouncePacketType> &clients;
+            ModuleList<AnnouncePacketType> &modules;
 
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ClientListener);
         };
@@ -196,10 +193,11 @@ namespace ananas::Server
 
         //======================================================================
 
+        template <typename AnnouncePacketType>
         class RebootSender final : public SenderThread
         {
         public:
-            RebootSender(const Utils::SenderThreadSocketParams &p, ClientList &clients);
+            RebootSender(const Utils::SenderThreadSocketParams &p, ClientList<AnnouncePacketType> &clients);
 
         protected:
             void runImpl() override;
@@ -207,7 +205,7 @@ namespace ananas::Server
         private:
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RebootSender)
 
-            ClientList &clients;
+            ClientList<AnnouncePacketType> &clients;
         };
 
         //======================================================================
@@ -247,15 +245,30 @@ namespace ananas::Server
 
         //======================================================================
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Server)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ServerBase)
 
         uint numChannels;
         Fifo fifo;
         SwitchList switches;
-        ClientList clients;
-        ModuleList modules;
         AuthorityInfo authority;
         juce::OwnedArray<AnanasThread> threads;
+    };
+
+    //==========================================================================
+    template<typename AnnouncePacketType>
+    class Server final : public ServerBase
+    {
+    public:
+        explicit Server(uint numChannelsToSend);
+
+        ClientList<AnnouncePacketType> *getClientList();
+
+        ModuleList<AnnouncePacketType> *getModuleList();
+    private:
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Server)
+
+        ClientList<AnnouncePacketType> clients;
+        ModuleList<AnnouncePacketType> modules;
     };
 }
 

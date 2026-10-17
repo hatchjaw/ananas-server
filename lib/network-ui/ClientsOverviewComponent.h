@@ -6,6 +6,7 @@
 
 namespace ananas::UI
 {
+    template <typename AnnouncePacketType>
     class ClientsOverviewComponent final : public juce::Component,
                                            public juce::ValueTree::Listener,
                                            juce::AsyncUpdater
@@ -113,6 +114,7 @@ namespace ananas::UI
                 float samplingRate;
                 float percentCPU;
                 juce::String secondarySourceCoordinates;
+                juce::String decoderMatrixRows;
             };
 
             juce::Array<Row> rows;

@@ -70,7 +70,7 @@ appropriately configured ethernet switch. The ethernet interface should be
 configured manually, i.e. _without DHCP_ as follows:
 
 - Address: 192.168.10.10
-- Subnet mask: 255.255.255.0
+- Subnet mask: 255.255.0.0
 - Gateway: 192.168.10.x
 
 where 'x' is the last octet of the IP address assigned to the switch.

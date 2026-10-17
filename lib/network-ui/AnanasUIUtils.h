@@ -120,6 +120,11 @@ namespace ananas::UI
             juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
             juce::Justification::centred
         };
+        inline static const ColumnHeader ClientTableDecoderMatrixRows{
+            9, "Decoder Matrix Rows", 160, 30, -1,
+            juce::TableHeaderComponent::visible | juce::TableHeaderComponent::resizable | juce::TableHeaderComponent::appearsOnColumnMenu,
+            juce::Justification::centred
+        };
 
         inline static const ColumnHeader AuthorityTableIpAddress{
             1, "IP address", 125, 30, -1,
