@@ -231,7 +231,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PluginProcessor::createParam
 {
     juce::AudioProcessorValueTreeState::ParameterLayout params{};
 
-    for (size_t n{0}; n < ananas::HOA::Constants::NumSpeakers; ++n) {
+    for (size_t n{1}; n <= ananas::HOA::Constants::NumSpeakers; ++n) {
         params.add(std::make_unique<juce::AudioParameterFloat>(
             ananas::HOA::Params::getSpeakerCoordinateParamID(n, ananas::HOA::SpeakerCoordinateAxis::X),
             ananas::HOA::Params::getSpeakerCoordinateParamName(n, ananas::HOA::SpeakerCoordinateAxis::X),

@@ -7,8 +7,8 @@ namespace ananas::HOA::UI
     ModuleComponent::ModuleComponent(const size_t idx, juce::ValueTree &persistentTree)
         : tree(persistentTree), index(idx)
     {
-        decoderMatrixRows.first = index * 2;
-        decoderMatrixRows.second = index * 2 + 1;
+        decoderMatrixRows.first = (index - 1) * 2;
+        decoderMatrixRows.second = (index - 1) * 2 + 1;
 
         addAndMakeVisible(moduleSelector);
 
@@ -84,24 +84,24 @@ namespace ananas::HOA::UI
     juce::Rectangle<int> ModuleComponent::getTheBounds() const
     {
         switch (index) {
-            case 0:
-                return {675, 80, 150, 25};
             case 1:
-                return {875, 560,150, 25};
+                return {675, 80, 150, 25};
             case 2:
-                return {375, 765,150, 25};
+                return {875, 560, 150, 25};
             case 3:
-                return {165, 280,150, 25};
+                return {375, 765, 150, 25};
             case 4:
-                return {525, 165,150, 25};
+                return {165, 280, 150, 25};
             case 5:
-                return {775, 425,150, 25};
+                return {525, 165, 150, 25};
             case 6:
-                return {525, 680,150, 25};
+                return {775, 425, 150, 25};
             case 7:
-                return {275, 425,150, 25};
+                return {525, 680, 150, 25};
+            case 8:
+                return {275, 425, 150, 25};
             default:
-                return {525, 425,150, 25};
+                return {525, 425, 150, 25};
         }
     }
 }

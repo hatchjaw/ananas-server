@@ -35,9 +35,12 @@ namespace ananas::HOA::UI
 
         void mouseUp(const juce::MouseEvent &event) override;
 
+        bool getIsHovered() const { return isHover; }
+
     private:
         size_t index{0};
         juce::AudioProcessorValueTreeState &state;
+        bool isHover{false};
     };
 }
 

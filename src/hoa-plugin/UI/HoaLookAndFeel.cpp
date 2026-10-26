@@ -6,7 +6,7 @@ namespace ananas::HOA::UI
     {
         // Sound field
         setColour(SoundFieldComponent::backgroundColourId, juce::Colours::black.withAlpha(0.1f));
-        setColour(SoundFieldComponent::azymuthalLineColourId, juce::Colours::black.withAlpha(0.25f));
+        setColour(SoundFieldComponent::azimuthalLineColourId, juce::Colours::black.withAlpha(0.25f));
 
         // Speaker icons
         setColour(SpeakerIconComponent::fillColourId, juce::Colours::lightgrey);
@@ -18,7 +18,7 @@ namespace ananas::HOA::UI
     {
         g.fillAll(s.findColour(SoundFieldComponent::backgroundColourId));
 
-        g.setColour(s.findColour(SoundFieldComponent::azymuthalLineColourId));
+        g.setColour(s.findColour(SoundFieldComponent::azimuthalLineColourId));
 
         const auto bounds{s.getLocalBounds().toFloat()};
         const auto diameter{juce::jmin(bounds.getWidth(), bounds.getHeight())};
@@ -35,7 +35,7 @@ namespace ananas::HOA::UI
         speaker.applyTransform(juce::AffineTransform::rotation(s.getRotation(), 40, 40));
 
         g.setColour(s.findColour(
-            s.isMouseOver() ?
+            s.getIsHovered() ?
             SpeakerIconComponent::mouseOverFillColourId :
             SpeakerIconComponent::fillColourId));
         g.fillPath(speaker);

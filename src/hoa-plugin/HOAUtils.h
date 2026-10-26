@@ -1,10 +1,7 @@
 #ifndef HOAUTILS_H
 #define HOAUTILS_H
 
-#include <limits.h>
 #include <juce_core/juce_core.h>
-#include <juce_graphics/juce_graphics.h>
-#include <AnanasUtils.h>
 
 namespace ananas::HOA
 {

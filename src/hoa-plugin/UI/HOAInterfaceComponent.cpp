@@ -14,12 +14,12 @@ namespace ananas::HOA::UI
     {
         addAndMakeVisible(soundFieldComponent);
 
-        for (size_t n{0}; n < numChannels; ++n) {
+        for (size_t n{1}; n <= numChannels; ++n) {
             const auto s{speakerIcons.add(new SpeakerIconComponent(n, apvts))};
             addAndMakeVisible(s);
         }
 
-        for (size_t n{0}; n < numChannels / 2; ++n) {
+        for (size_t n{1}; n <= numChannels / 2; ++n) {
             const auto m{modules.add(new ModuleComponent(n, persistentTree))};
             addAndMakeVisible(m);
         }

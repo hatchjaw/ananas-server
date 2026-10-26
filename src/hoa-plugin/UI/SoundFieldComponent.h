@@ -15,7 +15,7 @@ namespace ananas::HOA::UI
         enum ColourIds
         {
             backgroundColourId = 0x2002000,
-            azymuthalLineColourId = 0x2002001,
+            azimuthalLineColourId = 0x2002001,
         };
 
         //======================================================================

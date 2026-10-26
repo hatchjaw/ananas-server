@@ -21,37 +21,37 @@ namespace ananas::HOA::UI
     float SpeakerIconComponent::getRotation() const
     {
         switch (index) {
-            case 0:
-                return 0.0f;
             case 1:
-                return juce::MathConstants<float>::pi / 4.f;
+                return 0.0f;
             case 2:
-                return juce::MathConstants<float>::pi / 2.f;
+                return juce::MathConstants<float>::pi / 4.f;
             case 3:
-                return 3.f * juce::MathConstants<float>::pi / 4.f;
+                return juce::MathConstants<float>::pi / 2.f;
             case 4:
-                return juce::MathConstants<float>::pi;
+                return 3.f * juce::MathConstants<float>::pi / 4.f;
             case 5:
-                return 5.f * juce::MathConstants<float>::pi / 4.f;
+                return juce::MathConstants<float>::pi;
             case 6:
-                return 3.f * juce::MathConstants<float>::pi / 2.f;
+                return 5.f * juce::MathConstants<float>::pi / 4.f;
             case 7:
-                return 7.f * juce::MathConstants<float>::pi / 4.f;
+                return 3.f * juce::MathConstants<float>::pi / 2.f;
             case 8:
-                return 15.f * juce::MathConstants<float>::pi / 8.f;
+                return 7.f * juce::MathConstants<float>::pi / 4.f;
             case 9:
-                return juce::MathConstants<float>::pi / 8.f;
+                return 15.f * juce::MathConstants<float>::pi / 8.f;
             case 10:
-                return 3.f * juce::MathConstants<float>::pi / 8.f;
+                return juce::MathConstants<float>::pi / 8.f;
             case 11:
-                return 5.f * juce::MathConstants<float>::pi / 8.f;
+                return 3.f * juce::MathConstants<float>::pi / 8.f;
             case 12:
-                return 7.f * juce::MathConstants<float>::pi / 8.f;
+                return 5.f * juce::MathConstants<float>::pi / 8.f;
             case 13:
-                return 9.f * juce::MathConstants<float>::pi / 8.f;
+                return 7.f * juce::MathConstants<float>::pi / 8.f;
             case 14:
-                return 11.f * juce::MathConstants<float>::pi / 8.f;
+                return 9.f * juce::MathConstants<float>::pi / 8.f;
             case 15:
+                return 11.f * juce::MathConstants<float>::pi / 8.f;
+            case 16:
                 return 13.f * juce::MathConstants<float>::pi / 8.f;
             default:
                 return 0.f;
@@ -61,37 +61,37 @@ namespace ananas::HOA::UI
     juce::Rectangle<int> SpeakerIconComponent::getTheBounds() const
     {
         switch (index) {
-            case 0:
-                return {560, 0, 80, 80};
             case 1:
-                return {838, 116, 80, 80};
+                return {560, 0, 80, 80};
             case 2:
-                return {954, 400, 80, 80};
+                return {838, 116, 80, 80};
             case 3:
-                return {838, 673, 80, 80};
+                return {954, 400, 80, 80};
             case 4:
-                return {560, 790, 80, 80};
+                return {838, 673, 80, 80};
             case 5:
-                return {280, 673, 80, 80};
+                return {560, 790, 80, 80};
             case 6:
-                return {166, 400, 80, 80};
+                return {280, 673, 80, 80};
             case 7:
-                return {280, 115, 80, 80};
+                return {166, 400, 80, 80};
             case 8:
-                return {470, 170, 80, 80};
+                return {280, 115, 80, 80};
             case 9:
-                return {650, 170, 80, 80};
+                return {470, 170, 80, 80};
             case 10:
-                return {785, 310, 80, 80};
+                return {650, 170, 80, 80};
             case 11:
-                return {782, 490, 80, 80};
+                return {785, 310, 80, 80};
             case 12:
-                return {650, 618, 80, 80};
+                return {782, 490, 80, 80};
             case 13:
-                return {470, 618, 80, 80};
+                return {650, 618, 80, 80};
             case 14:
-                return {335, 490, 80, 80};
+                return {470, 618, 80, 80};
             case 15:
+                return {335, 490, 80, 80};
+            case 16:
                 return {335, 305, 80, 80};
             default:
                 return {560, 400, 80, 80};
@@ -101,18 +101,22 @@ namespace ananas::HOA::UI
     void SpeakerIconComponent::mouseEnter(const juce::MouseEvent &event)
     {
         ignoreUnused(event);
+        isHover = true;
         repaint();
     }
 
     void SpeakerIconComponent::mouseExit(const juce::MouseEvent &event)
     {
         ignoreUnused(event);
+        isHover = false;
         repaint();
     }
 
     void SpeakerIconComponent::mouseUp(const juce::MouseEvent &event)
     {
         ignoreUnused(event);
+        isHover = false;
+        repaint();
 
         auto *content = new SpeakerCoordinatesComponent(index, state); // your custom component
         content->setSize(400, 300);

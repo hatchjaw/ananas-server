@@ -23,7 +23,7 @@ namespace ananas::HOA
         if (property == Utils::Identifiers::ModulesParamID) {
             speakerPositions.clear();
             sphericalHarmonics.clear();
-            for (size_t n{0}; n < Constants::NumSpeakers; ++n) {
+            for (size_t n{1}; n <= Constants::NumSpeakers; ++n) {
                 const auto pos = Cartesian2Spherical(
                     state.getRawParameterValue(Params::getSpeakerCoordinateParamID(n, SpeakerCoordinateAxis::X))->load(),
                     state.getRawParameterValue(Params::getSpeakerCoordinateParamID(n, SpeakerCoordinateAxis::Y))->load(),
