@@ -19,6 +19,7 @@ other operating systems may follow in due course.
 
 - JUCE 8.0.6 (included as a submodule)
 - clap-juce-extensions (also included as a submodule)
+- Eigen (another submodule)
 - cmake 3.30
 - libcurl (Arch/Manjaro `sudo pacman -Syu curl`, Ubuntu
   `sudo apt-get install libcurl-dev` (or `libcurlpp-dev`))
@@ -99,9 +100,40 @@ of) connected switches, the connected time authority, and connected clients.
 
 ### ananasWFS
 
-A CLAP DAW plugin that embeds `ananas_server` transmits sixteen channels of 
-audio data, representing wave field synthesis (WFS) sound sources, and controls 
-a distributed WFS algorithm running on a network of embedded devices. See 
-associated repository [ananas-client](https://github.com/hatchjaw/ananas-client).
+![The WFS control plugin](images/wfs-control.png)
 
-(Full instructions to follow.)
+A CLAP DAW plugin that embeds `ananas_server`, and controls a distributed WFS
+algorithm. It transmits sixteen channels of audio data, representing wave field 
+synthesis (WFS) sound sources, and controls a distributed WFS algorithm running 
+on a network of embedded devices.
+See associated repository [ananas-client](https://github.com/hatchjaw/ananas-client).
+
+The plugin is best added to a channel in your DAW that is set up to receive from
+up to sixteen other channels.
+
+Use the *Number of Modules* dropdown menu to set the number of available DSP 
+modules; the user interface will be updated accordingly. Press the `m` key to
+toggle visibility of the module selectors. The speaker spacing numeric entry box
+should be used to set the distance between speaker drivers in your WFS setup.
+Numeric keys can be used to expand each dropdown list of modules' IP addresses.
+Assigning a module to a position in the array will trigger the transmission of
+the Cartesian coordinates of the two secondary sources associated with that 
+module. The positions of virtual/focused sources are represented by the numbered
+nodes; right-click on a node to reveal a menu that allows you to hide/show that
+node.
+
+### ananasHOA
+
+![The HOA control plugin](images/hoa-control.png)
+
+A CLAP DAW plugin that embeds `ananas_server`, and controls a distributed third
+order HOA algorithm. It expects to receive 16 channels of ACN-encoded audio and
+transmits these channels to the network to be received by a network of embedded
+devices. See associated repository [ananas-client](https://github.com/hatchjaw/ananas-client).
+
+Click on a speaker icon to reveal a modal window in which that speaker's
+Cartesian coordinates can be entered. Assign a module to a pair of loudspeakers
+using one of the dropdown menus to trigger the computation of the HOA decoder
+matrix and the transmission of two rows of that matrix to the selected module.
+As with the WFS plugin, numeric keys can be used to reveal the associated
+dropdown list of available modules.
